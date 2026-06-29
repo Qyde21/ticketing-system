@@ -21,6 +21,7 @@ export default async function OrganizerDashboard() {
           <li key={e.id} style={{ marginBottom: 8 }}>
             {e.title} — {e.status} — {new Date(e.start_at).toLocaleString()}
             {e.status === 'draft' && <PublishButton eventId={e.id} />}
+            {e.status === 'published' && <Link href={`/scan/${e.id}`}> Scan tickets</Link>}
           </li>
         ))}
       </ul>
