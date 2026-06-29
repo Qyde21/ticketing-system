@@ -9,7 +9,7 @@ const roleRules = [
   { prefix: '/scan', roles: ['organizer', 'admin'] },
 ];
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const rule = roleRules.find((r) => pathname.startsWith(r.prefix));
   if (!rule) return NextResponse.next();
