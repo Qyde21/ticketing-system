@@ -1,0 +1,29 @@
+import { sql } from '@/lib/db';
+import { getSession } from '@/lib/auth';
+import Link from 'next/link';
+import PublishButton from '../PublishButton';
+
+export default async function OrganizerDashboard() {
+  const session = await getSession();
+  const events = await sql`
+    SELECT id, title, slug, status, start_at
+    FROM events
+    WHERE organizer_id = ${session!.userId}
+    ORDER BY created_at DESC
+  `;
+
+  return (
+    <div style={{ maxWidth: 600, margin: '2rem auto' }}>
+      <h1>Your Events</h1>
+      <Link href="/organizer/events/new">+ Create new event</Link>
+      <ul>
+        {events.map((e: any) => (
+          <li key={e.id} style={{ marginBottom: 8 }}>
+            {e.title} — {e.status} — {new Date(e.start_at).toLocaleString()}
+            {e.status === 'draft' && <PublishButton eventId={e.id} />}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
