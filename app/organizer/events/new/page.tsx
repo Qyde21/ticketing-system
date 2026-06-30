@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import ImageUpload from './ImageUpload';
 
 interface TicketTypeInput {
   name: string;
@@ -11,6 +12,7 @@ interface TicketTypeInput {
 export default function NewEventPage() {
   const router = useRouter();
   const [title, setTitle] = useState('');
+  const [coverImageUrl, setCoverImageUrl] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
   const [venueName, setVenueName] = useState('');
@@ -49,6 +51,7 @@ export default function NewEventPage() {
         venueAddress,
         startAt,
         endAt: endAt || null,
+        coverImageUrl,
         ticketTypes: ticketTypes.map((tt) => ({
           name: tt.name,
           priceKes: Number(tt.priceKes),
@@ -71,6 +74,9 @@ export default function NewEventPage() {
       <h1>Create Event</h1>
 
       <input placeholder="Event title" value={title} onChange={(e) => setTitle(e.target.value)} required />
+
+      <ImageUpload onUploaded={setCoverImageUrl} />
+
       <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
       <input placeholder="Category (e.g. Concert, Festival)" value={category} onChange={(e) => setCategory(e.target.value)} />
       <input placeholder="Venue name" value={venueName} onChange={(e) => setVenueName(e.target.value)} required />

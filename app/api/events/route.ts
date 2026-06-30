@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { title, description, category, venueName, venueAddress, startAt, endAt, ticketTypes } = body;
+    const { title, description, category, venueName, venueAddress, startAt, endAt, coverImageUrl, ticketTypes } = body;
 
     if (!title || !venueName || !startAt || !Array.isArray(ticketTypes) || ticketTypes.length === 0) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -25,8 +25,8 @@ export async function POST(req: NextRequest) {
     }
 
     const [event] = await sql`
-      INSERT INTO events (organizer_id, title, slug, description, category, venue_name, venue_address, start_at, end_at, status)
-      VALUES (${session.userId}, ${title}, ${slug}, ${description ?? null}, ${category ?? null}, ${venueName}, ${venueAddress ?? null}, ${startAt}, ${endAt ?? null}, 'draft')
+      INSERT INTO events (organizer_id, title, slug, description, category, venue_name, venue_address, start_at, end_at, status, cover_image_url)
+      VALUES (${session.userId}, ${title}, ${slug}, ${description ?? null}, ${category ?? null}, ${venueName}, ${venueAddress ?? null}, ${startAt}, ${endAt ?? null}, 'draft', ${coverImageUrl ?? null})
       RETURNING id, slug
     `;
 
