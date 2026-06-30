@@ -3,6 +3,8 @@ import { getSession } from '@/lib/auth';
 import Link from 'next/link';
 import PublishButton from '../PublishButton';
 
+export const dynamic = 'force-dynamic';
+
 export default async function OrganizerDashboard() {
   const session = await getSession();
   const events = await sql`

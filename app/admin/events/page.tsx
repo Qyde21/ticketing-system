@@ -1,5 +1,7 @@
 import { sql } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminEventsPage() {
   const events = await sql`
     SELECT e.id, e.title, e.status, e.start_at, u.full_name AS organizer_name, u.email AS organizer_email

@@ -1,5 +1,8 @@
 import { sql } from '@/lib/db';
 import Link from 'next/link';
+import ApproveButton from './ApproveButton';
+
+export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboard() {
   const [stats] = await sql`
@@ -49,5 +52,3 @@ export default async function AdminDashboard() {
     </div>
   );
 }
-
-import ApproveButton from './ApproveButton';
