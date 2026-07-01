@@ -41,12 +41,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   await sql`UPDATE tickets SET status = 'cancelled' WHERE order_id = ${order.id}`;
 
   try {
+    console.log('Sending cancellation email to:', order.buyer_email);
     await sendCancellationEmail({
       toEmail: order.buyer_email,
       buyerName: order.buyer_name,
       eventTitle: order.event_title,
       reason: 'Your order has been refunded by the organizer.',
     });
+    console.log('Cancellation email sent successfully');
   } catch (emailErr) {
     console.error('Failed to send cancellation email:', emailErr);
   }
