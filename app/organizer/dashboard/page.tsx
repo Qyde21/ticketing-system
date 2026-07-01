@@ -12,6 +12,7 @@ export default async function OrganizerDashboard() {
     SELECT id, title, slug, status, start_at
     FROM events
     WHERE organizer_id = ${session!.userId}
+    AND status != 'cancelled'
     ORDER BY created_at DESC
   `;
 
