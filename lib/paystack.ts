@@ -1,4 +1,4 @@
-const PAYSTACK_BASE_URL = 'https://api.paystack.co';
+﻿const PAYSTACK_BASE_URL = 'https://api.paystack.co';
 
 export async function initializeTransaction(params: {
   email: string;
@@ -29,4 +29,21 @@ export async function initializeTransaction(params: {
     throw new Error(data.message || 'Failed to initialize Paystack transaction');
   }
   return data.data as { authorization_url: string; access_code: string; reference: string };
+}
+
+export async function refundTransaction(reference: string) {
+  const res = await fetch(`${PAYSTACK_BASE_URL}/refund`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ transaction: reference }),
+  });
+
+  const data = await res.json();
+  if (!data.status) {
+    throw new Error(data.message || 'Failed to process refund');
+  }
+  return data.data;
 }

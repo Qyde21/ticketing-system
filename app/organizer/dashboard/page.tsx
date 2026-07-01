@@ -1,7 +1,8 @@
-import { sql } from '@/lib/db';
+﻿import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import Link from 'next/link';
 import PublishButton from '../PublishButton';
+import CancelEventButton from '../CancelEventButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,9 +22,16 @@ export default async function OrganizerDashboard() {
       <ul>
         {events.map((e: any) => (
           <li key={e.id} style={{ marginBottom: 8 }}>
-            {e.title} — {e.status} — {new Date(e.start_at).toLocaleString()}
+            {e.title} - {e.status} - {new Date(e.start_at).toLocaleString()}
             {e.status === 'draft' && <PublishButton eventId={e.id} />}
             {e.status === 'published' && <Link href={`/scan/${e.id}`}> Scan tickets</Link>}
+            {(e.status === 'draft' || e.status === 'published') && (
+              <>
+                {' | '}
+                <Link href={`/organizer/events/${e.id}/orders`}>Orders</Link>
+                <CancelEventButton eventId={e.id} />
+              </>
+            )}
           </li>
         ))}
       </ul>
