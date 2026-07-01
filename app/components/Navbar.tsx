@@ -31,7 +31,12 @@ export default async function Navbar() {
             <>
               {dashboardHref && (
                 <Link href={dashboardHref} className="text-neutral-300 hover:text-white transition-colors">
-                  Dashboard
+                  {session.role === 'admin' ? 'Admin' : 'Dashboard'}
+                </Link>
+              )}
+              {session.role === 'admin' && (
+                <Link href="/admin/events" className="text-neutral-300 hover:text-white transition-colors">
+                  All Events
                 </Link>
               )}
               <NavbarClient userName={session.email} />
