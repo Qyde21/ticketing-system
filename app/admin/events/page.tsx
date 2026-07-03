@@ -36,6 +36,16 @@ export default async function AdminEventsPage() {
               <div style={{ fontSize: 13, color: '#666' }}>
                 {e.status} — {new Date(e.start_at).toLocaleDateString()}
               </div>
+              {e.status === 'published' && (
+                <div style={{ marginTop: 4, display: 'flex', gap: 8 }}>
+                  <Link href={`/scan/${e.id}`} style={{ fontSize: 12, color: '#6366f1' }}>
+                    Scan tickets
+                  </Link>
+                  <Link href={`/admin/scan/${e.id}`} style={{ fontSize: 12, color: '#6366f1' }}>
+                    Scan overview
+                  </Link>
+                </div>
+              )}
             </div>
 
             {/* Actions */}
