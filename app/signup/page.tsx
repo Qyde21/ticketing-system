@@ -6,7 +6,11 @@ export default function SignupPage() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('attendee');
+  const [role, setRole] = useState(
+  typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('role') === 'organizer'
+    ? 'organizer'
+    : 'attendee'
+);
   const [error, setError] = useState('');
   const router = useRouter();
 

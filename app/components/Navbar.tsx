@@ -51,6 +51,9 @@ export default async function Navbar() {
             </>
           ) : (
             <>
+              <Link href="/signup?role=organizer" className="text-neutral-300 hover:text-white transition-colors hidden sm:block">
+                Sell tickets
+              </Link>
               <Link href="/login" className="text-neutral-300 hover:text-white transition-colors">
                 Log in
               </Link>
