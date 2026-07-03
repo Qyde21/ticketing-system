@@ -32,6 +32,11 @@ export default async function Navbar() {
                   {session.role === 'admin' ? 'Admin' : 'Dashboard'}
                 </Link>
               )}
+              {session.role === 'organizer' && (
+                <Link href="/organizer/payouts" className="text-neutral-300 hover:text-white transition-colors">
+                  Payouts
+                </Link>
+              )}
               {session.role === 'admin' && (
                 <>
                   <Link href="/admin/organizers" className="text-neutral-300 hover:text-white transition-colors">
