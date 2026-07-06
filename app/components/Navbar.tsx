@@ -37,6 +37,11 @@ export default async function Navbar() {
                   Payouts
                 </Link>
               )}
+              {session.role === 'attendee' && (
+                <Link href="/inbox" className="text-neutral-300 hover:text-white transition-colors">
+                  Inbox
+                </Link>
+              )}
               {session.role === 'admin' && (
                 <>
                   <Link href="/admin/organizers" className="text-neutral-300 hover:text-white transition-colors">
