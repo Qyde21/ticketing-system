@@ -22,7 +22,7 @@ export default async function AttendeeDashboard() {
     FROM orders o
     JOIN events e ON e.id = o.event_id
     LEFT JOIN tickets t ON t.order_id = o.id
-    WHERE o.buyer_email = ${session.email}
+    WHERE LOWER(o.buyer_email) = LOWER(${session.email})
     AND o.payment_status = 'paid'
     GROUP BY o.id, e.id
     ORDER BY e.start_at ASC
