@@ -10,6 +10,8 @@ export default async function Navbar() {
       ? '/admin/dashboard'
       : session?.role === 'organizer'
       ? '/organizer/dashboard'
+      : session?.role === 'attendee'
+      ? '/attendee/dashboard'
       : null;
 
   return (
@@ -49,6 +51,9 @@ export default async function Navbar() {
                   </Link>
                   <Link href="/admin/events" className="text-neutral-300 hover:text-white transition-colors">
                     All Events
+                  </Link>
+                  <Link href="/admin/payouts" className="text-neutral-300 hover:text-white transition-colors">
+                    Payouts
                   </Link>
                 </>
               )}

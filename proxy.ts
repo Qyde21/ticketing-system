@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
@@ -7,6 +7,7 @@ const roleRules = [
   { prefix: '/admin', roles: ['admin'] },
   { prefix: '/organizer', roles: ['organizer', 'admin'] },
   { prefix: '/scan', roles: ['organizer', 'admin'] },
+  { prefix: '/attendee', roles: ['attendee', 'organizer', 'admin'] },
 ];
 
 export async function proxy(req: NextRequest) {
@@ -29,5 +30,5 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/organizer/:path*', '/scan/:path*'],
+  matcher: ['/admin/:path*', '/organizer/:path*', '/scan/:path*', '/attendee/:path*'],
 };
