@@ -26,7 +26,8 @@ export default async function PayoutsPage() {
 
   const totalGross = events.reduce((sum: number, e: any) => sum + Number(e.gross_revenue), 0);
   const totalRefunded = events.reduce((sum: number, e: any) => sum + Number(e.refunded_amount), 0);
-  const totalNet = totalGross - totalRefunded;
+  const totalFees = totalGross * 0.10;
+  const totalNet = totalGross - totalRefunded - totalFees;
 
   return (
     <div style={{ maxWidth: 700, margin: '2rem auto', padding: '0 1rem' }}>
@@ -36,14 +37,15 @@ export default async function PayoutsPage() {
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
         {[
           { label: 'Gross Revenue', value: totalGross, color: '#6366f1' },
+          { label: 'TicketHub Fee (10%)', value: totalFees, color: '#f59e0b' },
           { label: 'Refunded', value: totalRefunded, color: '#dc2626' },
-          { label: 'Net Revenue', value: totalNet, color: '#16a34a' },
+          { label: 'Your Net Payout', value: totalNet, color: '#16a34a' },
         ].map((stat) => (
-          <div key={stat.label} style={{ background: '#fff', borderRadius: 8, padding: '16px 24px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', flex: 1, minWidth: 160 }}>
-            <div style={{ fontSize: 24, fontWeight: 700, color: stat.color }}>
-              KES {stat.value.toLocaleString()}
+          <div key={stat.label} style={{ background: '#fff', borderRadius: 8, padding: '16px 20px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', flex: 1, minWidth: 140 }}>
+            <div style={{ fontSize: 22, fontWeight: 700, color: stat.color }}>
+              KES {stat.value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
             </div>
-            <div style={{ fontSize: 13, color: '#666', marginTop: 4 }}>{stat.label}</div>
+            <div style={{ fontSize: 12, color: '#666', marginTop: 4 }}>{stat.label}</div>
           </div>
         ))}
       </div>
@@ -54,7 +56,8 @@ export default async function PayoutsPage() {
         {events.map((e: any) => {
           const gross = Number(e.gross_revenue);
           const refunded = Number(e.refunded_amount);
-          const net = gross - refunded;
+          const fees = gross * 0.10;
+          const net = gross - refunded - fees;
           return (
             <li key={e.id} style={{ background: '#fff', borderRadius: 8, padding: 16, marginBottom: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
@@ -69,18 +72,24 @@ export default async function PayoutsPage() {
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontSize: 18, fontWeight: 700, color: '#16a34a' }}>
-                    KES {net.toLocaleString()}
+                    KES {net.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                   </div>
-                  <div style={{ fontSize: 12, color: '#666' }}>net</div>
+                  <div style={{ fontSize: 12, color: '#666' }}>your payout</div>
+                  <div style={{ fontSize: 12, color: '#f59e0b', marginTop: 2 }}>
+                    KES {fees.toLocaleString(undefined, { maximumFractionDigits: 0 })} TicketHub fee
+                  </div>
+                  <div style={{ fontSize: 12, color: '#6366f1', marginTop: 2 }}>
+                    KES {gross.toLocaleString(undefined, { maximumFractionDigits: 0 })} gross
+                  </div>
                   {refunded > 0 && (
-                    <div style={{ fontSize: 12, color: '#dc2626' }}>
-                      -{`KES ${refunded.toLocaleString()}`} refunded
+                    <div style={{ fontSize: 12, color: '#dc2626', marginTop: 2 }}>
+                      -KES {refunded.toLocaleString()} refunded
                     </div>
                   )}
                 </div>
               </div>
               <div style={{ marginTop: 8 }}>
-                <Link href={`/organizer/events/${e.id}/orders`} style={{ fontSize: 13, color: '#6366f1' }}>
+                <Link href={'/organizer/events/' + e.id + '/orders'} style={{ fontSize: 13, color: '#6366f1' }}>
                   View orders
                 </Link>
               </div>
@@ -91,7 +100,7 @@ export default async function PayoutsPage() {
       </ul>
 
       <p style={{ fontSize: 12, color: '#999', marginTop: 16 }}>
-        Note: Paystack deducts transaction fees before settlement. Net revenue shown here is before Paystack fees.
+        Note: Paystack also deducts payment processing fees (typically 1.5% + KES 100 per transaction) before settlement. Your actual payout may be slightly lower.
       </p>
     </div>
   );
