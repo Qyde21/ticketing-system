@@ -59,7 +59,7 @@ export default async function AdminPayoutsPage() {
             <li key={o.id} style={{ background: '#fff', borderRadius: 8, padding: 16, marginBottom: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
                 <div>
-                  <strong>{o.business_name}</strong>
+                  <strong style={{ color: "#111827" }}>{o.business_name}</strong>
                   {o.role === 'admin' && (
                     <span style={{ marginLeft: 8, fontSize: 11, background: '#fbbf24', color: '#000', padding: '2px 6px', borderRadius: 99, fontWeight: 700 }}>ADMIN</span>
                   )}
