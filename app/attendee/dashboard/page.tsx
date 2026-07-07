@@ -15,7 +15,9 @@ export default async function AttendeeDashboard() {
   }
 
   const lowerEmail = session.email.toLowerCase();
-  const orders = await sql`n    SELECT o.id, o.total_amount_kes, o.payment_status, o.created_at, o.quantity,
+
+  const orders = await sql`
+    SELECT o.id, o.total_amount_kes, o.payment_status, o.created_at, o.quantity,
            e.title, e.venue_name, e.start_at, e.slug, e.cover_image_url,
            e.latitude, e.longitude,
            array_agg(t.ticket_code) AS ticket_codes
@@ -35,7 +37,7 @@ export default async function AttendeeDashboard() {
 
       {orders.length === 0 && (
         <div style={{ background: '#fff', borderRadius: 8, padding: 32, textAlign: 'center', color: '#666', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
-          No tickets yet. <Link href='/' style={{ color: '#6366f1' }}>Browse events</Link>
+          No tickets yet. <Link href="/" style={{ color: '#6366f1' }}>Browse events</Link>
         </div>
       )}
 
@@ -51,6 +53,7 @@ export default async function AttendeeDashboard() {
               <p style={{ margin: '0 0 12px', color: '#6366f1', fontWeight: 600, fontSize: 14 }}>
                 {new Date(o.start_at).toLocaleString('en-KE', { dateStyle: 'full', timeStyle: 'short' })}
               </p>
+
               <div style={{ marginBottom: 12 }}>
                 <p style={{ margin: '0 0 6px', fontSize: 13, fontWeight: 600, color: '#111' }}>Your tickets:</p>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -61,13 +64,15 @@ export default async function AttendeeDashboard() {
                   ))}
                 </div>
               </div>
+
               {o.latitude && o.longitude ? (
-                <a href={mapsUrl(o.latitude, o.longitude)} target='_blank' rel='noopener noreferrer' style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#16a34a', textDecoration: 'none', fontWeight: 600 }}>
+                <a href={mapsUrl(o.latitude, o.longitude)} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#16a34a', textDecoration: 'none', fontWeight: 600 }}>
                   View on Google Maps
                 </a>
               ) : (
                 <p style={{ fontSize: 13, color: '#999', margin: 0 }}>📍 {o.venue_name}</p>
               )}
+
               <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #f3f4f6', display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#666' }}>
                 <span>KES {Number(o.total_amount_kes).toLocaleString()} · {o.quantity} ticket(s)</span>
                 <span>{new Date(o.created_at).toLocaleDateString()}</span>
@@ -79,6 +84,3 @@ export default async function AttendeeDashboard() {
     </div>
   );
 }
-
-
-
