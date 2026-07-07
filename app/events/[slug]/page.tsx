@@ -67,7 +67,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
             const remaining = tt.quantity_total - tt.quantity_sold;
             return (
               <div key={tt.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
-                <span>{tt.name} — KES {Number(tt.price_kes).toLocaleString()}</span>
+                <span style={{ color: "#111827" }}>{tt.name} — KES {Number(tt.price_kes).toLocaleString()}</span>
                 <span style={{ color: remaining === 0 ? '#dc2626' : remaining < 10 ? '#f59e0b' : '#16a34a', fontWeight: 600 }}>
                   {remaining === 0 ? 'Sold out' : remaining + ' left'}
                 </span>
