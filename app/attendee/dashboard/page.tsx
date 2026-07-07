@@ -14,6 +14,7 @@ export default async function AttendeeDashboard() {
     return <div style={{ margin: '2rem' }}>Please log in to view your dashboard.</div>;
   }
 
+  const lowerEmail = session.email.toLowerCase();
   const orders = await sql`n    SELECT o.id, o.total_amount_kes, o.payment_status, o.created_at, o.quantity,
            e.title, e.venue_name, e.start_at, e.slug, e.cover_image_url,
            e.latitude, e.longitude,
@@ -21,7 +22,7 @@ export default async function AttendeeDashboard() {
     FROM orders o
     JOIN events e ON e.id = o.event_id
     LEFT JOIN tickets t ON t.order_id = o.id
-    WHERE LOWER(o.buyer_email) = LOWER(${session.email})
+    WHERE o.buyer_email = ${lowerEmail}
     AND o.payment_status = 'paid'
     GROUP BY o.id, e.id
     ORDER BY e.start_at ASC
@@ -78,4 +79,6 @@ export default async function AttendeeDashboard() {
     </div>
   );
 }
+
+
 
