@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 
-export async function GET(req: NextRequest, { params }: { params: Promise<{ reference: string }> }) {
-  const { reference } = await params;
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
 
   const [order] = await sql`
-    SELECT id, payment_status FROM orders WHERE paystack_reference = ${reference}
+    SELECT id, payment_status FROM orders WHERE paystack_reference = ${id}
   `;
   if (!order) {
     return NextResponse.json({ error: 'Order not found' }, { status: 404 });
