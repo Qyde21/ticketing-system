@@ -18,6 +18,16 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     return NextResponse.json({ error: 'Only cancelled events can be deleted' }, { status: 400 });
   }
 
+  const orders = await sql`SELECT id FROM orders WHERE event_id = ${id}`;
+  for (const order of orders) {
+    await sql`DELETE FROM payment_events WHERE order_id = ${order.id}`;
+    await sql`DELETE FROM tickets WHERE order_id = ${order.id}`;
+  }
+
+  await sql`DELETE FROM messages WHERE event_id = ${id}`;
+  await sql`DELETE FROM orders WHERE event_id = ${id}`;
+  await sql`DELETE FROM event_staff WHERE event_id = ${id}`;
+  await sql`DELETE FROM ticket_types WHERE event_id = ${id}`;
   await sql`DELETE FROM events WHERE id = ${id}`;
 
   return NextResponse.json({ success: true });
