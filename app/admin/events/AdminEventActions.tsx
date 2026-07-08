@@ -28,6 +28,19 @@ export default function AdminEventActions({ eventId, status }: { eventId: string
     }
   }
 
+  async function handleDelete() {
+    if (!confirm('Permanently delete this cancelled event? This cannot be undone.')) return;
+    setLoading(true);
+    const res = await fetch('/api/events/' + eventId + '/delete', { method: 'DELETE' });
+    setLoading(false);
+    if (res.ok) {
+      router.refresh();
+    } else {
+      const data = await res.json();
+      alert(data.error || 'Failed to delete event');
+    }
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
       {status === 'draft' && (
@@ -41,7 +54,12 @@ export default function AdminEventActions({ eventId, status }: { eventId: string
         </button>
       )}
       {status === 'cancelled' && (
-        <span style={{ fontSize: 12, color: '#999' }}>Cancelled</span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <span style={{ fontSize: 12, color: '#999' }}>Cancelled</span>
+          <button onClick={handleDelete} disabled={loading} style={{ fontSize: 12, color: '#dc2626', whiteSpace: 'nowrap', background: 'none', border: '1px solid #dc2626', borderRadius: 4, padding: '2px 8px', cursor: 'pointer' }}>
+            {loading ? '...' : 'Delete'}
+          </button>
+        </div>
       )}
     </div>
   );
