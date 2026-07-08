@@ -8,20 +8,20 @@ export default function AdminEventActions({ eventId, status }: { eventId: string
 
   async function handlePublish() {
     setLoading(true);
-    const res = await fetch(`/api/events/${eventId}/publish`, { method: 'PATCH' });
+    const res = await fetch('/api/events/' + eventId + '/publish', { method: 'PATCH' });
     setLoading(false);
     if (res.ok) router.refresh();
     else alert('Failed to publish event');
   }
 
   async function handleCancel() {
-    if (!confirm('Cancel this event? All paid orders will be refunded automatically.')) return;
+    if (!confirm('Are you sure you want to cancel this event? All paid orders will be refunded automatically. This cannot be undone.')) return;
     setLoading(true);
-    const res = await fetch(`/api/events/${eventId}/cancel`, { method: 'PATCH' });
+    const res = await fetch('/api/events/' + eventId + '/cancel', { method: 'PATCH' });
     const data = await res.json();
     setLoading(false);
     if (res.ok) {
-      alert(`Event cancelled. ${data.refundedOrders} order(s) refunded.`);
+      alert('Event cancelled. ' + data.refundedOrders + ' order(s) refunded.');
       router.refresh();
     } else {
       alert('Failed to cancel event');
