@@ -1,6 +1,7 @@
 ﻿import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import Link from 'next/link';
+import ShareTicket from './ShareTicket';
 
 export const dynamic = 'force-dynamic';
 
@@ -48,19 +49,25 @@ export default async function AttendeeDashboard() {
               <img src={o.cover_image_url} alt={o.title} style={{ width: '100%', height: 160, objectFit: 'cover' }} />
             )}
             <div style={{ padding: 16 }}>
-              <h2 style={{ margin: '0 0 4px', fontSize: 18 }}>{o.title}</h2>
+              <h2 style={{ margin: '0 0 4px', fontSize: 18, color: '#111827' }}>{o.title}</h2>
               <p style={{ margin: '0 0 4px', color: '#666', fontSize: 14 }}>{o.venue_name}</p>
               <p style={{ margin: '0 0 12px', color: '#6366f1', fontWeight: 600, fontSize: 14 }}>
                 {new Date(o.start_at).toLocaleString('en-KE', { dateStyle: 'full', timeStyle: 'short' })}
               </p>
 
               <div style={{ marginBottom: 12 }}>
-                <p style={{ margin: '0 0 6px', fontSize: 13, fontWeight: 600, color: '#111' }}>Your tickets:</p>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  {o.ticket_codes.map((code: string) => (
-                    <Link key={code} href={'/tickets/' + code} style={{ background: '#f3f4f6', color: '#6366f1', padding: '4px 12px', borderRadius: 6, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>
-                      {code}
-                    </Link>
+                <p style={{ margin: '0 0 8px', fontSize: 13, fontWeight: 600, color: '#111' }}>
+                  Your tickets ({o.ticket_codes.length}):
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {o.ticket_codes.map((code: string, index: number) => (
+                    <div key={code} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#f9fafb', borderRadius: 6, padding: '8px 12px' }}>
+                      <span style={{ fontSize: 12, color: '#6b7280', minWidth: 20 }}>#{index + 1}</span>
+                      <Link href={'/tickets/' + code} style={{ color: '#6366f1', fontWeight: 600, fontSize: 13, textDecoration: 'none', flex: 1 }}>
+                        {code}
+                      </Link>
+                      <ShareTicket code={code} eventTitle={o.title} />
+                    </div>
                   ))}
                 </div>
               </div>
