@@ -34,7 +34,7 @@ export default function Footer() {
           <div>
             <h3 style={{ color: '#fff', fontSize: 14, fontWeight: 700, marginBottom: 12, marginTop: 0 }}>Support</h3>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <li><a href="mailto:support@tickethub.co.ke" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: 14 }}>Contact Us</a></li>
+              <li><a href="/contact" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: 14 }}>Contact Us</a></li>
               <li><a href="https://wa.me/254114525941" target="_blank" rel="noopener noreferrer" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: 14 }}>WhatsApp Support</a></li>
               <li><Link href="/faq" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: 14 }}>FAQ</Link></li>
               <li><Link href="/about" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: 14 }}>About Us</Link></li>
