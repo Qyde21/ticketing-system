@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useEffect, useRef, useState } from 'react';
 
 interface CheckinResult {
@@ -7,8 +7,9 @@ interface CheckinResult {
   holderName?: string;
 }
 
-export default function Scanner({ eventId }: { eventId: string }) {
+export default function Scanner({ eventId, initialCheckedIn, initialTotal }: { eventId: string; initialCheckedIn: number; initialTotal: number }) {
   const [result, setResult] = useState<CheckinResult | null>(null);
+  const [checkedIn, setCheckedIn] = useState(initialCheckedIn);
   const scannerRef = useRef<any>(null);
   const lastCodeRef = useRef<string | null>(null);
 
@@ -32,11 +33,12 @@ export default function Scanner({ eventId }: { eventId: string }) {
           });
           const data = await res.json();
 
-          setResult({
-            status: res.ok ? 'success' : 'error',
-            message: data.message || data.error,
-            holderName: data.holderName,
-          });
+          if (res.ok) {
+            setCheckedIn((prev) => prev + 1);
+            setResult({ status: 'success', message: data.message, holderName: data.holderName });
+          } else {
+            setResult({ status: 'error', message: data.error, holderName: data.holderName });
+          }
 
           setTimeout(() => { lastCodeRef.current = null; }, 3000);
         },
@@ -52,21 +54,22 @@ export default function Scanner({ eventId }: { eventId: string }) {
     };
   }, [eventId]);
 
+  const percent = initialTotal > 0 ? Math.round((checkedIn / initialTotal) * 100) : 0;
+
   return (
     <div>
+      {/* Live updated counter */}
+      <div style={{ background: '#f0fdf4', borderRadius: 8, padding: '10px 16px', marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <span style={{ fontSize: 14, color: '#166534', fontWeight: 600 }}>Live count: {checkedIn} / {initialTotal} checked in</span>
+        <span style={{ fontSize: 13, color: '#16a34a', fontWeight: 700 }}>{percent}%</span>
+      </div>
+
       <div id="reader" />
+
       {result && (
-        <div
-          style={{
-            marginTop: 16,
-            padding: 12,
-            borderRadius: 8,
-            background: result.status === 'success' ? '#d4edda' : '#f8d7da',
-            color: result.status === 'success' ? '#155724' : '#721c24',
-          }}
-        >
-          <strong>{result.status === 'success' ? '✓ Checked in' : `✕ ${result.message}`}</strong>
-          {result.holderName && <p>{result.holderName}</p>}
+        <div style={{ marginTop: 16, padding: 12, borderRadius: 8, background: result.status === 'success' ? '#d4edda' : '#f8d7da', color: result.status === 'success' ? '#155724' : '#721c24' }}>
+          <strong>{result.status === 'success' ? '✓ Checked in' : result.message}</strong>
+          {result.holderName && <p style={{ margin: '4px 0 0' }}>{result.holderName}</p>}
         </div>
       )}
     </div>
