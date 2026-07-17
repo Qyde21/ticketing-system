@@ -3,53 +3,90 @@ import { getSession } from '@/lib/auth';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
+// Force Next.js to skip build-time static generation and run this fresh on every request
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
-export default async function OrganizerScanOverviewPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id: eventId } = await params;
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
 
-  // 1. Retrieve the session using your project's native auth helper
+export default async function OrganizerScanOverviewPage({ params }: PageProps) {
+  // Await the routing parameters
+  const resolvedParams = await params;
+  const eventId = resolvedParams.id;
+
+  // Retrieve current user session
   const session = await getSession();
+  
+  // Debug logging on Vercel Server console
+  console.log("--- SCAN OVERVIEW ROUTE ACCESS ---");
+  console.log("Event ID:", eventId);
+  console.log("Session details:", session);
+
   if (!session || !session.userId) {
     redirect('/login');
   }
 
   const userId = session.userId;
-  const userRole = session.role; // Assuming session contains 'role' (e.g. 'admin' or 'organizer')
+  const userRole = session.role;
 
-  // 2. Verify that this event exists. If user is an organizer, they must own it.
-  let event;
-  if (userRole === 'admin') {
-    const [adminEvent] = await sql`
-      SELECT id, title, venue_name, start_at, organizer_id
-      FROM events
-      WHERE id = ${eventId}
-    `;
-    event = adminEvent;
-  } else {
-    const [organizerEvent] = await sql`
-      SELECT id, title, venue_name, start_at, organizer_id
-      FROM events
-      WHERE id = ${eventId} AND organizer_id = ${userId}
-    `;
-    event = organizerEvent;
+  let event = null;
+
+  try {
+    if (userRole === 'admin') {
+      // Admin bypass: load event regardless of status or who owns it
+      const results = await sql`
+        SELECT id, title, venue_name, start_at, organizer_id
+        FROM events
+        WHERE id = ${eventId}
+      `;
+      if (results && results.length > 0) {
+        event = results[0];
+      }
+    } else {
+      // Organizer security check: must be the owner
+      const results = await sql`
+        SELECT id, title, venue_name, start_at, organizer_id
+        FROM events
+        WHERE id = ${eventId} AND organizer_id = ${userId}
+      `;
+      if (results && results.length > 0) {
+        event = results[0];
+      }
+    }
+  } catch (error) {
+    console.error("Database query failed:", error);
   }
 
+  // If still no event found, print descriptive error with role info
   if (!event) {
     return (
-      <div style={{ margin: '2rem', textAlign: 'center', color: '#dc2626' }}>
-        <strong>Access Denied:</strong> Event not found or you do not have permission to view this scan overview.
+      <div style={{ maxWidth: 600, margin: '4rem auto', padding: '2rem', background: '#fef2f2', border: '1px solid #fee2e2', borderRadius: 8, fontFamily: 'sans-serif' }}>
+        <h1 style={{ color: '#991b1b', fontSize: 20, marginTop: 0 }}>Access Denied (Debug Panel)</h1>
+        <p style={{ color: '#7f1d1d', fontSize: 14 }}>
+          We couldn't load the event or authorize this request.
+        </p>
+        <div style={{ background: '#fff', padding: 12, borderRadius: 6, marginTop: 12, fontSize: 13, border: '1px solid #f3f4f6' }}>
+          <strong>Your Active Session:</strong>
+          <pre style={{ margin: '8px 0 0 0', color: '#4b5563' }}>{JSON.stringify({ userId, userRole, eventId }, null, 2)}</pre>
+        </div>
+        <div style={{ marginTop: 20 }}>
+          <Link href="/admin/events" style={{ color: '#6366f1', textDecoration: 'none', fontWeight: 600, fontSize: 14 }}>
+            ← Return to Event List
+          </Link>
+        </div>
       </div>
     );
   }
 
-  // 3. Fetch the ticket data
+  // Fetch ticket data
   const tickets = await sql`
     SELECT t.ticket_code, t.status, t.holder_name, t.checked_in_at,
            tt.name AS ticket_type
     FROM tickets t
-    JOIN ticket_types tt ON tt.id = t.ticket_type_id
-    JOIN orders o ON o.id = t.order_id
+    LEFT JOIN ticket_types tt ON tt.id = t.ticket_type_id
+    LEFT JOIN orders o ON o.id = t.order_id
     WHERE o.event_id = ${eventId}
     ORDER BY t.checked_in_at DESC NULLS LAST
   `;
@@ -60,12 +97,12 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
   const cancelled = tickets.filter((t: any) => t.status === 'cancelled').length;
 
   return (
-    <div style={{ maxWidth: 700, margin: '2rem auto', padding: '0 1rem' }}>
-      <Link href={userRole === 'admin' ? `/admin/organizers/${event.organizer_id}/events` : `/organizer/dashboard`} style={{ fontSize: 13, color: '#6366f1' }}>
+    <div style={{ maxWidth: 700, margin: '2rem auto', padding: '0 1rem', fontFamily: 'sans-serif' }}>
+      <Link href={userRole === 'admin' ? `/admin/organizers/${event.organizer_id}/events` : `/organizer/dashboard`} style={{ fontSize: 13, color: '#6366f1', textDecoration: 'none' }}>
         ← Back to {userRole === 'admin' ? 'events list' : 'dashboard'}
       </Link>
-      <h1 style={{ marginTop: 8 }}>{event.title}</h1>
-      <p style={{ color: '#666' }}>{event.venue_name} — {new Date(event.start_at).toLocaleString()}</p>
+      <h1 style={{ marginTop: 8, color: '#111827' }}>{event.title}</h1>
+      <p style={{ color: '#666' }}>{event.venue_name || 'No Venue Specified'} — {event.start_at ? new Date(event.start_at).toLocaleString() : 'No Date'}</p>
 
       {/* Stats Grid */}
       <div style={{ display: 'flex', gap: 12, marginTop: 16, flexWrap: 'wrap' }}>
@@ -92,18 +129,18 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
 
       <Link
         href={`/scan/${eventId}`}
-        style={{ display: 'inline-block', marginTop: 12, background: '#6366f1', color: '#fff', padding: '8px 20px', borderRadius: 8, fontWeight: 600, fontSize: 14 }}
+        style={{ display: 'inline-block', marginTop: 12, background: '#6366f1', color: '#fff', padding: '8px 20px', borderRadius: 8, fontWeight: 600, fontSize: 14, textDecoration: 'none' }}
       >
         Open Scanner
       </Link>
 
-      <h2 style={{ marginTop: 24 }}>Tickets</h2>
+      <h2 style={{ marginTop: 24, color: '#111827' }}>Tickets</h2>
       <ul style={{ listStyle: 'none', padding: 0 }}>
         {tickets.map((t: any) => (
           <li key={t.ticket_code} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', marginBottom: 8, background: '#fff', borderRadius: 8, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
             <div>
-              <strong style={{ fontSize: 13 }}>{t.ticket_code}</strong>
-              <div style={{ fontSize: 12, color: '#666' }}>{t.holder_name} — {t.ticket_type}</div>
+              <strong style={{ fontSize: 13, color: '#111827' }}>{t.ticket_code}</strong>
+              <div style={{ fontSize: 12, color: '#666' }}>{t.holder_name || 'Anonymous'} — {t.ticket_type || 'Standard'}</div>
               {t.checked_in_at && (
                 <div style={{ fontSize: 12, color: '#16a34a' }}>
                   Checked in: {new Date(t.checked_in_at).toLocaleTimeString()}

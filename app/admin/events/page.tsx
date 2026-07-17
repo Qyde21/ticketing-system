@@ -37,7 +37,7 @@ export default async function AdminEventsPage() {
             <div style={{ flex: 1 }}>
               <strong style={{ color: '#111827' }}>{e.title}</strong>
               <div style={{ fontSize: 13, color: '#666', marginTop: 2 }}>
-                {e.status} — {new Date(e.start_at).toLocaleDateString()}
+                Status: <span style={{ fontWeight: 600, color: '#111827' }}>{e.status}</span> — {new Date(e.start_at).toLocaleDateString()}
               </div>
               <div style={{ fontSize: 11, color: '#999', marginTop: 1 }}>
                 Organizer: {e.organizer_name} ({e.organizer_email})
@@ -45,12 +45,10 @@ export default async function AdminEventsPage() {
 
               {/* Action Links mimicking the working Organizer structure */}
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 6, fontSize: 13 }}>
-                {e.status === 'published' && (
-                  <>
-                    <Link href={`/scan/${e.id}`} style={{ color: '#6366f1', textDecoration: 'none' }}>Scan tickets</Link>
-                    <Link href={`/organizer/events/${e.id}/scan-overview`} style={{ color: '#6366f1', textDecoration: 'none' }}>Scan overview</Link>
-                  </>
-                )}
+                {/* ADMIN OVERRIDE: Show scanner links to admins even if status is draft/pending to prevent 404s */}
+                <Link href={`/scan/${e.id}`} style={{ color: '#6366f1', textDecoration: 'none' }}>Scan tickets</Link>
+                <Link href={`/organizer/events/${e.id}/scan-overview`} style={{ color: '#6366f1', textDecoration: 'none' }}>Scan overview</Link>
+                
                 <Link href={`/organizer/events/${e.id}/orders`} style={{ color: '#6366f1', textDecoration: 'none' }}>Orders</Link>
                 <Link href={`/organizer/events/${e.id}/messages`} style={{ color: '#6366f1', textDecoration: 'none' }}>Messages</Link>
                 <Link href={`/organizer/events/${e.id}/edit`} style={{ color: '#6366f1', textDecoration: 'none' }}>Edit cover</Link>
