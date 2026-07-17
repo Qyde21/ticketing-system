@@ -40,12 +40,12 @@ export default async function HomePage() {
 
       <div style={{ maxWidth: 1000, margin: '0 auto', padding: '0 1rem' }}>
         <h2 style={{ marginBottom: 16 }}>Events Coming Up</h2>
-        <EventList events={remainingUpcoming} />
+        <EventList events={remainingUpcoming} showFilters={true} />
 
         {pastEvents.length > 0 && (
           <div style={{ marginTop: 40 }}>
             <h2 style={{ marginBottom: 16, color: '#666' }}>Past Events</h2>
-            <EventList events={pastEvents} />
+            <EventList events={pastEvents} showFilters={false} />
           </div>
         )}
       </div>
