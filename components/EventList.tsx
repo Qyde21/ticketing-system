@@ -2,7 +2,7 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 
-export default function EventList({ events }: { events: any[] }) {
+export default function EventList({ events, showFilters = true }: { events: any[], showFilters?: boolean }) {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
 
@@ -16,30 +16,31 @@ export default function EventList({ events }: { events: any[] }) {
 
   return (
     <div>
-      {/* Search and Categories */}
-      <div style={{ marginBottom: 24 }}>
-        <input 
-          type="text" 
-          placeholder="Search events, venues..." 
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          style={{ width: "100%", padding: "12px", borderRadius: 8, background: "#1f1f1f", border: "1px solid #333", color: "#fff", marginBottom: 16 }} 
-        />
-        <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 8 }}>
-          {["All", "Concert", "Festival", "Comedy", "Autoshow", "Sports", "Other"].map(cat => (
-            <button 
-              key={cat} 
-              onClick={() => setCategory(cat)}
-              style={{ 
-                padding: "8px 16px", borderRadius: 20, cursor: 'pointer',
-                background: category === cat ? '#fff' : '#1f1f1f', 
-                color: category === cat ? '#000' : '#fff',
-                border: "1px solid #333", whiteSpace: "nowrap" 
-              }}
-            >{cat}</button>
-          ))}
+      {showFilters && (
+        <div style={{ marginBottom: 24 }}>
+          <input 
+            type="text" 
+            placeholder="Search events, venues..." 
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{ width: "100%", padding: "12px", borderRadius: 8, background: "#1f1f1f", border: "1px solid #333", color: "#fff", marginBottom: 16 }} 
+          />
+          <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 8 }}>
+            {["All", "Concert", "Festival", "Comedy", "Autoshow", "Sports", "Other"].map(cat => (
+              <button 
+                key={cat} 
+                onClick={() => setCategory(cat)}
+                style={{ 
+                  padding: "8px 16px", borderRadius: 20, cursor: 'pointer',
+                  background: category === cat ? '#fff' : '#1f1f1f', 
+                  color: category === cat ? '#000' : '#fff',
+                  border: "1px solid #333", whiteSpace: "nowrap" 
+                }}
+              >{cat}</button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>
         {filteredEvents.map((e: any) => {
