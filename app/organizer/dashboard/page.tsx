@@ -37,7 +37,12 @@ export default async function OrganizerDashboard() {
               </div>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 6, fontSize: 13 }}>
                 {e.status === 'draft' && <PublishButton eventId={e.id} />}
-                {e.status === 'published' && <Link href={`/scan/${e.id}`}>Scan tickets</Link>}
+                {e.status === 'published' && (
+                  <>
+                    <Link href={`/scan/${e.id}`}>Scan tickets</Link>
+                    <Link href={`/organizer/events/${e.id}/scan-overview`}>Scan overview</Link>
+                  </>
+                )}
                 <Link href={`/organizer/events/${e.id}/orders`}>Orders</Link>
                 <Link href={`/organizer/events/${e.id}/messages`}>Messages</Link>
                 <Link href={`/organizer/events/${e.id}/edit`}>Edit cover</Link>

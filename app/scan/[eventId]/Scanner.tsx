@@ -1,5 +1,6 @@
 ﻿'use client';
 import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface CheckinResult {
   status: 'success' | 'error';
@@ -8,10 +9,68 @@ interface CheckinResult {
 }
 
 export default function Scanner({ eventId, initialCheckedIn, initialTotal }: { eventId: string; initialCheckedIn: number; initialTotal: number }) {
+  const router = useRouter();
   const [result, setResult] = useState<CheckinResult | null>(null);
   const [checkedIn, setCheckedIn] = useState(initialCheckedIn);
   const scannerRef = useRef<any>(null);
   const lastCodeRef = useRef<string | null>(null);
+
+  // Sync state if server numbers change
+  useEffect(() => {
+    setCheckedIn(initialCheckedIn);
+  }, [initialCheckedIn]);
+
+  // Helper function to extract any UTC/ISO time in the message and convert it to EAT (Local Time)
+  const formatTimeInMessage = (msg: string) => {
+    if (!msg) return msg;
+    
+    // Regex to detect an ISO timestamp (e.g., 2026-07-17T05:45:38.000Z)
+    const isoRegex = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z/;
+    const match = msg.match(isoRegex);
+    
+    if (match) {
+      try {
+        const utcDate = new Date(match[0]);
+        const localTimeStr = utcDate.toLocaleTimeString(undefined, {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true,
+        });
+        return msg.replace(match[0], localTimeStr);
+      } catch (e) {
+        return msg;
+      }
+    }
+    
+    // Fallback: If it's a raw timestamp string like "05:45:38", construct a date to convert UTC to Local
+    const rawTimeRegex = /(\d{1,2}):(\d{2}):(\d{2})/;
+    const rawMatch = msg.match(rawTimeRegex);
+    if (rawMatch && !msg.toLowerCase().includes('am') && !msg.toLowerCase().includes('pm')) {
+      try {
+        const now = new Date();
+        const utcDate = new Date(Date.UTC(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
+          parseInt(rawMatch[1]),
+          parseInt(rawMatch[2]),
+          parseInt(rawMatch[3])
+        ));
+        const localTimeStr = utcDate.toLocaleTimeString(undefined, {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true,
+        });
+        return msg.replace(rawMatch[0], localTimeStr);
+      } catch (e) {
+        return msg;
+      }
+    }
+
+    return msg;
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -36,8 +95,13 @@ export default function Scanner({ eventId, initialCheckedIn, initialTotal }: { e
           if (res.ok) {
             setCheckedIn((prev) => prev + 1);
             setResult({ status: 'success', message: data.message, holderName: data.holderName });
+            
+            // Instantly refresh Server Component cards at the top of the screen!
+            router.refresh();
           } else {
-            setResult({ status: 'error', message: data.error, holderName: data.holderName });
+            // Check if error message contains a UTC timestamp and localize it
+            const localizedMessage = formatTimeInMessage(data.error || data.message);
+            setResult({ status: 'error', message: localizedMessage, holderName: data.holderName });
           }
 
           setTimeout(() => { lastCodeRef.current = null; }, 3000);
@@ -52,7 +116,7 @@ export default function Scanner({ eventId, initialCheckedIn, initialTotal }: { e
       mounted = false;
       scannerRef.current?.clear().catch(() => {});
     };
-  }, [eventId]);
+  }, [eventId, router]);
 
   const percent = initialTotal > 0 ? Math.round((checkedIn / initialTotal) * 100) : 0;
 

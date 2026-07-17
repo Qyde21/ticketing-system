@@ -1,20 +1,37 @@
 ﻿import { sql } from '@/lib/db';
+import { getSession } from '@/lib/auth';
 import Link from 'next/link';
-import LocalTime from '@/components/LocalTime';
+import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
-export default async function AdminScanPage({ params }: { params: Promise<{ eventId: string }> }) {
-  const { eventId } = await params;
+export default async function OrganizerScanOverviewPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id: eventId } = await params;
+  
+  // 1. Retrieve the session using your project's native auth helper
+  const session = await getSession();
+  if (!session || !session.userId) {
+    redirect('/login');
+  }
 
+  const userId = session.userId;
+
+  // 2. Verify that this event belongs to the logged-in organizer
   const [event] = await sql`
-    SELECT id, title, venue_name, start_at FROM events WHERE id = ${eventId}
+    SELECT id, title, venue_name, start_at, organizer_id 
+    FROM events 
+    WHERE id = ${eventId} AND organizer_id = ${userId}
   `;
 
   if (!event) {
-    return <div style={{ margin: '2rem' }}>Event not found.</div>;
+    return (
+      <div style={{ margin: '2rem', textAlign: 'center', color: '#dc2626' }}>
+        <strong>Access Denied:</strong> Event not found or you do not have permission to view this scan overview.
+      </div>
+    );
   }
 
+  // 3. Fetch the ticket data
   const tickets = await sql`
     SELECT t.ticket_code, t.status, t.holder_name, t.checked_in_at,
            tt.name AS ticket_type
@@ -32,10 +49,13 @@ export default async function AdminScanPage({ params }: { params: Promise<{ even
 
   return (
     <div style={{ maxWidth: 700, margin: '2rem auto', padding: '0 1rem' }}>
-      <Link href="/admin/events" style={{ fontSize: 13, color: '#6366f1' }}>Back to events</Link>
+      <Link href={`/organizer/dashboard`} style={{ fontSize: 13, color: '#6366f1' }}>
+        ← Back to dashboard
+      </Link>
       <h1 style={{ marginTop: 8 }}>{event.title}</h1>
       <p style={{ color: '#666' }}>{event.venue_name} — {new Date(event.start_at).toLocaleString()}</p>
 
+      {/* Stats Grid */}
       <div style={{ display: 'flex', gap: 12, marginTop: 16, flexWrap: 'wrap' }}>
         {[
           { label: 'Total tickets', value: total, color: '#6366f1' },
@@ -50,6 +70,7 @@ export default async function AdminScanPage({ params }: { params: Promise<{ even
         ))}
       </div>
 
+      {/* Progress Bar */}
       <div style={{ marginTop: 16, background: '#e5e7eb', borderRadius: 99, height: 8, overflow: 'hidden' }}>
         <div style={{ width: `${total > 0 ? (checkedIn / total) * 100 : 0}%`, background: '#16a34a', height: '100%', transition: 'width 0.3s' }} />
       </div>
@@ -72,8 +93,8 @@ export default async function AdminScanPage({ params }: { params: Promise<{ even
               <strong style={{ fontSize: 13 }}>{t.ticket_code}</strong>
               <div style={{ fontSize: 12, color: '#666' }}>{t.holder_name} — {t.ticket_type}</div>
               {t.checked_in_at && (
-                <div style={{ fontSize: 12, color: '#16a34a', fontWeight: 500 }}>
-                  Checked in: <LocalTime isoString={t.checked_in_at.toISOString()} />
+                <div style={{ fontSize: 12, color: '#16a34a' }}>
+                  Checked in: {new Date(t.checked_in_at).toLocaleTimeString()}
                 </div>
               )}
             </div>
