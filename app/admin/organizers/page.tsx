@@ -21,22 +21,22 @@ export default async function AdminOrganizersPage() {
   return (
     <div style={{ maxWidth: 800, margin: '2rem auto', padding: '0 1rem' }}>
       <h1>Organizer Management</h1>
-      <p style={{ color: '#666' }}>{organizers.length} organizer(s) total</p>
+      <p style={{ color: '#4b5563' }}>{organizers.length} organizer(s) total</p>
 
       <ul style={{ listStyle: 'none', padding: 0, marginTop: 16 }}>
         {organizers.map((o: any) => (
           <li key={o.id} style={{ background: '#fff', borderRadius: 8, padding: 16, marginBottom: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
               <div>
-                <strong>{o.business_name}</strong>
-                <div style={{ fontSize: 13, color: '#666', marginTop: 2 }}>
+                <strong style={{ color: '#111827', fontSize: 16 }}>{o.business_name}</strong>
+                <div style={{ fontSize: 14, color: '#374151', marginTop: 4 }}>
                   {o.full_name} — {o.email}
                 </div>
-                <div style={{ fontSize: 13, color: '#666', marginTop: 2 }}>
-                  Joined: {new Date(o.created_at).toLocaleDateString()} |
+                <div style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>
+                  Joined: {new Date(o.created_at).toLocaleDateString()} | 
                   Events: {o.total_events} ({o.published_events} published)
                 </div>
-                <div style={{ marginTop: 4 }}>
+                <div style={{ marginTop: 8 }}>
                   <span style={{
                     display: 'inline-block',
                     padding: '2px 8px',
@@ -50,8 +50,8 @@ export default async function AdminOrganizersPage() {
                   </span>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                <Link href={`/admin/organizers/${o.id}/events`} style={{ fontSize: 13 }}>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                <Link href={`/admin/organizers/${o.id}/events`} style={{ fontSize: 14, color: '#4f46e5', fontWeight: 600 }}>
                   View events
                 </Link>
                 <OrganizerActions
