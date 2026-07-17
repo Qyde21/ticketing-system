@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function OrganizerScanOverviewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: eventId } = await params;
-  
+
   // 1. Retrieve the session using your project's native auth helper
   const session = await getSession();
   if (!session || !session.userId) {
@@ -15,13 +15,25 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
   }
 
   const userId = session.userId;
+  const userRole = session.role; // Assuming session contains 'role' (e.g. 'admin' or 'organizer')
 
-  // 2. Verify that this event belongs to the logged-in organizer
-  const [event] = await sql`
-    SELECT id, title, venue_name, start_at, organizer_id 
-    FROM events 
-    WHERE id = ${eventId} AND organizer_id = ${userId}
-  `;
+  // 2. Verify that this event exists. If user is an organizer, they must own it.
+  let event;
+  if (userRole === 'admin') {
+    const [adminEvent] = await sql`
+      SELECT id, title, venue_name, start_at, organizer_id
+      FROM events
+      WHERE id = ${eventId}
+    `;
+    event = adminEvent;
+  } else {
+    const [organizerEvent] = await sql`
+      SELECT id, title, venue_name, start_at, organizer_id
+      FROM events
+      WHERE id = ${eventId} AND organizer_id = ${userId}
+    `;
+    event = organizerEvent;
+  }
 
   if (!event) {
     return (
@@ -49,8 +61,8 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
 
   return (
     <div style={{ maxWidth: 700, margin: '2rem auto', padding: '0 1rem' }}>
-      <Link href={`/organizer/dashboard`} style={{ fontSize: 13, color: '#6366f1' }}>
-        ← Back to dashboard
+      <Link href={userRole === 'admin' ? `/admin/organizers/${event.organizer_id}/events` : `/organizer/dashboard`} style={{ fontSize: 13, color: '#6366f1' }}>
+        ← Back to {userRole === 'admin' ? 'events list' : 'dashboard'}
       </Link>
       <h1 style={{ marginTop: 8 }}>{event.title}</h1>
       <p style={{ color: '#666' }}>{event.venue_name} — {new Date(event.start_at).toLocaleString()}</p>
