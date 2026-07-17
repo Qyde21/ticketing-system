@@ -5,6 +5,7 @@ import Link from 'next/link';
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
+  // Query for ALL upcoming events to populate the list and identify the next one
   const events = await sql`
     SELECT 
       e.id, e.title, e.slug, e.venue_name, e.start_at, e.cover_image_url, e.category,
@@ -12,11 +13,12 @@ export default async function HomePage() {
       COALESCE(SUM(tt.quantity_sold), 0) as total_sold
     FROM events e
     LEFT JOIN ticket_types tt ON tt.event_id = e.id
-    WHERE e.status = 'published'
+    WHERE e.status = 'published' AND e.start_at >= NOW()
     GROUP BY e.id
     ORDER BY e.start_at ASC
   `;
 
+  // The very first item is now guaranteed to be the next upcoming event
   const featuredEvent = events[0];
   const remainingEvents = events.slice(1);
 
@@ -36,7 +38,6 @@ export default async function HomePage() {
 
       <div style={{ maxWidth: 1000, margin: '0 auto', padding: '0 1rem' }}>
         <h2 style={{ marginBottom: 16 }}>Events Coming Up</h2>
-        {/* EventList contains the Search Bar and Category Buttons */}
         <EventList events={remainingEvents} />
       </div>
     </div>
