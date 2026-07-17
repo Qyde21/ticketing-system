@@ -1,5 +1,6 @@
 ﻿import { sql } from '@/lib/db';
 import EventList from '@/components/EventList';
+import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,11 +17,27 @@ export default async function HomePage() {
     ORDER BY e.start_at ASC
   `;
 
+  // Grab the first event as the featured banner
+  const featuredEvent = events[0];
+  const remainingEvents = events.slice(1);
+
   return (
-    <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh', color: '#fff', padding: '2rem 1rem' }}>
-      <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+    <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh', color: '#fff', paddingBottom: '2rem' }}>
+      {/* Featured Banner */}
+      {featuredEvent && (
+        <div style={{ position: 'relative', width: '100%', height: 400, marginBottom: 24 }}>
+          <img src={featuredEvent.cover_image_url} alt={featuredEvent.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <div style={{ position: 'absolute', bottom: 0, padding: 20, background: 'linear-gradient(transparent, rgba(0,0,0,0.9))', width: '100%' }}>
+            <h1 style={{ margin: 0, fontSize: 24 }}>{featuredEvent.title}</h1>
+            <p style={{ margin: '4px 0', opacity: 0.8 }}>{featuredEvent.venue_name}</p>
+            <Link href={`/events/${featuredEvent.slug}`} style={{ color: '#fff', textDecoration: 'underline' }}>View Event</Link>
+          </div>
+        </div>
+      )}
+
+      <div style={{ maxWidth: 1000, margin: '0 auto', padding: '0 1rem' }}>
         <h2 style={{ marginBottom: 16 }}>Events Coming Up</h2>
-        <EventList events={events} />
+        <EventList events={remainingEvents} />
       </div>
     </div>
   );
