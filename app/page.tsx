@@ -17,7 +17,6 @@ export default async function HomePage() {
     ORDER BY e.start_at ASC
   `;
 
-  // Grab the first event as the featured banner
   const featuredEvent = events[0];
   const remainingEvents = events.slice(1);
 
@@ -37,6 +36,7 @@ export default async function HomePage() {
 
       <div style={{ maxWidth: 1000, margin: '0 auto', padding: '0 1rem' }}>
         <h2 style={{ marginBottom: 16 }}>Events Coming Up</h2>
+        {/* EventList contains the Search Bar and Category Buttons */}
         <EventList events={remainingEvents} />
       </div>
     </div>
