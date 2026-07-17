@@ -43,11 +43,12 @@ export default function EventList({ events }: { events: any[] }) {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>
         {filteredEvents.map((e: any) => (
           <div key={e.id} style={{ background: '#121212', borderRadius: 12, overflow: 'hidden', border: '1px solid #1f1f1f' }}>
-             {/* ... Keep your existing card UI here ... */}
-             <div style={{ padding: 16 }}>
-                <h3 style={{ fontSize: 16, fontWeight: 700 }}>{e.title}</h3>
-                <Link href={`/events/${e.slug}`} style={{ color: '#10b981' }}>View Details</Link>
-             </div>
+            {e.cover_image_url && <img src={e.cover_image_url} alt={e.title} style={{ width: '100%', height: 180, objectFit: 'cover' }} />}
+            <div style={{ padding: 16 }}>
+              <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 4px 0' }}>{e.title}</h3>
+              <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 12 }}>{e.venue_name || 'Venue TBA'}</p>
+              <Link href={`/events/${e.slug}`} style={{ color: '#10b981', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>View Details</Link>
+            </div>
           </div>
         ))}
       </div>
