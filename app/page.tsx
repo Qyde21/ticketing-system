@@ -26,6 +26,15 @@ export default async function HomePage() {
     <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh', color: '#fff', fontFamily: 'sans-serif', padding: '2rem 1rem' }}>
       <div style={{ maxWidth: 1000, margin: '0 auto' }}>
         
+        {/* Search and Categories */}
+        <div style={{ marginBottom: 24 }}>
+          <input type="text" placeholder="Search events, venues..." style={{ width: "100%", padding: "12px", borderRadius: 8, background: "#1f1f1f", border: "1px solid #333", color: "#fff", marginBottom: 16 }} />
+          <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 8 }}>
+            {["All", "Concert", "Festival", "Comedy", "Autoshow", "Sports", "Other"].map(cat => (
+              <button key={cat} style={{ padding: "8px 16px", borderRadius: 20, background: "#1f1f1f", border: "1px solid #333", color: "#fff", whiteSpace: "nowrap" }}>{cat}</button>
+            ))}
+          </div>
+        </div>
         <h2 style={{ fontSize: 14, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9ca3af', marginBottom: 16 }}>
           Events Coming Up
         </h2>
