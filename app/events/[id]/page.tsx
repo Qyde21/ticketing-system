@@ -18,7 +18,10 @@ export default async function EventDetailPage({ params }: PageProps) {
 
   const imageUrl = event.cover_image_url || event.imageUrl;
   const eventDate = event.start_at || event.date;
+  const endDate = event.end_at;
   const location = event.venue_name || event.location || "Venue TBD";
+
+  const isEnded = (endDate && new Date(endDate) < new Date()) || event.status === 'completed' || event.status === 'cancelled';
 
   return (
     <main className="max-w-4xl mx-auto px-4 py-8">
@@ -34,8 +37,15 @@ export default async function EventDetailPage({ params }: PageProps) {
         </div>
       )}
 
-      <h1 className="text-3xl font-bold mb-4">{event.title}</h1>
-      
+      <div className="flex justify-between items-start mb-4">
+        <h1 className="text-3xl font-bold">{event.title}</h1>
+        {isEnded && (
+          <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-semibold capitalize">
+            {event.status === 'cancelled' ? 'Event Cancelled' : 'Event Ended'}
+          </span>
+        )}
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 bg-gray-50 p-6 rounded-lg">
         <div>
           <p className="text-gray-600 font-medium">Date & Time</p>
@@ -57,12 +67,18 @@ export default async function EventDetailPage({ params }: PageProps) {
       </div>
 
       <div>
-        <Link 
-          href={`/checkout/${event.id}`} 
-          className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
-        >
-          Get Tickets
-        </Link>
+        {isEnded ? (
+          <div className="bg-gray-100 text-gray-500 px-6 py-3 rounded-lg font-semibold inline-block text-center cursor-not-allowed">
+            {event.status === 'cancelled' ? 'Ticket Sales Closed (Event Cancelled)' : 'Ticket Sales Closed (Event Ended)'}
+          </div>
+        ) : (
+          <Link
+            href={`/checkout/${event.id}`}
+            className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+          >
+            Get Tickets
+          </Link>
+        )}
       </div>
     </main>
   );
