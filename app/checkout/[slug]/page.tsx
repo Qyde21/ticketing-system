@@ -36,23 +36,23 @@ export default async function CheckoutPage({ params }: PageProps) {
   return (
     <main className="max-w-3xl mx-auto px-4 py-8 text-white">
       <div className="mb-6">
-        <Link href={`/events/${event.slug || event.id}`} className="text-blue-400 hover:underline">
+        <Link href={`/events/${event.slug || event.id}`} className="text-indigo-400 hover:underline">
           &larr; Back to Event
         </Link>
       </div>
 
-      <h1 className="text-3xl font-bold mb-2 text-white">Get Tickets</h1>
-      <p className="text-gray-300 mb-8">Secure your spot for <span className="font-semibold text-white">{event.title}</span></p>
+      <h1 className="text-3xl font-extrabold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Get Tickets</h1>
+      <p className="text-gray-300 mb-8">Secure your spot for <span className="font-semibold text-indigo-300">{event.title}</span></p>
 
-      <div className="bg-gray-900 p-6 rounded-lg mb-8 border border-gray-800 text-white">
+      <div className="bg-gray-900 p-6 rounded-lg mb-8 border border-gray-800 text-white shadow-xl">
         <div className="flex justify-between items-center mb-4 pb-4 border-b border-gray-800">
           <div>
-            <h2 className="font-semibold text-lg text-white">{event.title}</h2>
-            <p className="text-sm text-gray-300">{eventDate ? new Date(eventDate).toLocaleString() : "TBD"}</p>
+            <h2 className="font-bold text-xl text-indigo-300">{event.title}</h2>
+            <p className="text-sm text-gray-300 mt-1">{eventDate ? new Date(eventDate).toLocaleString() : "TBD"}</p>
             <p className="text-sm text-gray-300">{location}</p>
           </div>
           {imageUrl && (
-            <img src={imageUrl} alt={event.title} className="w-20 h-20 object-cover rounded-md" />
+            <img src={imageUrl} alt={event.title} className="w-20 h-20 object-cover rounded-md border border-gray-700" />
           )}
         </div>
       </div>
