@@ -24,7 +24,7 @@ export default async function EventDetailPage({ params }: PageProps) {
   const isEnded = (endDate && new Date(endDate) < new Date()) || event.status === 'completed' || event.status === 'cancelled';
 
   return (
-    <main className="max-w-4xl mx-auto px-4 py-8">
+    <main className="max-w-4xl mx-auto px-4 py-8 text-gray-900">
       <div className="mb-6">
         <Link href="/" className="text-blue-600 hover:underline">
           &larr; Back to Home
@@ -46,18 +46,18 @@ export default async function EventDetailPage({ params }: PageProps) {
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 bg-gray-50 p-6 rounded-lg">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 bg-gray-100 p-6 rounded-lg border border-gray-200">
         <div>
-          <p className="text-gray-600 font-medium">Date & Time</p>
-          <p className="text-lg">{eventDate ? new Date(eventDate).toLocaleString() : "TBD"}</p>
+          <p className="text-gray-500 font-medium text-sm">Date & Time</p>
+          <p className="text-lg font-semibold text-gray-900">{eventDate ? new Date(eventDate).toLocaleString() : "TBD"}</p>
         </div>
         <div>
-          <p className="text-gray-600 font-medium">Location</p>
-          <p className="text-lg">{location}</p>
+          <p className="text-gray-500 font-medium text-sm">Location</p>
+          <p className="text-lg font-semibold text-gray-900">{location}</p>
         </div>
         <div>
-          <p className="text-gray-600 font-medium">Category</p>
-          <p className="text-lg capitalize">{event.category || "General"}</p>
+          <p className="text-gray-500 font-medium text-sm">Category</p>
+          <p className="text-lg font-semibold text-gray-900 capitalize">{event.category || "General"}</p>
         </div>
       </div>
 
