@@ -18,23 +18,24 @@ export default function EventList({ events, showFilters = true }: { events: any[
     <div>
       {showFilters && (
         <div style={{ marginBottom: 24 }}>
-          <input 
-            type="text" 
-            placeholder="Search events, venues..." 
+          <input
+            type="text"
+            placeholder="Search events, venues..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            style={{ width: "100%", padding: "12px", borderRadius: 8, background: "#1f1f1f", border: "1px solid #333", color: "#fff", marginBottom: 16 }} 
+            style={{ width: "100%", padding: "12px", borderRadius: 8, background: "#1f1f1f", border: "1px solid #333", color: "#fff", marginBottom: 16 }}
           />
           <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 8 }}>
             {["All", "Concert", "Festival", "Comedy", "Autoshow", "Sports", "Other"].map(cat => (
-              <button 
-                key={cat} 
+              <button
+                key={cat}
                 onClick={() => setCategory(cat)}
-                style={{ 
+                style={{
                   padding: "8px 16px", borderRadius: 20, cursor: 'pointer',
-                  background: category === cat ? '#fff' : '#1f1f1f', 
-                  color: category === cat ? '#000' : '#fff',
-                  border: "1px solid #333", whiteSpace: "nowrap" 
+                  background: category === cat ? 'linear-gradient(to right, #4f46e5, #06b6d4)' : '#1f1f1f',
+                  color: category === cat ? '#fff' : '#ccc',
+                  border: category === cat ? 'none' : '1px solid #333', whiteSpace: "nowrap",
+                  fontWeight: category === cat ? 700 : 500
                 }}
               >{cat}</button>
             ))}
@@ -51,18 +52,19 @@ export default function EventList({ events, showFilters = true }: { events: any[
           const isSoldOut = capacity > 0 && sold >= capacity;
 
           return (
-            <div key={e.id} style={{ position: 'relative', background: '#121212', borderRadius: 12, overflow: 'hidden', border: '1px solid #1f1f1f' }}>
-              <div style={{ position: 'relative', height: 180 }}>
+            <div key={e.id} style={{ position: 'relative', background: '#121212', borderRadius: 12, overflow: 'hidden', border: '1px solid #1f1f1f', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.5)' }}>
+              <div style={{ position: 'relative', height: 180, background: '#1a1a1a' }}>
                 {e.cover_image_url && <img src={e.cover_image_url} alt={e.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
                 {isPastEvent ? (
-                  <div style={{ position: 'absolute', top: 10, right: 10, background: '#4b5563', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>ENDED</div>
+                  <div style={{ position: 'absolute', top: 10, right: 10, background: '#4b5563', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>ENDED</div>
                 ) : isSoldOut ? (
-                  <div style={{ position: 'absolute', top: 10, right: 10, background: '#dc2626', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>SOLD OUT</div>
+                  <div style={{ position: 'absolute', top: 10, right: 10, background: '#dc2626', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>SOLD OUT</div>
                 ) : null}
               </div>
               <div style={{ padding: 16 }}>
-                <h3 style={{ fontSize: 16, fontWeight: 700 }}>{e.title}</h3>
-                <Link href={`/events/${e.slug}`} style={{ color: '#10b981', fontSize: 13 }}>View Details</Link>
+                <h3 className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400" style={{ fontSize: 17, marginBottom: 8 }}>{e.title}</h3>
+                <p className="text-gray-400 text-xs mb-3">{e.venue_name || 'Venue TBD'}</p>
+                <Link href={`/events/${e.slug}`} className="text-indigo-400 hover:text-cyan-400 font-semibold" style={{ fontSize: 13, textDecoration: 'none' }}>View Details &rarr;</Link>
               </div>
             </div>
           );
