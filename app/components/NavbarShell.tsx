@@ -1,7 +1,7 @@
-﻿'use client';
+'use client';
+
+import React from 'react';
 import Link from 'next/link';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 interface NavbarShellProps {
   userEmail?: string;
@@ -10,68 +10,71 @@ interface NavbarShellProps {
 }
 
 export default function NavbarShell({ userEmail, userRole, dashboardHref }: NavbarShellProps) {
-  const [open, setOpen] = useState(false);
-  const router = useRouter();
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.href = '/';
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-  async function handleLogout() {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    router.push('/');
-    router.refresh();
-    setOpen(false);
-  }
-
-  const loggedInLinks = (
-    <>
-      <Link href="/" onClick={() => setOpen(false)} className="text-neutral-300 hover:text-white transition-colors">Events</Link>
-      {dashboardHref && <Link href={dashboardHref} onClick={() => setOpen(false)} className="text-neutral-300 hover:text-white transition-colors">{userRole === 'admin' ? 'Admin' : 'Dashboard'}</Link>}
-      {userRole === 'organizer' && <Link href="/organizer/payouts" onClick={() => setOpen(false)} className="text-neutral-300 hover:text-white transition-colors">Payouts</Link>}
-      {userRole === 'attendee' && <Link href="/inbox" onClick={() => setOpen(false)} className="text-neutral-300 hover:text-white transition-colors">Inbox</Link>}
-      {userRole === 'admin' && <>
-        <Link href="/admin/organizers" onClick={() => setOpen(false)} className="text-neutral-300 hover:text-white transition-colors">Organizers</Link>
-        <Link href="/admin/events" onClick={() => setOpen(false)} className="text-neutral-300 hover:text-white transition-colors">All Events</Link>
-        <Link href="/admin/payouts" onClick={() => setOpen(false)} className="text-neutral-300 hover:text-white transition-colors">Payouts</Link>
-      </>}
-      <button onClick={handleLogout} className="text-neutral-300 hover:text-white transition-colors text-sm text-left">Log out</button>
-    </>
-  );
-
-  const loggedOutLinks = (
-    <>
-      <Link href="/" onClick={() => setOpen(false)} className="text-neutral-300 hover:text-white transition-colors">Events</Link>
-      <Link href="/pricing" onClick={() => setOpen(false)} className="text-neutral-300 hover:text-white transition-colors">Pricing</Link>
-      <Link href="/signup?role=organizer" onClick={() => setOpen(false)} className="text-neutral-300 hover:text-white transition-colors">Sell tickets</Link>
-      <Link href="/login" onClick={() => setOpen(false)} className="text-neutral-300 hover:text-white transition-colors">Log in</Link>
-      <Link href="/signup" onClick={() => setOpen(false)} className="bg-amber-400 text-black px-4 py-1.5 rounded-full font-semibold hover:bg-amber-300 transition-colors text-center">Sign up</Link>
-    </>
-  );
+  const isLoggedIn = !!userEmail;
 
   return (
-    <nav className="bg-neutral-900 text-white sticky top-0 z-50 border-b border-neutral-800">
-      <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 font-extrabold text-xl tracking-tight">
-          <span className="bg-amber-400 text-black px-2 py-0.5 rounded text-sm font-black">TH</span>
-          TicketHub
+    <header className="bg-slate-900 border-b border-slate-800 text-white sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+        {/* Left Side: Green TH Badge + TicketHub Logo */}
+        <Link href="/" className="flex items-center gap-2 text-lg font-bold hover:opacity-90 transition">
+          <span className="bg-emerald-600 text-white px-2 py-0.5 rounded text-sm font-black">
+            TH
+          </span>
+          <span className="text-white font-extrabold text-xl">TicketHub</span>
         </Link>
 
-        {/* Desktop links */}
-        <div className="hidden sm:flex items-center gap-6 text-sm font-medium">
-          {userEmail ? loggedInLinks : loggedOutLinks}
-        </div>
+        {/* Right Side: Navigation Links */}
+        <nav className="flex items-center gap-6 text-sm font-medium">
+          {isLoggedIn ? (
+            <>
+              <Link href="/" className="text-slate-300 hover:text-white transition">Events</Link>
+              
+              {userRole === 'admin' && (
+                <>
+                  <Link href="/admin/dashboard" className="text-slate-300 hover:text-white transition">Admin</Link>
+                  <Link href="/admin/organizers" className="text-slate-300 hover:text-white transition">Organizers</Link>
+                  <Link href="/admin/events" className="text-slate-300 hover:text-white transition">All Events</Link>
+                  <Link href="/admin/payouts" className="text-slate-300 hover:text-white transition">Payouts</Link>
+                </>
+              )}
 
-        {/* Mobile hamburger button */}
-        <button onClick={() => setOpen(!open)} className="sm:hidden flex flex-col gap-1.5 p-2" aria-label="Menu">
-          <span className={`block w-6 h-0.5 bg-white transition-all duration-200 ${open ? 'rotate-45 translate-y-2' : ''}`} />
-          <span className={`block w-6 h-0.5 bg-white transition-all duration-200 ${open ? 'opacity-0' : ''}`} />
-          <span className={`block w-6 h-0.5 bg-white transition-all duration-200 ${open ? '-rotate-45 -translate-y-2' : ''}`} />
-        </button>
+              {userRole === 'organizer' && (
+                <>
+                  <Link href="/organizer/dashboard" className="text-slate-300 hover:text-white transition">Dashboard</Link>
+                  <Link href="/organizer/payouts" className="text-slate-300 hover:text-white transition">Payouts</Link>
+                </>
+              )}
+
+              {userRole === 'attendee' && (
+                <Link href="/attendee/dashboard" className="text-slate-300 hover:text-white transition">My Tickets</Link>
+              )}
+
+              <button 
+                onClick={handleLogout} 
+                className="text-slate-300 hover:text-white transition cursor-pointer"
+              >
+                Log out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/login" className="text-slate-300 hover:text-white transition">Sign in</Link>
+              <Link href="/signup" className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-md font-medium transition">
+                Get Started
+              </Link>
+            </>
+          )}
+        </nav>
       </div>
-
-      {/* Mobile dropdown menu */}
-      {open && (
-        <div className="sm:hidden bg-neutral-800 border-t border-neutral-700 px-6 py-4 flex flex-col gap-4 text-sm font-medium">
-          {userEmail ? loggedInLinks : loggedOutLinks}
-        </div>
-      )}
-    </nav>
+    </header>
   );
 }

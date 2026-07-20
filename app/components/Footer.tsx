@@ -1,68 +1,65 @@
-﻿import Link from 'next/link';
+import React from 'react';
+import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer style={{ background: '#111827', color: '#9ca3af', marginTop: 64 }}>
-      <div style={{ maxWidth: '72rem', margin: '0 auto', padding: '48px 24px 24px' }}>
-
-        {/* Top section */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 32, marginBottom: 40 }}>
-
-          {/* Brand */}
+    <footer className="bg-slate-900 border-t border-slate-800 text-slate-300 py-12">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
+          {/* Brand Info */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-              <span style={{ background: '#fbbf24', color: '#000', padding: '2px 8px', borderRadius: 4, fontSize: 13, fontWeight: 900 }}>TH</span>
-              <span style={{ color: '#fff', fontWeight: 800, fontSize: 18 }}>TicketHub</span>
-            </div>
-            <p style={{ fontSize: 14, lineHeight: 1.6, margin: 0 }}>
-              Kenya&apos;s premier event ticketing platform. Buy and sell tickets for concerts, festivals, and live events.
+            <Link href="/" className="flex items-center gap-2 mb-3 text-lg font-bold">
+              <span className="bg-emerald-600 text-white px-2 py-0.5 rounded text-sm font-black">
+                TH
+              </span>
+              <span className="text-white font-extrabold text-xl">TicketHub</span>
+            </Link>
+            <p className="text-sm text-slate-400 leading-relaxed">
+              Kenya's premier event ticketing platform. Buy and sell tickets for concerts, festivals, and live events.
             </p>
           </div>
 
-          {/* Quick links */}
+          {/* Quick Links */}
           <div>
-            <h3 style={{ color: '#fff', fontSize: 14, fontWeight: 700, marginBottom: 12, marginTop: 0 }}>Quick Links</h3>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <li><Link href="/" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: 14 }}>Browse Events</Link></li>
-              <li><Link href="/signup?role=organizer" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: 14 }}>Sell Tickets</Link></li>
-              <li><Link href="/login" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: 14 }}>Log In</Link></li>
-              <li><Link href="/signup" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: 14 }}>Sign Up</Link></li>
+            <h4 className="text-white text-sm font-bold mb-4">Quick Links</h4>
+            <ul className="space-y-2 text-sm text-slate-400">
+              <li><Link href="/" className="hover:text-white transition">Browse Events</Link></li>
+              <li><Link href="/pricing" className="hover:text-white transition">Sell Tickets</Link></li>
+              <li><Link href="/login" className="hover:text-white transition">Log In</Link></li>
+              <li><Link href="/signup" className="hover:text-white transition">Sign Up</Link></li>
             </ul>
           </div>
 
           {/* Support */}
           <div>
-            <h3 style={{ color: '#fff', fontSize: 14, fontWeight: 700, marginBottom: 12, marginTop: 0 }}>Support</h3>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <li><a href="/contact" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: 14 }}>Contact Us</a></li>
-              <li><a href="https://wa.me/254114525941" target="_blank" rel="noopener noreferrer" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: 14 }}>WhatsApp Support</a></li>
-              <li><Link href="/faq" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: 14 }}>FAQ</Link></li>
-              <li><Link href="/about" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: 14 }}>About Us</Link></li>
+            <h4 className="text-white text-sm font-bold mb-4">Support</h4>
+            <ul className="space-y-2 text-sm text-slate-400">
+              <li><Link href="/contact" className="hover:text-white transition">Contact Us</Link></li>
+              <li><a href="https://wa.me/254114525941" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">WhatsApp Support</a></li>
+              <li><Link href="/faq" className="hover:text-white transition">FAQ</Link></li>
+              <li><Link href="/about" className="hover:text-white transition">About Us</Link></li>
             </ul>
           </div>
 
-          {/* Social */}
+          {/* Follow Us */}
           <div>
-            <h3 style={{ color: '#fff', fontSize: 14, fontWeight: 700, marginBottom: 12, marginTop: 0 }}>Follow Us</h3>
-            <div style={{ display: 'flex', gap: 12 }}>
-              <a href="https://twitter.com/tickethubke" target="_blank" rel="noopener noreferrer" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: 14 }}>Twitter/X</a>
-              <a href="https://instagram.com/tickethubke" target="_blank" rel="noopener noreferrer" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: 14 }}>Instagram</a>
-              <a href="https://facebook.com/tickethubke" target="_blank" rel="noopener noreferrer" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: 14 }}>Facebook</a>
+            <h4 className="text-white text-sm font-bold mb-4">Follow Us</h4>
+            <div className="flex gap-4 text-sm text-slate-400">
+              <a href="https://twitter.com/tickethubke" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Twitter/X</a>
+              <a href="https://instagram.com/tickethubke" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Instagram</a>
+              <a href="https://facebook.com/tickethubke" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Facebook</a>
             </div>
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div style={{ borderTop: '1px solid #1f2937', paddingTop: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-          <p style={{ margin: 0, fontSize: 13 }}>
-            &copy; {new Date().getFullYear()} TicketHub Kenya. All rights reserved.
-          </p>
-          <div style={{ display: 'flex', gap: 16, fontSize: 13 }}>
-            <Link href="/privacy" style={{ color: '#9ca3af', textDecoration: 'none' }}>Privacy Policy</Link>
-            <Link href="/terms" style={{ color: '#9ca3af', textDecoration: 'none' }}>Terms of Service</Link>
+        {/* Bottom Bar */}
+        <div className="border-t border-slate-800 pt-6 flex flex-col md:flex-row justify-between items-center text-xs text-slate-400 gap-4">
+          <p>&copy; {new Date().getFullYear()} TicketHub Kenya. All rights reserved.</p>
+          <div className="flex gap-6">
+            <Link href="/privacy" className="hover:text-white transition">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-white transition">Terms of Service</Link>
           </div>
         </div>
-
       </div>
     </footer>
   );
