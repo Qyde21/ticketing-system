@@ -51,7 +51,7 @@ export default function NavbarShell({ userEmail, userRole }: NavbarShellProps) {
           <span className="text-white font-extrabold text-lg sm:text-xl tracking-tight">TicketHub</span>
         </Link>
 
-        {/* Desktop Navigation Links (md screens and up) */}
+        {/* Desktop Navigation Links */}
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
           {isLoggedIn ? (
             <>
@@ -87,7 +87,8 @@ export default function NavbarShell({ userEmail, userRole }: NavbarShellProps) {
           ) : (
             <>
               <Link href="/" className={getLinkClass('/')}>Events</Link>
-              <Link href="/#events" className={getLinkClass('/#events')}>Get Ticket</Link>
+              <Link href="/signup?role=attendee" className={getLinkClass('/signup?role=attendee')}>Get Ticket</Link>
+              <Link href="/signup?role=organizer" className={getLinkClass('/signup?role=organizer')}>Sell Tickets</Link>
               <Link href="/login" className={getLinkClass('/login')}>Sign in</Link>
               <Link href="/signup" className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-md font-medium transition shadow-sm">
                 Get Started
@@ -96,7 +97,7 @@ export default function NavbarShell({ userEmail, userRole }: NavbarShellProps) {
           )}
         </nav>
 
-        {/* Mobile Hamburger Button (Always visible on mobile) */}
+        {/* Mobile Hamburger Button */}
         <div className="flex md:hidden items-center">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -117,7 +118,7 @@ export default function NavbarShell({ userEmail, userRole }: NavbarShellProps) {
 
       </div>
 
-      {/* Mobile Drawer Menu (Logged In & Logged Out) */}
+      {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-slate-800 bg-slate-900 px-4 pt-2 pb-6 space-y-2">
           {isLoggedIn ? (
@@ -154,7 +155,8 @@ export default function NavbarShell({ userEmail, userRole }: NavbarShellProps) {
           ) : (
             <>
               <Link href="/" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/')}>Events</Link>
-              <Link href="/#events" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/#events')}>Get Ticket</Link>
+              <Link href="/signup?role=attendee" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/signup?role=attendee')}>Get Ticket</Link>
+              <Link href="/signup?role=organizer" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/signup?role=organizer')}>Sell Tickets</Link>
               <Link href="/login" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/login')}>Sign in</Link>
               <Link href="/signup" onClick={() => setMobileMenuOpen(false)} className="block w-full text-center bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-md font-medium transition mt-2">
                 Get Started
