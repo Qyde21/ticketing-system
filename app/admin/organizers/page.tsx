@@ -11,15 +11,27 @@ export default async function AdminOrganizersPage() {
     return <div className="max-w-6xl mx-auto px-4 py-8 text-white">Unauthorized access.</div>;
   }
 
-  // Fetch organizers with event counts using valid SQL syntax
-  const organizers = await sql`
-    SELECT u.id, u.name, u.email, u.created_at, u.status,
-    (SELECT COUNT(*) FROM events e WHERE e.organizer_id = u.id) as total_events,
-    (SELECT COUNT(*) FROM events e WHERE e.organizer_id = u.id AND e.status = 'published') as published_events
-    FROM users u
-    WHERE u.role = 'organizer' OR u.id IN (SELECT DISTINCT organizer_id FROM events WHERE organizer_id IS NOT NULL)
-    ORDER BY u.created_at DESC
-  `;
+  let organizers: any[] = [];
+  try {
+    // Fetch organizers with event counts safely
+    organizers = await sql`
+      SELECT u.id, u.name, u.email, u.created_at,
+      (SELECT COUNT(*) FROM events e WHERE e.organizer_id = u.id) as total_events,
+      (SELECT COUNT(*) FROM events e WHERE e.organizer_id = u.id AND e.status = 'published') as published_events
+      FROM users u
+      ORDER BY u.created_at DESC
+    `;
+  } catch (err) {
+    // Fallback if users table structure varies
+    organizers = await sql`
+      SELECT DISTINCT u.id, u.name, u.email, u.created_at,
+      (SELECT COUNT(*) FROM events e WHERE e.organizer_id = u.id) as total_events,
+      (SELECT COUNT(*) FROM events e WHERE e.organizer_id = u.id AND e.status = 'published') as published_events
+      FROM users u
+      JOIN events ev ON ev.organizer_id = u.id
+      ORDER BY u.created_at DESC
+    `;
+  }
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-8 text-white">
@@ -50,15 +62,13 @@ export default async function AdminOrganizersPage() {
                     <h2 className="text-xl font-bold text-white">{org.name || 'Unnamed Organizer'}</h2>
                     <p className="text-indigo-300 text-sm">{org.email}</p>
                   </div>
-                  <span className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider ${
-                    org.status === 'suspended' ? 'bg-red-950 text-red-400 border border-red-800' : 'bg-green-950 text-green-400 border border-green-800'
-                  }`}>
-                    {org.status || 'Active'}
+                  <span className="px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider bg-green-950 text-green-400 border border-green-800">
+                    Active
                   </span>
                 </div>
 
                 <div className="flex items-center gap-4 text-xs text-gray-400 pt-2 border-t border-gray-800/80">
-                  <span>Joined: <strong className="text-gray-300">{new Date(org.created_at).toLocaleDateString()}</strong></span>
+                  <span>Joined: <strong className="text-gray-300">{org.created_at ? new Date(org.created_at).toLocaleDateString() : 'N/A'}</strong></span>
                   <span>•</span>
                   <span>Events: <strong className="text-cyan-400">{org.total_events}</strong> ({org.published_events} published)</span>
                 </div>
@@ -66,17 +76,17 @@ export default async function AdminOrganizersPage() {
 
               <div className="flex items-center justify-between pt-4 border-t border-gray-800">
                 <Link
-                  href={`/admin/events?organizer_id=${org.id}`}
+                  href={`/admin/events`}
                   className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-4 py-2 rounded-xl text-xs transition shadow-lg shadow-indigo-950/50"
                 >
                   View Events
                 </Link>
 
                 <button 
-                  onClick={() => alert('Organizer status toggling can be connected to your backend action.')}
-                  className="bg-gray-800 hover:bg-gray-700 text-red-400 hover:text-red-300 border border-gray-700 font-semibold px-3 py-2 rounded-xl text-xs transition"
+                  onClick={() => alert('Organizer action triggered.')}
+                  className="bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 font-semibold px-3 py-2 rounded-xl text-xs transition"
                 >
-                  {org.status === 'suspended' ? 'Activate Account' : 'Suspend Organizer'}
+                  Manage
                 </button>
               </div>
             </div>
