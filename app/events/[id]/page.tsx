@@ -48,10 +48,20 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
     notFound();
   }
 
-  // Strict check: An event is only ended if its status is 'ended' or its date is strictly in the past
+  // Parse event date and log for debugging
   const now = new Date();
   const eventDate = event.date ? new Date(event.date) : null;
-  const isEnded = event.status === 'ended' || (eventDate !== null && !isNaN(eventDate.getTime()) && eventDate < now);
+
+  console.log("EVENT DEBUG:", {
+    title: event.title,
+    rawDate: event.date,
+    parsedDate: eventDate?.toISOString(),
+    now: now.toISOString(),
+    status: event.status
+  });
+
+  // Strict check: Only consider ended if status is explicitly 'ended' or date is strictly in the past
+  const isEnded = event.status === 'ended' || (eventDate !== null && !isNaN(eventDate.getTime()) && eventDate.getTime() < now.getTime());
 
   return (
     <main className="max-w-4xl mx-auto px-4 py-8 text-white">
