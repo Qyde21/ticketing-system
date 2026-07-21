@@ -48,9 +48,10 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
     notFound();
   }
 
-  // Determine if event has ended based on event date or status tag
+  // Strict check: An event is only ended if its status is 'ended' or its date is strictly in the past
+  const now = new Date();
   const eventDate = event.date ? new Date(event.date) : null;
-  const isEnded = event.status === 'ended' || (eventDate && eventDate < new Date());
+  const isEnded = event.status === 'ended' || (eventDate !== null && !isNaN(eventDate.getTime()) && eventDate < now);
 
   return (
     <main className="max-w-4xl mx-auto px-4 py-8 text-white">
