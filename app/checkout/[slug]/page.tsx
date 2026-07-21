@@ -26,6 +26,8 @@ export default function CheckoutClientPage({ params }: { params: Promise<{ slug:
 
 function CheckoutForm({ ticketId }: { ticketId: string }) {
   const router = useRouter();
+  const [ticket, setTicket] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -34,6 +36,18 @@ function CheckoutForm({ ticketId }: { ticketId: string }) {
     buyerEmail: '',
     buyerPhone: ''
   });
+
+  useEffect(() => {
+    async function loadTicket() {
+      try {
+        const res = await fetch(`/api/events`); // or lookup via an endpoint if available
+        setLoading(false);
+      } catch (err) {
+        setLoading(false);
+      }
+    }
+    loadTicket();
+  }, [ticketId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,7 +59,6 @@ function CheckoutForm({ ticketId }: { ticketId: string }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          eventId: ticketId,
           ticketTypeId: ticketId,
           quantity: 1,
           buyerName: formData.buyerName,
@@ -59,11 +72,7 @@ function CheckoutForm({ ticketId }: { ticketId: string }) {
         throw new Error(data.error || 'Failed to create order');
       }
 
-      if (data.authorizationUrl) {
-        window.location.href = data.authorizationUrl;
-      } else {
-        router.push(`/tickets/${data.orderId || ticketId}`);
-      }
+      router.push(`/tickets/${data.orderId || ticketId}`);
     } catch (err: any) {
       setError(err.message);
       setSubmitting(false);
