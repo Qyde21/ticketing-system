@@ -13,21 +13,34 @@ export default async function EventOrdersPage({ params }: { params: Promise<{ id
     return <div className="max-w-6xl mx-auto px-4 py-8 text-white">Unauthorized.</div>;
   }
 
-  // Fetch event details
-  const events = await sql`SELECT title FROM events WHERE id = ${id}`;
+  const decodedId = decodeURIComponent(id);
+
+  // Fetch event by UUID or fallback to slug/title match
+  const events = await sql`
+    SELECT id, title FROM events 
+    WHERE id::text = ${decodedId} OR slug = ${decodedId.toLowerCase()} OR title ILIKE ${decodedId}
+  `;
 
   if (events.length === 0) {
-    return <div className="max-w-6xl mx-auto px-4 py-8 text-white">Event not found with ID: {id}</div>;
+    return (
+      <main className="max-w-6xl mx-auto px-4 py-8 text-white">
+        <h1 className="text-2xl font-bold text-red-400 mb-2">Event Not Found</h1>
+        <p className="text-gray-400">Could not find an event matching: <code className="bg-gray-800 px-2 py-1 rounded text-cyan-300">{decodedId}</code></p>
+        <div className="mt-6">
+          <Link href="/admin/events" className="text-indigo-400 hover:underline">&larr; Back to Events Dashboard</Link>
+        </div>
+      </main>
+    );
   }
 
   const event = events[0];
 
-  // Fetch orders for this event
+  // Fetch orders using the correct event UUID
   const orders = await sql`
     SELECT o.id, o.quantity, o.total_amount_kes, o.payment_status, o.created_at, o.buyer_name, o.buyer_email, t.name as ticket_name
     FROM orders o
     LEFT JOIN ticket_types t ON t.id = o.ticket_type_id
-    WHERE o.event_id = ${id}
+    WHERE o.event_id = ${event.id}
     ORDER BY o.created_at DESC
   `;
 
