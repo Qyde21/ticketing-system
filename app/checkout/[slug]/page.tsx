@@ -17,12 +17,20 @@ export default async function CheckoutPage({ params }: PageProps) {
     notFound();
   }
 
-  // Fetch ticket types for this event and map price_kes correctly
+  // Fetch ticket types and filter out sold out tickets
   const ticketTypesRaw = await sql`SELECT * FROM ticket_types WHERE event_id = ${event.id}`;
-  const ticketTypes = ticketTypesRaw.map((t: any) => ({
-    ...t,
-    price: Number(t.price_kes || t.price || 0)
-  }));
+  const ticketTypes = ticketTypesRaw
+    .map((t: any) => ({
+      ...t,
+      price: Number(t.price_kes || t.price || 0)
+    }))
+    .filter((t: any) => {
+      const total = Number(t.quantity_total) || 0;
+      const sold = Number(t.quantity_sold) || 0;
+      const remaining = Math.max(0, total - sold);
+      // Keep only tickets that are not sold out (or have unlimited/zero capacity set)
+      return total === 0 || remaining > 0;
+    });
 
   const imageUrl = event.cover_image_url || event.imageUrl;
   const eventDate = event.start_at || event.date;

@@ -16,10 +16,15 @@ export default async function EventDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  // Fetch ticket types / availability
-  const ticketTypes = await sql`
+  // Fetch ticket types and map price correctly from price_kes or price
+  const ticketTypesRaw = await sql`
     SELECT * FROM ticket_types WHERE event_id = ${event.id}
   `;
+
+  const ticketTypes = ticketTypesRaw.map((t: any) => ({
+    ...t,
+    price: Number(t.price_kes || t.price || 0)
+  }));
 
   const imageUrl = event.cover_image_url || event.imageUrl;
   const eventDate = event.start_at || event.date;
@@ -87,7 +92,7 @@ export default async function EventDetailPage({ params }: PageProps) {
                   <div>
                     <h3 className="font-bold text-lg text-white">{ticket.name}</h3>
                     <p className="text-sm text-gray-400">{ticket.description || 'Standard access ticket'}</p>
-                    <p className="text-sm font-semibold text-cyan-400 mt-1">${Number(ticket.price).toFixed(2)}</p>
+                    <p className="text-sm font-semibold text-cyan-400 mt-1">KES {ticket.price.toLocaleString()}</p>
                   </div>
                   <div className="text-right">
                     {isSoldOut ? (
