@@ -11,13 +11,13 @@ export default async function AdminOrganizersPage() {
     return <div className="max-w-6xl mx-auto px-4 py-8 text-white">Unauthorized access.</div>;
   }
 
-  // Fetch organizers with event counts
+  // Fetch organizers with event counts using valid SQL syntax
   const organizers = await sql`
-    u.id, u.name, u.email, u.created_at, u.status,
+    SELECT u.id, u.name, u.email, u.created_at, u.status,
     (SELECT COUNT(*) FROM events e WHERE e.organizer_id = u.id) as total_events,
     (SELECT COUNT(*) FROM events e WHERE e.organizer_id = u.id AND e.status = 'published') as published_events
     FROM users u
-    WHERE u.role = 'organizer' OR u.id IN (SELECT DISTINCT organizer_id FROM events)
+    WHERE u.role = 'organizer' OR u.id IN (SELECT DISTINCT organizer_id FROM events WHERE organizer_id IS NOT NULL)
     ORDER BY u.created_at DESC
   `;
 
