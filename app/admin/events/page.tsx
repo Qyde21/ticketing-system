@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import PublishButton from '@/app/organizer/PublishButton';
 import CancelEventButton from '@/app/organizer/CancelEventButton';
+import DeleteEventButton from './DeleteEventButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -112,6 +113,8 @@ export default async function AdminEventsPage() {
                 {(e.status === 'draft' || e.status === 'published') && (
                   <CancelEventButton eventId={e.id} />
                 )}
+
+                <DeleteEventButton eventId={e.id} />
               </div>
             </div>
           ))}
