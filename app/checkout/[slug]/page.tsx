@@ -17,7 +17,7 @@ export default async function CheckoutPage({ params }: { params: Promise<{ slug:
 
   try {
     const ttRes = await sql`
-      SELECT tt.*, e.title as event_title, e.cover_image_url, e.image_url
+      SELECT tt.*, e.title as event_title, e.cover_image_url
       FROM ticket_types tt
       JOIN events e ON e.id::text = tt.event_id::text
       WHERE tt.id::text = ${ticketIdOrSlug} OR tt.name ILIKE ${ticketIdOrSlug.replace(/-/g, ' ')}
@@ -31,7 +31,7 @@ export default async function CheckoutPage({ params }: { params: Promise<{ slug:
     ticketType = ttRes[0];
     event = {
       title: ticketType.event_title,
-      cover_image_url: ticketType.cover_image_url || ticketType.image_url
+      cover_image_url: ticketType.cover_image_url
     };
 
   } catch (err) {
