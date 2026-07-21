@@ -16,19 +16,33 @@ export default async function AdminOrganizersPage() {
   try {
     organizers = await sql`
       SELECT 
-        COALESCE(u.id, e.organizer_id) as id,
+        u.id,
         COALESCE(u.email, 'organizer@tickethub.com') as email,
         COALESCE(u.status, 'active') as status,
-        MIN(e.created_at) as created_at,
-        COUNT(e.id) as total_events,
-        COUNT(e.id) FILTER (WHERE e.status = 'published') as published_events
-      FROM events e
-      LEFT JOIN users u ON u.id = e.organizer_id
-      GROUP BY COALESCE(u.id, e.organizer_id), COALESCE(u.email, 'organizer@tickethub.com'), COALESCE(u.status, 'active')
-      ORDER BY created_at DESC
+        u.created_at,
+        (SELECT COUNT(*) FROM events e WHERE e.organizer_id = u.id) as total_events,
+        (SELECT COUNT(*) FROM events e WHERE e.organizer_id = u.id AND e.status = 'published') as published_events
+      FROM users u
+      ORDER BY u.created_at DESC
     `;
   } catch (err) {
-    organizers = [];
+    try {
+      organizers = await sql`
+        SELECT 
+          COALESCE(u.id, e.organizer_id) as id,
+          COALESCE(u.email, 'organizer@tickethub.com') as email,
+          'active' as status,
+          MIN(e.created_at) as created_at,
+          COUNT(e.id) as total_events,
+          COUNT(e.id) FILTER (WHERE e.status = 'published') as published_events
+        FROM events e
+        LEFT JOIN users u ON u.id = e.organizer_id
+        GROUP BY COALESCE(u.id, e.organizer_id), COALESCE(u.email, 'organizer@tickethub.com')
+        ORDER BY created_at DESC
+      `;
+    } catch (e2) {
+      organizers = [];
+    }
   }
 
   return (
@@ -68,7 +82,7 @@ export default async function AdminOrganizersPage() {
                 </div>
 
                 <div className="flex items-center gap-4 text-xs text-gray-400 pt-2 border-t border-gray-800/80">
-                  <span>First Event: <strong className="text-gray-300">{org.created_at ? new Date(org.created_at).toLocaleDateString() : 'N/A'}</strong></span>
+                  <span>Joined: <strong className="text-gray-300">{org.created_at ? new Date(org.created_at).toLocaleDateString() : 'N/A'}</strong></span>
                   <span>•</span>
                   <span>Events: <strong className="text-cyan-400">{org.total_events}</strong> ({org.published_events} published)</span>
                 </div>
