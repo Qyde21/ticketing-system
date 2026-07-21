@@ -17,7 +17,7 @@ export default async function CheckoutPage({ params }: { params: Promise<{ slug:
 
   try {
     const ttRes = await sql`
-      SELECT tt.*, e.title as event_title, e.start_at, e.start_date, e.date, e.venue_name, e.location, e.cover_image_url, e.image_url
+      SELECT tt.*, e.title as event_title, e.cover_image_url, e.image_url
       FROM ticket_types tt
       JOIN events e ON e.id::text = tt.event_id::text
       WHERE tt.id::text = ${ticketIdOrSlug} OR tt.name ILIKE ${ticketIdOrSlug.replace(/-/g, ' ')}
@@ -31,8 +31,6 @@ export default async function CheckoutPage({ params }: { params: Promise<{ slug:
     ticketType = ttRes[0];
     event = {
       title: ticketType.event_title,
-      start_at: ticketType.start_at || ticketType.start_date || ticketType.date,
-      venue_name: ticketType.venue_name || ticketType.location,
       cover_image_url: ticketType.cover_image_url || ticketType.image_url
     };
 
@@ -71,11 +69,6 @@ export default async function CheckoutPage({ params }: { params: Promise<{ slug:
             <span className="text-cyan-400 font-extrabold text-lg">
               KES {priceNum.toLocaleString()}
             </span>
-          </div>
-
-          <div className="text-xs text-gray-400 space-y-1">
-            <p><strong>Venue:</strong> {event.venue_name || 'TBD'}</p>
-            <p><strong>Date:</strong> {event.start_at ? new Date(event.start_at).toLocaleString() : 'TBD'}</p>
           </div>
         </div>
 
