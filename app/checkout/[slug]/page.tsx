@@ -5,15 +5,15 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export default function CheckoutClientPage({ params }: { params: Promise<{ slug: string }> | { slug: string } }) {
-  const [ticketId, setTicketId] = useState<string>('');
+  const [slug, setSlug] = useState<string>('');
 
   useEffect(() => {
     Promise.resolve(params).then((resolved) => {
-      setTicketId(resolved.slug);
+      setSlug(resolved.slug);
     });
   }, [params]);
 
-  if (!ticketId) {
+  if (!slug) {
     return (
       <main className="max-w-2xl mx-auto px-4 py-12 text-white text-center">
         <p className="text-gray-400">Loading checkout...</p>
@@ -21,13 +21,11 @@ export default function CheckoutClientPage({ params }: { params: Promise<{ slug:
     );
   }
 
-  return <CheckoutForm ticketId={ticketId} />;
+  return <CheckoutForm identifier={slug} />;
 }
 
-function CheckoutForm({ ticketId }: { ticketId: string }) {
+function CheckoutForm({ identifier }: { identifier: string }) {
   const router = useRouter();
-  const [ticket, setTicket] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -36,18 +34,6 @@ function CheckoutForm({ ticketId }: { ticketId: string }) {
     buyerEmail: '',
     buyerPhone: ''
   });
-
-  useEffect(() => {
-    async function loadTicket() {
-      try {
-        const res = await fetch(`/api/events`); // or lookup via an endpoint if available
-        setLoading(false);
-      } catch (err) {
-        setLoading(false);
-      }
-    }
-    loadTicket();
-  }, [ticketId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,7 +45,7 @@ function CheckoutForm({ ticketId }: { ticketId: string }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ticketTypeId: ticketId,
+          ticketTypeId: identifier,
           quantity: 1,
           buyerName: formData.buyerName,
           buyerEmail: formData.buyerEmail,
@@ -72,7 +58,7 @@ function CheckoutForm({ ticketId }: { ticketId: string }) {
         throw new Error(data.error || 'Failed to create order');
       }
 
-      router.push(`/tickets/${data.orderId || ticketId}`);
+      router.push(`/tickets/${data.orderId || identifier}`);
     } catch (err: any) {
       setError(err.message);
       setSubmitting(false);

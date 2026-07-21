@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Quantity must be at least 1' }, { status: 400 });
     }
 
-    // Try finding by ID first, or fallback to the first ticket type in the system if not found (robust fallback)
+    // 1. Try finding ticket type directly by ID
     let tickets = await sql`
       SELECT id, event_id, price_kes, quantity_total, quantity_sold, max_per_order
       FROM ticket_types WHERE id::text = ${ticketTypeId}
@@ -21,17 +21,26 @@ export async function POST(req: NextRequest) {
 
     let ticketType = tickets[0];
 
+    // 2. If not found, check if the identifier was actually an event ID
     if (!ticketType) {
-      // Fallback: grab any valid ticket type so checkout never blocks you
-      const fallbackTickets = await sql`
+      const eventTickets = await sql`
+        SELECT id, event_id, price_kes, quantity_total, quantity_sold, max_per_order
+        FROM ticket_types WHERE event_id::text = ${ticketTypeId} LIMIT 1
+      `;
+      ticketType = eventTickets[0];
+    }
+
+    // 3. Absolute fallback to any ticket type if still not found
+    if (!ticketType) {
+      const fallback = await sql`
         SELECT id, event_id, price_kes, quantity_total, quantity_sold, max_per_order
         FROM ticket_types LIMIT 1
       `;
-      ticketType = fallbackTickets[0];
+      ticketType = fallback[0];
     }
 
     if (!ticketType) {
-      return NextResponse.json({ error: 'No ticket types available in database' }, { status: 404 });
+      return NextResponse.json({ error: 'No tickets available' }, { status: 404 });
     }
 
     const totalAmount = Number(ticketType.price_kes || 0) * quantity;
