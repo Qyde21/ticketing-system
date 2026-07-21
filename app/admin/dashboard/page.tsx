@@ -144,7 +144,7 @@ export default async function AdminDashboard() {
                       <p className="text-sm font-bold text-emerald-400">{ev.totalSold} / {ev.totalCapacity}</p>
                     </div>
                     <Link 
-                      href={`/admin/events/${ev.id}/analytics`}
+                      href={`/events/${ev.slug || ev.id}`}
                       className="bg-gray-800 hover:bg-gray-700 text-indigo-300 text-xs px-3 py-1.5 rounded transition font-medium border border-gray-700"
                     >
                       Full Details &rarr;
