@@ -16,7 +16,6 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
   let tickets: any[] = [];
 
   try {
-    // Try finding by id or slug / title match
     let eventRes = await sql`
       SELECT e.*, COALESCE(u.full_name, 'Organizer') as organizer_name 
       FROM events e 
@@ -25,7 +24,6 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
     `;
 
     if (eventRes.length === 0) {
-      // Fallback query matching partial text if slugified
       const cleanSlug = eventIdOrSlug.replace(/-/g, ' ');
       eventRes = await sql`
         SELECT e.*, COALESCE(u.full_name, 'Organizer') as organizer_name 
@@ -129,9 +127,12 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                           Sales Closed
                         </span>
                       ) : (
-                        <span className="px-3 py-1 bg-green-950 text-green-400 border border-green-800 rounded-lg text-xs font-bold uppercase tracking-wider">
-                          Available
-                        </span>
+                        <Link
+                          href={`/checkout?ticket_id=${t.id}`}
+                          className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-lg shadow-green-950/50 block text-center"
+                        >
+                          Buy Ticket
+                        </Link>
                       )}
                     </div>
                   </div>
