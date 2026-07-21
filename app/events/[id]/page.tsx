@@ -6,9 +6,9 @@ export const dynamic = 'force-dynamic';
 
 export default async function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
-  const eventId = resolvedParams?.id;
+  const eventIdOrSlug = resolvedParams?.id;
 
-  if (!eventId) {
+  if (!eventIdOrSlug) {
     notFound();
   }
 
@@ -16,12 +16,25 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
   let tickets: any[] = [];
 
   try {
-    const eventRes = await sql`
+    // Try finding by id or slug / title match
+    let eventRes = await sql`
       SELECT e.*, COALESCE(u.full_name, 'Organizer') as organizer_name 
       FROM events e 
       LEFT JOIN users u ON u.id::text = e.organizer_id::text 
-      WHERE e.id::text = ${eventId}
+      WHERE e.id::text = ${eventIdOrSlug} OR e.slug = ${eventIdOrSlug}
     `;
+
+    if (eventRes.length === 0) {
+      // Fallback query matching partial text if slugified
+      const cleanSlug = eventIdOrSlug.replace(/-/g, ' ');
+      eventRes = await sql`
+        SELECT e.*, COALESCE(u.full_name, 'Organizer') as organizer_name 
+        FROM events e 
+        LEFT JOIN users u ON u.id::text = e.organizer_id::text 
+        WHERE LOWER(e.title) LIKE ${'%' + cleanSlug.toLowerCase() + '%'}
+        LIMIT 1
+      `;
+    }
 
     if (eventRes.length === 0) {
       notFound();
@@ -30,7 +43,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
     event = eventRes[0];
 
     tickets = await sql`
-      SELECT * FROM tickets WHERE event_id::text = ${eventId}
+      SELECT * FROM tickets WHERE event_id::text = ${String(event.id)}
     `.catch(() => []);
   } catch (err) {
     console.error("Error loading event details:", err);
