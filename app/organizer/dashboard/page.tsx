@@ -1,127 +1,113 @@
 ﻿import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import Link from 'next/link';
-import PublishButton from '../PublishButton';
-import CancelEventButton from '../CancelEventButton';
 
 export const dynamic = 'force-dynamic';
 
-export default async function OrganizerDashboard() {
+export default async function OrganizerDashboardPage() {
   const session = await getSession();
-  const events = await sql`
-    SELECT id, title, slug, status, start_at, cover_image_url
-    FROM events
-    WHERE organizer_id = ${session!.userId}
-    AND status != 'cancelled'
-    ORDER BY created_at DESC
-  `;
+
+  if (!session) {
+    return <div className="max-w-6xl mx-auto px-4 py-8 text-white">Unauthorized.</div>;
+  }
+
+  // Fetch events belonging to this organizer (or all if admin)
+  const events = session.role === 'admin' 
+    ? await sql`SELECT * FROM events ORDER BY created_at DESC`
+    : await sql`SELECT * FROM events WHERE organizer_id = ${session.userId} ORDER BY created_at DESC`;
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-8 text-white">
       <div className="flex justify-between items-center mb-8 pb-4 border-b border-gray-800">
         <div>
-          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Your Events</h1>
-          <p className="text-gray-400 text-sm mt-1">Manage your created events, track ticket sales, and monitor check-ins</p>
+          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Events & Ticket Inventory Analytics</h1>
+          <p className="text-gray-400 text-sm mt-1">Real-time status breakdown and ticket sales overview</p>
         </div>
-        <Link
-          href="/organizer/events/new"
-          className="bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-bold px-5 py-2.5 rounded-lg transition shadow-lg"
-        >
-          + Create New Event
-        </Link>
       </div>
 
       {events.length === 0 ? (
-        <div className="text-center py-16 bg-gray-900 border border-gray-800 rounded-2xl shadow-xl">
-          <p className="text-gray-400 mb-4">You haven't created any events yet.</p>
-          <Link
-            href="/organizer/events/new"
-            className="inline-block bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 py-3 rounded-lg transition shadow"
-          >
-            Create Your First Event
-          </Link>
+        <div className="text-center py-16 bg-gray-900 border border-gray-800 rounded-2xl shadow-xl text-gray-400">
+          No events found.
         </div>
       ) : (
-        <div className="space-y-4">
-          {events.map((e: any) => (
-            <div
-              key={e.id}
-              className="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-lg flex flex-col md:flex-row gap-6 items-start md:items-center justify-between transition hover:border-gray-700"
-            >
-              <div className="flex items-center gap-5 w-full md:w-auto">
-                <div className="w-24 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-gray-800 border border-gray-700 relative">
-                  {e.cover_image_url ? (
-                    <img src={e.cover_image_url} alt={e.title} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="flex items-center justify-center h-full text-xs text-gray-500 text-center p-2">
-                      {e.title}
+        <div className="space-y-6">
+          {events.map(async (event: any) => {
+            // Fetch ticket types and orders for revenue/tickets sold breakdown
+            const ticketTypes = await sql`
+              SELECT * FROM ticket_types WHERE event_id = ${event.id}
+            `;
+            
+            const orders = await sql`
+              SELECT quantity, total_amount_kes, payment_status, ticket_type_id 
+              FROM orders 
+              WHERE event_id = ${event.id} AND (payment_status = 'paid' OR payment_status = 'completed' OR payment_status = 'success')
+            `;
+
+            const totalRevenue = orders.reduce((acc: number, o: any) => acc + Number(o.total_amount_kes), 0);
+            const totalTicketsSold = orders.reduce((acc: number, o: any) => acc + Number(o.quantity), 0);
+            const totalInventory = ticketTypes.reduce((acc: number, t: any) => acc + Number(t.quantity_total), 0);
+
+            return (
+              <div key={event.id} className="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl space-y-4">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-800 pb-4">
+                  <div>
+                    <div className="flex items-center gap-3">
+                      <h2 className="text-xl font-bold text-white">{event.title}</h2>
+                      <span className={`px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider ${
+                        event.status === 'published' ? 'bg-green-950 text-green-400 border border-green-800' : 'bg-gray-800 text-gray-400'
+                      }`}>
+                        {event.status}
+                      </span>
                     </div>
-                  )}
-                </div>
-
-                <div>
-                  <div className="flex items-center gap-3">
-                    <h2 className="text-lg font-bold text-white">{e.title}</h2>
-                    <span className={`px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider ${
-                      e.status === 'published' ? 'bg-green-950 text-green-400 border border-green-800' : 'bg-amber-950 text-amber-400 border border-amber-800'
-                    }`}>
-                      {e.status}
-                    </span>
+                    <p className="text-xs text-gray-500 mt-1">Created: {new Date(event.created_at).toLocaleDateString()}</p>
                   </div>
-                  <p className="text-xs text-gray-400 mt-1">
-                    Date: {e.start_at ? new Date(e.start_at).toLocaleDateString() : 'TBD'}
-                  </p>
+
+                  <div className="flex items-center gap-6 text-right">
+                    <div>
+                      <span className="text-xs text-gray-400 block">Revenue</span>
+                      <span className="text-lg font-extrabold text-cyan-400">KES {totalRevenue.toLocaleString()}</span>
+                    </div>
+                    <div>
+                      <span className="text-xs text-gray-400 block">Tickets Sold</span>
+                      <span className="text-lg font-extrabold text-emerald-400">{totalTicketsSold} / {totalInventory || '—'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-indigo-400 pt-1">
+                  <Link href={`/admin/events/${event.id}/orders`} className="hover:underline text-cyan-300 bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Orders</Link>
+                  <Link href={`/admin/events/${event.id}`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Manage Details</Link>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pt-2">
+                  {ticketTypes.map((ticket: any) => {
+                    const sold = orders
+                      .filter((o: any) => o.ticket_type_id === ticket.id)
+                      .reduce((acc: number, o: any) => acc + Number(o.quantity), 0);
+                    const remaining = ticket.quantity_total - sold;
+                    const progress = Math.min(100, (sold / ticket.quantity_total) * 100);
+
+                    return (
+                      <div key={ticket.id} className="bg-gray-950 border border-gray-800/80 rounded-xl p-4 space-y-2">
+                        <div className="flex justify-between items-start">
+                          <h3 className="font-semibold text-white text-sm">{ticket.name}</h3>
+                          <span className="text-indigo-300 font-bold text-sm">KES {Number(ticket.price_kes).toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between text-xs text-gray-400">
+                          <span>Sold: <strong className="text-white">{sold}</strong></span>
+                          <span>Remaining: <strong className="text-white">{remaining}</strong></span>
+                          <span>Total: <strong className="text-white">{ticket.quantity_total}</strong></span>
+                        </div>
+                        <div className="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden">
+                          <div className="bg-cyan-500 h-full rounded-full transition-all" style={{ width: `${progress}%` }} />
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-2 pt-4 md:pt-0 border-t md:border-t-0 border-gray-800 w-full md:w-auto justify-end">
-                {e.status === 'draft' && <PublishButton eventId={e.id} />}
-                
-                {e.status === 'published' && (
-                  <>
-                    <Link
-                      href={`/scan/${e.id}`}
-                      className="bg-indigo-950 hover:bg-indigo-900 text-indigo-300 border border-indigo-800 px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow"
-                    >
-                      Scan Tickets
-                    </Link>
-                    <Link
-                      href={`/organizer/events/${e.id}/scan-overview`}
-                      className="bg-cyan-950 hover:bg-cyan-900 text-cyan-300 border border-cyan-800 px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow"
-                    >
-                      Scan Overview
-                    </Link>
-                  </>
-                )}
-
-                <Link
-                  href={`/organizer/events/${e.id}/orders`}
-                  className="bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow"
-                >
-                  Orders
-                </Link>
-
-                <Link
-                  href={`/organizer/events/${e.id}/messages`}
-                  className="bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow"
-                >
-                  Messages
-                </Link>
-
-                <Link
-                  href={`/organizer/events/${e.id}/edit`}
-                  className="bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow"
-                >
-                  Edit Cover
-                </Link>
-
-                {(e.status === 'draft' || e.status === 'published') && (
-                  <CancelEventButton eventId={e.id} />
-                )}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </main>
