@@ -40,7 +40,6 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
 
     event = eventRes[0];
 
-    // Fetch from ticket_types table using event_id
     ticketTypes = await sql`
       SELECT * FROM ticket_types WHERE event_id::text = ${String(event.id)}
     `.catch(() => []);
@@ -111,9 +110,16 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
           <div className="space-y-4 pt-4 border-t border-gray-800">
             <h2 className="text-lg font-bold text-white">Ticket Availability</h2>
 
-            {ticketTypes.length === 0 ? (
+            {isEnded ? (
+              <div className="p-6 bg-gray-950 border border-gray-800 rounded-xl text-center space-y-2">
+                <span className="inline-block px-3 py-1 bg-red-950 text-red-400 border border-red-800 rounded-full text-xs font-bold uppercase tracking-wider">
+                  Event Ended
+                </span>
+                <p className="text-gray-400 text-sm">Sales closed for this event.</p>
+              </div>
+            ) : ticketTypes.length === 0 ? (
               <div className="p-4 bg-gray-950 border border-gray-800 rounded-xl text-gray-400 text-sm text-center">
-                {isEnded ? 'Ticket sales have concluded for this past event.' : 'No ticket tiers currently listed for this event.'}
+                No ticket tiers currently listed for this event.
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-4">
@@ -137,11 +143,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                       </div>
 
                       <div>
-                        {isEnded ? (
-                          <span className="px-3 py-1 bg-gray-800 text-gray-400 rounded-lg text-xs font-bold uppercase tracking-wider">
-                            Sales Closed
-                          </span>
-                        ) : isSoldOut ? (
+                        {isSoldOut ? (
                           <span className="px-3 py-1 bg-red-950 text-red-400 border border-red-800 rounded-lg text-xs font-bold uppercase tracking-wider">
                             Sold Out
                           </span>
