@@ -1,20 +1,31 @@
 ﻿'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-export default function CheckoutClientPage({ params }: { params: { slug: string } }) {
-  // Client component wrapper or handle params
-  return <CheckoutForm ticketId={params.slug} />;
-}
+export default function CheckoutClientPage({ params }: { params: Promise<{ slug: string }> | { slug: string } }) {
+  const [ticketId, setTicketId] = useState<string>('');
 
-import { useEffect } from 'react';
+  useEffect(() => {
+    Promise.resolve(params).then((resolved) => {
+      setTicketId(resolved.slug);
+    });
+  }, [params]);
+
+  if (!ticketId) {
+    return (
+      <main className="max-w-2xl mx-auto px-4 py-12 text-white text-center">
+        <p className="text-gray-400">Loading checkout...</p>
+      </main>
+    );
+  }
+
+  return <CheckoutForm ticketId={ticketId} />;
+}
 
 function CheckoutForm({ ticketId }: { ticketId: string }) {
   const router = useRouter();
-  const [ticket, setTicket] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -23,20 +34,6 @@ function CheckoutForm({ ticketId }: { ticketId: string }) {
     buyerEmail: '',
     buyerPhone: ''
   });
-
-  useEffect(() => {
-    async function fetchTicket() {
-      try {
-        const res = await fetch(`/api/tickets/${ticketId}`);
-        // If there's no specific ticket API, we can fetch event/ticket details or pass it directly.
-        // Let's implement a fallback or direct fetch from public endpoints if available.
-        setLoading(false);
-      } catch (err) {
-        setLoading(false);
-      }
-    }
-    fetchTicket();
-  }, [ticketId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,7 +45,7 @@ function CheckoutForm({ ticketId }: { ticketId: string }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          eventId: ticketId, // or get from ticket lookup
+          eventId: ticketId,
           ticketTypeId: ticketId,
           quantity: 1,
           buyerName: formData.buyerName,
