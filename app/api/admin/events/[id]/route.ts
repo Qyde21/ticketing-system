@@ -1,4 +1,5 @@
-import { sql } from '@/lib/db';
+﻿import { sql } from '@/lib/db';
+import { getSession } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 
 export async function DELETE(
@@ -6,30 +7,18 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await getSession();
+    if (!session || session.role !== 'admin') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { id } = await params;
 
-    // Delete child records first to satisfy FK constraints
-    // Delete ticket purchases / tickets associated with ticket_types for this event
-    await sql`
-      DELETE FROM tickets 
-      WHERE ticket_type_id IN (SELECT id FROM ticket_types WHERE event_id = ${id})
-    `;
-
-    // Delete ticket types for this event
     await sql`DELETE FROM ticket_types WHERE event_id = ${id}`;
-
-    // Delete orders / payouts associated with this event if applicable
-    await sql`DELETE FROM orders WHERE event_id = ${id}`;
-
-    // Finally delete the event
     await sql`DELETE FROM events WHERE id = ${id}`;
 
-    return NextResponse.json({ success: true, message: 'Event deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting event:', error);
-    return NextResponse.json(
-      { error: 'Failed to delete event' },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
   }
 }
