@@ -14,7 +14,6 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
 
   let event: any = null;
   let ticketTypes: any[] = [];
-  let allTables: any[] = [];
 
   try {
     let eventRes = await sql`
@@ -41,27 +40,11 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
 
     event = eventRes[0];
 
-    // Find all table names in the database to locate ticket tiers
-    allTables = await sql`
-      SELECT table_name 
-      FROM information_schema.tables 
-      WHERE table_schema = 'public'
-    `.catch(() => []);
-
-    // Query ticket_types or equivalent table using event_id
+    // Fetch from ticket_types table using event_id
     ticketTypes = await sql`
       SELECT * FROM ticket_types WHERE event_id::text = ${String(event.id)}
-    `.catch(async () => {
-      // Fallback query if table name is different
-      return await sql`
-        SELECT * FROM tickets WHERE event_id::text = ${String(event.id)}
-      `.catch(() => []);
-    });
+    `.catch(() => []);
 
-    console.log("=========================================");
-    console.log("📋 PUBLIC TABLES IN DB:", allTables.map((t: any) => t.table_name));
-    console.log("🎫 TICKET TYPES FOUND:", ticketTypes);
-    console.log("=========================================");
   } catch (err) {
     console.error("Error loading event details:", err);
     notFound();
@@ -134,30 +117,46 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-4">
-                {ticketTypes.map((t: any) => (
-                  <div key={t.id} className="p-4 bg-gray-950 border border-gray-800 rounded-xl flex justify-between items-center">
-                    <div>
-                      <h3 className="font-bold text-white text-base">{t.name || t.tier_name || 'Standard Ticket'}</h3>
-                      <p className="text-xs text-gray-400">{t.description || 'Standard access ticket'}</p>
-                      <span className="text-cyan-400 font-bold text-sm mt-1 block">KES {t.price || 0}</span>
-                    </div>
+                {ticketTypes.map((t: any) => {
+                  const priceNum = parseFloat(t.price_kes || 0);
+                  const total = t.quantity_total ?? 0;
+                  const sold = t.quantity_sold ?? 0;
+                  const remaining = Math.max(0, total - sold);
+                  const isSoldOut = remaining <= 0;
 
-                    <div>
-                      {isEnded ? (
-                        <span className="px-3 py-1 bg-gray-800 text-gray-400 rounded-lg text-xs font-bold uppercase tracking-wider">
-                          Sales Closed
+                  return (
+                    <div key={t.id} className="p-4 bg-gray-950 border border-gray-800 rounded-xl flex justify-between items-center">
+                      <div>
+                        <h3 className="font-bold text-white text-base">{t.name}</h3>
+                        <p className="text-xs text-gray-400 mt-0.5">
+                          {remaining > 0 ? `${remaining} available (${sold} sold)` : 'All tickets sold out'}
+                        </p>
+                        <span className="text-cyan-400 font-bold text-sm mt-1 block">
+                          KES {priceNum.toLocaleString()}
                         </span>
-                      ) : (
-                        <Link
-                          href={`/checkout?ticket_id=${t.id}`}
-                          className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-lg shadow-green-950/50 block text-center"
-                        >
-                          Buy Ticket
-                        </Link>
-                      )}
+                      </div>
+
+                      <div>
+                        {isEnded ? (
+                          <span className="px-3 py-1 bg-gray-800 text-gray-400 rounded-lg text-xs font-bold uppercase tracking-wider">
+                            Sales Closed
+                          </span>
+                        ) : isSoldOut ? (
+                          <span className="px-3 py-1 bg-red-950 text-red-400 border border-red-800 rounded-lg text-xs font-bold uppercase tracking-wider">
+                            Sold Out
+                          </span>
+                        ) : (
+                          <Link
+                            href={`/checkout?ticket_id=${t.id}`}
+                            className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-lg shadow-green-950/50 block text-center"
+                          >
+                            Buy Ticket
+                          </Link>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
