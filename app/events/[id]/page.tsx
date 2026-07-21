@@ -1,142 +1,132 @@
-﻿import { sql } from "@/lib/db";
-import { notFound } from "next/navigation";
-import Link from "next/link";
+﻿import { sql } from '@/lib/db';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
-interface PageProps {
-  params: Promise<{ id: string }>;
-}
+export const dynamic = 'force-dynamic';
 
-export default async function EventDetailPage({ params }: PageProps) {
-  const { id } = await params;
+export default async function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
+  const eventId = resolvedParams?.id;
 
-  const events = await sql`SELECT * FROM events WHERE id::text = ${id} OR slug = ${id}`;
-  const event = events[0];
-
-  if (!event) {
+  if (!eventId) {
     notFound();
   }
 
-  // Fetch ticket types and map price correctly from price_kes or price
-  const ticketTypesRaw = await sql`
-    SELECT * FROM ticket_types WHERE event_id = ${event.id}
-  `;
+  let event: any = null;
+  let tickets: any[] = [];
 
-  const ticketTypes = ticketTypesRaw.map((t: any) => ({
-    ...t,
-    price: Number(t.price_kes || t.price || 0)
-  }));
+  try {
+    const eventRes = await sql`
+      SELECT e.*, COALESCE(u.full_name, 'Organizer') as organizer_name 
+      FROM events e 
+      LEFT JOIN users u ON u.id::text = e.organizer_id::text 
+      WHERE e.id::text = ${eventId}
+    `;
 
-  const imageUrl = event.cover_image_url || event.imageUrl;
-  const eventDate = event.start_at || event.date;
-  const endDate = event.end_at;
-  const location = event.venue_name || event.location || "Venue TBD";
+    if (eventRes.length === 0) {
+      notFound();
+    }
 
-  const isEnded = (endDate && new Date(endDate) < new Date()) || event.status === 'completed' || event.status === 'cancelled';
+    event = eventRes[0];
+
+    tickets = await sql`
+      SELECT * FROM tickets WHERE event_id::text = ${eventId}
+    `.catch(() => []);
+  } catch (err) {
+    console.error("Error loading event details:", err);
+    notFound();
+  }
+
+  // Determine if event has ended based on event date or status tag
+  const eventDate = event.date ? new Date(event.date) : null;
+  const isEnded = event.status === 'ended' || (eventDate && eventDate < new Date());
 
   return (
     <main className="max-w-4xl mx-auto px-4 py-8 text-white">
       <div className="mb-6">
-        <Link href="/" className="text-indigo-400 hover:underline">
-          &larr; Back to Home
+        <Link href="/events" className="text-indigo-400 hover:underline text-sm font-semibold">
+          ← Back to Events
         </Link>
       </div>
 
-      {imageUrl && (
-        <div className="w-full h-80 relative mb-6 rounded-lg overflow-hidden bg-gray-900 border border-gray-800 shadow-xl">
-          <img src={imageUrl} alt={event.title} className="w-full h-full object-cover" />
-        </div>
-      )}
-
-      <div className="flex justify-between items-start mb-4">
-        <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">{event.title}</h1>
-        {isEnded && (
-          <span className="bg-red-900 text-red-200 px-3 py-1 rounded-full text-sm font-semibold capitalize border border-red-700">
-            {event.status === 'cancelled' ? 'Event Cancelled' : 'Event Ended'}
-          </span>
+      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-2xl">
+        {event.image_url && (
+          <div className="w-full h-72 sm:h-96 relative bg-gray-950">
+            <img 
+              src={event.image_url} 
+              alt={event.title} 
+              className="w-full h-full object-cover"
+            />
+          </div>
         )}
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 bg-gray-900 p-6 rounded-lg border border-gray-800 shadow-lg">
-        <div>
-          <p className="text-indigo-300 font-medium text-sm">Date & Time</p>
-          <p className="text-lg font-semibold text-white mt-1">{eventDate ? new Date(eventDate).toLocaleString() : "TBD"}</p>
-        </div>
-        <div>
-          <p className="text-indigo-300 font-medium text-sm">Location</p>
-          <p className="text-lg font-semibold text-white mt-1">{location}</p>
-        </div>
-        <div>
-          <p className="text-indigo-300 font-medium text-sm">Category</p>
-          <p className="text-lg font-semibold text-white mt-1 capitalize">{event.category || "General"}</p>
-        </div>
-      </div>
+        <div className="p-6 sm:p-8 space-y-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-white">{event.title}</h1>
+              <p className="text-xs text-indigo-300 mt-1">Organized by {event.organizer_name}</p>
+            </div>
+            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+              isEnded ? 'bg-red-950 text-red-400 border border-red-800' : 'bg-green-950 text-green-400 border border-green-800'
+            }`}>
+              {isEnded ? 'Event Ended' : event.status || 'Active'}
+            </span>
+          </div>
 
-      <div className="mb-8">
-        <h2 className="text-xl font-bold mb-2 text-indigo-300">About This Event</h2>
-        <p className="text-gray-300 whitespace-pre-line leading-relaxed">{event.description || "No description provided."}</p>
-      </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-gray-950/60 border border-gray-800/80 p-4 rounded-xl text-sm">
+            <div>
+              <span className="text-gray-400 block text-xs">Date & Time</span>
+              <strong className="text-gray-200">{eventDate ? eventDate.toLocaleString() : 'TBD'}</strong>
+            </div>
+            <div>
+              <span className="text-gray-400 block text-xs">Location</span>
+              <strong className="text-gray-200">{event.location || 'Online'}</strong>
+            </div>
+            <div>
+              <span className="text-gray-400 block text-xs">Category</span>
+              <strong className="text-gray-200">{event.category || 'General'}</strong>
+            </div>
+          </div>
 
-      {/* Ticket Availability Section */}
-      <div className="mb-8 bg-gray-900 p-6 rounded-lg border border-gray-800 shadow-lg">
-        <h2 className="text-xl font-bold mb-4 text-indigo-300">Ticket Availability</h2>
-        {ticketTypes.length > 0 ? (
-          <div className="space-y-4">
-            {ticketTypes.map((ticket: any) => {
-              const total = Number(ticket.quantity_total) || 0;
-              const sold = Number(ticket.quantity_sold) || 0;
-              const remaining = Math.max(0, total - sold);
-              const isSoldOut = total > 0 && remaining === 0;
-              
-              // Low stock threshold set to 15 tickets
-              const LOW_STOCK_THRESHOLD = 15;
-              const isLowStock = remaining <= LOW_STOCK_THRESHOLD && remaining > 0;
+          <div className="space-y-3">
+            <h2 className="text-lg font-bold text-white">About This Event</h2>
+            <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-line">{event.description}</p>
+          </div>
 
-              return (
-                <div key={ticket.id} className="flex justify-between items-center p-4 bg-gray-800/80 rounded-lg border border-gray-700">
-                  <div>
-                    <h3 className="font-bold text-lg text-white">{ticket.name}</h3>
-                    <p className="text-sm text-gray-400">{ticket.description || 'Standard access ticket'}</p>
-                    <p className="text-sm font-semibold text-cyan-400 mt-1">KES {ticket.price.toLocaleString()}</p>
-                  </div>
-                  <div className="text-right">
-                    {isSoldOut ? (
-                      <span className="inline-block bg-red-950 text-red-400 border border-red-800 px-3 py-1 rounded-md text-xs font-bold">
-                        SOLD OUT
-                      </span>
-                    ) : isLowStock ? (
-                      <div>
-                        <span className="inline-block bg-amber-950 text-amber-300 border border-amber-800 px-3 py-1 rounded-md text-xs font-bold animate-pulse">
-                          Only {remaining} left!
+          <div className="space-y-4 pt-4 border-t border-gray-800">
+            <h2 className="text-lg font-bold text-white">Ticket Availability</h2>
+
+            {tickets.length === 0 ? (
+              <div className="p-4 bg-gray-950 border border-gray-800 rounded-xl text-gray-400 text-sm text-center">
+                {isEnded ? 'Ticket sales have concluded for this past event.' : 'No ticket tiers currently listed.'}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-4">
+                {tickets.map((t: any) => (
+                  <div key={t.id} className="p-4 bg-gray-950 border border-gray-800 rounded-xl flex justify-between items-center">
+                    <div>
+                      <h3 className="font-bold text-white text-base">{t.name || t.tier_name || 'Standard Ticket'}</h3>
+                      <p className="text-xs text-gray-400">{t.description || 'Standard access ticket'}</p>
+                      <span className="text-cyan-400 font-bold text-sm mt-1 block">KES {t.price || 0}</span>
+                    </div>
+
+                    <div>
+                      {isEnded ? (
+                        <span className="px-3 py-1 bg-gray-800 text-gray-400 rounded-lg text-xs font-bold uppercase tracking-wider">
+                          Sales Closed
                         </span>
-                      </div>
-                    ) : (
-                      <span className="inline-block bg-emerald-950 text-emerald-300 border border-emerald-800 px-3 py-1 rounded-md text-xs font-bold">
-                        Available
-                      </span>
-                    )}
+                      ) : (
+                        <span className="px-3 py-1 bg-green-950 text-green-400 border border-green-800 rounded-lg text-xs font-bold uppercase tracking-wider">
+                          Available
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                ))}
+              </div>
+            )}
           </div>
-        ) : (
-          <p className="text-gray-400">No ticket types configured for this event yet.</p>
-        )}
-      </div>
-
-      <div>
-        {isEnded ? (
-          <div className="bg-gray-800 text-gray-400 px-6 py-3 rounded-lg font-semibold inline-block text-center cursor-not-allowed border border-gray-700">
-            {event.status === 'cancelled' ? 'Ticket Sales Closed (Event Cancelled)' : 'Ticket Sales Closed (Event Ended)'}
-          </div>
-        ) : (
-          <Link
-            href={`/checkout/${event.id}`}
-            className="inline-block bg-gradient-to-r from-indigo-600 to-cyan-600 text-white px-8 py-3 rounded-lg font-bold hover:from-indigo-500 hover:to-cyan-500 transition shadow-lg"
-          >
-            Get Tickets
-          </Link>
-        )}
+        </div>
       </div>
     </main>
   );
