@@ -1,13 +1,16 @@
-import { sql } from '@/lib/db';
+﻿import { sql } from '@/lib/db';
 import Link from 'next/link';
+import PublishButton from '@/app/organizer/PublishButton';
+import CancelEventButton from '@/app/organizer/CancelEventButton';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminEventsPage() {
   const events = await sql`
-    SELECT e.*, u.full_name as organizer_name, u.email as organizer_email
+    SELECT e.id, e.title, e.slug, e.status, e.start_at, e.cover_image_url, u.full_name as organizer_name
     FROM events e
-    LEFT JOIN users u ON u.id = e.organizer_id
+    JOIN users u ON u.id = e.organizer_id
+    WHERE e.status != 'cancelled'
     ORDER BY e.created_at DESC
   `;
 
@@ -15,123 +18,100 @@ export default async function AdminEventsPage() {
     <main className="max-w-6xl mx-auto px-4 py-8 text-white">
       <div className="flex justify-between items-center mb-8 pb-4 border-b border-gray-800">
         <div>
-          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Manage Events</h1>
-          <p className="text-gray-400 text-sm mt-1">Overview and management of all platform events</p>
+          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Manage All Events</h1>
+          <p className="text-gray-400 text-sm mt-1">Platform-wide overview and management of all events</p>
         </div>
         <Link
-          href="/admin/events/new"
-          className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-4 py-2 rounded-lg transition shadow text-sm"
+          href="/admin/dashboard"
+          className="bg-gray-800 hover:bg-gray-700 text-indigo-300 font-semibold px-4 py-2 rounded-lg border border-gray-700 transition shadow"
         >
-          + Create New Event
+          &larr; Back to Dashboard
         </Link>
       </div>
 
       {events.length === 0 ? (
-        <div className="text-center py-12 bg-gray-900 border border-gray-800 rounded-xl">
-          <p className="text-gray-400 text-sm mb-4">No events found on the platform.</p>
-          <Link
-            href="/admin/events/new"
-            className="inline-block bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition"
-          >
-            Create Your First Event
-          </Link>
+        <div className="text-center py-16 bg-gray-900 border border-gray-800 rounded-2xl shadow-xl text-gray-400">
+          No events found on the platform.
         </div>
       ) : (
         <div className="space-y-4">
-          {events.map((event: any) => (
-            <div 
-              key={event.id} 
-              className="bg-gray-900 border border-gray-800 rounded-xl p-5 shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-gray-700 transition"
+          {events.map((e: any) => (
+            <div
+              key={e.id}
+              className="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-lg flex flex-col md:flex-row gap-6 items-start md:items-center justify-between transition hover:border-gray-700"
             >
-              <div className="flex items-start gap-4">
-                {event.image_url ? (
-                  <img 
-                    src={event.image_url} 
-                    alt={event.title} 
-                    className="w-20 h-20 object-cover rounded-lg border border-gray-800 shrink-0" 
-                  />
-                ) : (
-                  <div className="w-20 h-20 bg-gray-800 rounded-lg border border-gray-700 flex items-center justify-center text-gray-500 text-xs shrink-0">
-                    No Image
-                  </div>
-                )}
+              <div className="flex items-center gap-5 w-full md:w-auto">
+                <div className="w-24 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-gray-800 border border-gray-700 relative">
+                  {e.cover_image_url ? (
+                    <img src={e.cover_image_url} alt={e.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-xs text-gray-500 text-center p-2">
+                      {e.title}
+                    </div>
+                  )}
+                </div>
+
                 <div>
                   <div className="flex items-center gap-3">
-                    <h2 className="text-lg font-bold text-white">{event.title}</h2>
-                    <span className={`text-[10px] px-2 py-0.5 rounded uppercase font-bold tracking-wider ${
-                      event.status === 'published' 
-                        ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' 
-                        : event.status === 'completed' 
-                        ? 'bg-blue-950 text-blue-400 border border-blue-800' 
-                        : 'bg-amber-950 text-amber-400 border border-amber-800'
+                    <h2 className="text-lg font-bold text-white">{e.title}</h2>
+                    <span className={`px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider ${
+                      e.status === 'published' ? 'bg-green-950 text-green-400 border border-green-800' : 'bg-amber-950 text-amber-400 border border-amber-800'
                     }`}>
-                      {event.status || 'Draft'}
+                      {e.status}
                     </span>
                   </div>
                   <p className="text-xs text-gray-400 mt-1">
-                    Organizer: <strong className="text-gray-300">{event.organizer_name || event.organizer_email || 'Platform Admin'}</strong>
-                  </p>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    Created: {event.created_at ? new Date(event.created_at).toLocaleDateString() : 'N/A'}
+                    Organizer: <span className="text-indigo-300 font-semibold">{e.organizer_name}</span> | Date: {e.start_at ? new Date(e.start_at).toLocaleDateString() : 'TBD'}
                   </p>
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2 w-full md:w-auto justify-end pt-3 md:pt-0 border-t md:border-t-0 border-gray-800">
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center gap-2 pt-4 md:pt-0 border-t md:border-t-0 border-gray-800 w-full md:w-auto justify-end">
                 <Link
-                  href={`/events/${event.slug || event.id}`}
-                  className="bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-medium px-3 py-1.5 rounded border border-gray-700 transition"
+                  href={`/events/${e.slug || e.id}`}
+                  target="_blank"
+                  className="bg-gray-800 hover:bg-gray-700 text-indigo-300 border border-gray-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow"
                 >
                   View Page
                 </Link>
+
+                {e.status === 'published' && (
+                  <>
+                    <Link
+                      href={`/scan/${e.id}`}
+                      className="bg-indigo-950 hover:bg-indigo-900 text-indigo-300 border border-indigo-800 px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow"
+                    >
+                      Scan Tickets
+                    </Link>
+                    <Link
+                      href={`/organizer/events/${e.id}/scan-overview`}
+                      className="bg-cyan-950 hover:bg-cyan-900 text-cyan-300 border border-cyan-800 px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow"
+                    >
+                      Scan Overview
+                    </Link>
+                  </>
+                )}
+
                 <Link
-                  href={`/admin/events/${event.id}/scan`}
-                  className="bg-gray-800 hover:bg-gray-700 text-emerald-300 text-xs font-medium px-3 py-1.5 rounded border border-gray-700 transition"
-                >
-                  Scan tickets
-                </Link>
-                <Link
-                  href={`/admin/events/${event.id}/scan-overview`}
-                  className="bg-gray-800 hover:bg-gray-700 text-cyan-300 text-xs font-medium px-3 py-1.5 rounded border border-gray-700 transition"
-                >
-                  Scan overview
-                </Link>
-                <Link
-                  href={`/admin/events/${event.id}/orders`}
-                  className="bg-gray-800 hover:bg-gray-700 text-indigo-300 text-xs font-medium px-3 py-1.5 rounded border border-gray-700 transition"
+                  href={`/organizer/events/${e.id}/orders`}
+                  className="bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow"
                 >
                   Orders
                 </Link>
+
                 <Link
-                  href={`/admin/events/${event.id}/messages`}
-                  className="bg-gray-800 hover:bg-gray-700 text-purple-300 text-xs font-medium px-3 py-1.5 rounded border border-gray-700 transition"
+                  href={`/organizer/events/${e.id}/edit`}
+                  className="bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow"
                 >
-                  Messages
+                  Edit Cover
                 </Link>
-                <Link
-                  href={`/admin/events/${event.id}/edit-cover`}
-                  className="bg-gray-800 hover:bg-gray-700 text-amber-300 text-xs font-medium px-3 py-1.5 rounded border border-gray-700 transition"
-                >
-                  Edit cover
-                </Link>
-                <Link
-                  href={`/admin/events/${event.id}/edit`}
-                  className="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium px-3 py-1.5 rounded transition shadow"
-                >
-                  Edit
-                </Link>
-                <Link
-                  href={`/admin/events/${event.id}/cancel`}
-                  className="bg-gray-800 hover:bg-gray-700 text-orange-400 text-xs font-medium px-3 py-1.5 rounded border border-gray-700 transition"
-                >
-                  Cancel event
-                </Link>
-                <Link
-                  href={`/admin/events/${event.id}/delete`}
-                  className="bg-red-950 hover:bg-red-900 text-red-400 text-xs font-medium px-3 py-1.5 rounded border border-red-800 transition"
-                >
-                  Delete event
-                </Link>
+
+                {e.status === 'draft' && <PublishButton eventId={e.id} />}
+
+                {(e.status === 'draft' || e.status === 'published') && (
+                  <CancelEventButton eventId={e.id} />
+                )}
               </div>
             </div>
           ))}
