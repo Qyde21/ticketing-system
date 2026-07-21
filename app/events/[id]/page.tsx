@@ -48,19 +48,10 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
     notFound();
   }
 
-  // Parse event date and log for debugging
   const now = new Date();
   const eventDate = event.date ? new Date(event.date) : null;
 
-  console.log("EVENT DEBUG:", {
-    title: event.title,
-    rawDate: event.date,
-    parsedDate: eventDate?.toISOString(),
-    now: now.toISOString(),
-    status: event.status
-  });
-
-  // Strict check: Only consider ended if status is explicitly 'ended' or date is strictly in the past
+  // Robust check: Only mark as ended if status is explicitly 'ended' OR if a valid date exists and is in the past.
   const isEnded = event.status === 'ended' || (eventDate !== null && !isNaN(eventDate.getTime()) && eventDate.getTime() < now.getTime());
 
   return (
@@ -98,7 +89,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-gray-950/60 border border-gray-800/80 p-4 rounded-xl text-sm">
             <div>
               <span className="text-gray-400 block text-xs">Date & Time</span>
-              <strong className="text-gray-200">{eventDate ? eventDate.toLocaleString() : 'TBD'}</strong>
+              <strong className="text-gray-200">{eventDate && !isNaN(eventDate.getTime()) ? eventDate.toLocaleString() : 'TBD'}</strong>
             </div>
             <div>
               <span className="text-gray-400 block text-xs">Location</span>
