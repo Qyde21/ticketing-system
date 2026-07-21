@@ -1,4 +1,4 @@
-﻿import { sql } from '@/lib/db';
+import { sql } from '@/lib/db';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 
@@ -10,21 +10,23 @@ export default async function EventDetailPage({
   const resolvedParams = await params;
   const identifier = resolvedParams.id;
 
-  let events = await sql`
+  let events: any = await sql`
     SELECT * FROM events WHERE id::text = ${identifier} OR slug = ${identifier} LIMIT 1
   `;
 
-  if (!events || events.length === 0) {
+  if (!events || (Array.isArray(events) && events.length === 0) || (events.rows && events.rows.length === 0)) {
     events = await sql`
       SELECT * FROM events WHERE LOWER(title) LIKE ${'%' + identifier.replace(/-/g, ' ').toLowerCase() + '%'} LIMIT 1
     `;
   }
 
-  if (!events || events.length === 0) {
+  const rows = Array.isArray(events) ? events : (events?.rows || []);
+
+  if (rows.length === 0) {
     notFound();
   }
 
-  const event = Array.isArray(events) ? events[0] : (events.rows?.[0] || events);
+  const event = rows[0];
 
   if (!event || !event.id) {
     notFound();
