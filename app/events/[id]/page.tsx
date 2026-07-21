@@ -14,6 +14,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
 
   let event: any = null;
   let tickets: any[] = [];
+  let tableColumns: any[] = [];
 
   try {
     let eventRes = await sql`
@@ -40,15 +41,27 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
 
     event = eventRes[0];
 
-    tickets = await sql`
-      SELECT * FROM tickets WHERE event_id::text = ${String(event.id)}
+    // Inspect the actual columns of the 'tickets' table in PostgreSQL
+    tableColumns = await sql`
+      SELECT column_name, data_type 
+      FROM information_schema.columns 
+      WHERE table_name = 'tickets'
     `.catch(() => []);
+
+    // Try selecting everything from tickets without filters to see what rows exist
+    tickets = await sql`
+      SELECT * FROM tickets LIMIT 5
+    `.catch(() => []);
+
+    console.log("=========================================");
+    console.log("🛠️ TICKETS TABLE COLUMNS:", tableColumns.map((c: any) => c.column_name));
+    console.log("📦 SAMPLE TICKET ROWS:", tickets);
+    console.log("=========================================");
   } catch (err) {
     console.error("Error loading event details:", err);
     notFound();
   }
 
-  // Check start_at or start_date or date safely
   const now = new Date();
   const rawEventDate = event.start_at || event.start_date || event.date;
   const eventDate = rawEventDate ? new Date(rawEventDate) : null;
@@ -110,46 +123,9 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
           <div className="space-y-4 pt-4 border-t border-gray-800">
             <h2 className="text-lg font-bold text-white">Ticket Availability</h2>
 
-            {tickets.length === 0 ? (
-              <div className="p-4 bg-gray-950 border border-gray-800 rounded-xl text-gray-400 text-sm text-center">
-                {isEnded ? 'Ticket sales have concluded for this past event.' : 'No ticket tiers currently listed.'}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-4">
-                {tickets.map((t: any) => {
-                  const isSoldOut = t.quantity_available !== undefined && t.quantity_available !== null && Number(t.quantity_available) <= 0;
-
-                  return (
-                    <div key={t.id} className="p-4 bg-gray-950 border border-gray-800 rounded-xl flex justify-between items-center">
-                      <div>
-                        <h3 className="font-bold text-white text-base">{t.name || t.tier_name || 'Standard Ticket'}</h3>
-                        <p className="text-xs text-gray-400">{t.description || 'Standard access ticket'}</p>
-                        <span className="text-cyan-400 font-bold text-sm mt-1 block">KES {t.price || 0}</span>
-                      </div>
-
-                      <div>
-                        {isEnded ? (
-                          <span className="px-3 py-1 bg-gray-800 text-gray-400 rounded-lg text-xs font-bold uppercase tracking-wider">
-                            Sales Closed
-                          </span>
-                        ) : isSoldOut ? (
-                          <span className="px-3 py-1 bg-red-950 text-red-400 border border-red-800 rounded-lg text-xs font-bold uppercase tracking-wider">
-                            Sold Out
-                          </span>
-                        ) : (
-                          <Link
-                            href={`/checkout?ticket_id=${t.id}`}
-                            className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-lg shadow-green-950/50 block text-center"
-                          >
-                            Buy Ticket
-                          </Link>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+            <div className="p-4 bg-gray-950 border border-gray-800 rounded-xl text-gray-400 text-sm text-center">
+              Schema Inspection Mode Active — Check your terminal output!
+            </div>
           </div>
         </div>
       </div>
