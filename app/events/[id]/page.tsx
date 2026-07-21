@@ -149,7 +149,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                           </span>
                         ) : (
                           <Link
-                            href={`/checkout?ticket_id=${t.id}`}
+                            href={`/checkout/${t.id}`}
                             className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-lg shadow-green-950/50 block text-center"
                           >
                             Buy Ticket
