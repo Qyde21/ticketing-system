@@ -48,11 +48,10 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
     notFound();
   }
 
+  // Reverting to the previous strict check: Only flag as ended if status is 'ended' or date has passed.
   const now = new Date();
   const eventDate = event.date ? new Date(event.date) : null;
-
-  // Robust check: Only mark as ended if status is explicitly 'ended' OR if a valid date exists and is in the past.
-  const isEnded = event.status === 'ended' || (eventDate !== null && !isNaN(eventDate.getTime()) && eventDate.getTime() < now.getTime());
+  const isEnded = event.status === 'ended' || (eventDate !== null && !isNaN(eventDate.getTime()) && eventDate < now);
 
   return (
     <main className="max-w-4xl mx-auto px-4 py-8 text-white">
