@@ -17,43 +17,113 @@ export default async function OrganizerDashboard() {
   `;
 
   return (
-    <div style={{ maxWidth: 700, margin: '2rem auto', padding: '0 1rem' }}>
-      <h1>Your Events</h1>
-      <Link href="/organizer/events/new" style={{ color: '#6366f1', fontWeight: 600 }}>+ Create new event</Link>
-      <ul style={{ listStyle: 'none', padding: 0, marginTop: 16 }}>
-        {events.map((e: any) => (
-          <li key={e.id} style={{ display: 'flex', gap: 16, marginBottom: 16, alignItems: 'center', background: '#fff', borderRadius: 8, padding: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
-            <div style={{ width: 80, height: 60, borderRadius: 6, overflow: 'hidden', flexShrink: 0, background: '#6366f1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {e.cover_image_url ? (
-                <img src={e.cover_image_url} alt={e.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              ) : (
-                <span style={{ color: '#fff', fontSize: 10, textAlign: 'center', padding: 4 }}>{e.title}</span>
-              )}
-            </div>
-            <div style={{ flex: 1 }}>
-              <strong style={{ color: '#111827', fontSize: 15 }}>{e.title}</strong>
-              <div style={{ fontSize: 13, color: '#4b5563', marginTop: 2 }}>
-                {e.status.toUpperCase()} — {new Date(e.start_at).toLocaleDateString()}
+    <main className="max-w-6xl mx-auto px-4 py-8 text-white">
+      <div className="flex justify-between items-center mb-8 pb-4 border-b border-gray-800">
+        <div>
+          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Your Events</h1>
+          <p className="text-gray-400 text-sm mt-1">Manage your created events, track ticket sales, and monitor check-ins</p>
+        </div>
+        <Link
+          href="/organizer/events/new"
+          className="bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-bold px-5 py-2.5 rounded-lg transition shadow-lg"
+        >
+          + Create New Event
+        </Link>
+      </div>
+
+      {events.length === 0 ? (
+        <div className="text-center py-16 bg-gray-900 border border-gray-800 rounded-2xl shadow-xl">
+          <p className="text-gray-400 mb-4">You haven't created any events yet.</p>
+          <Link
+            href="/organizer/events/new"
+            className="inline-block bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 py-3 rounded-lg transition shadow"
+          >
+            Create Your First Event
+          </Link>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {events.map((e: any) => (
+            <div
+              key={e.id}
+              className="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-lg flex flex-col md:flex-row gap-6 items-start md:items-center justify-between transition hover:border-gray-700"
+            >
+              <div className="flex items-center gap-5 w-full md:w-auto">
+                <div className="w-24 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-gray-800 border border-gray-700 relative">
+                  {e.cover_image_url ? (
+                    <img src={e.cover_image_url} alt={e.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-xs text-gray-500 text-center p-2">
+                      {e.title}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-lg font-bold text-white">{e.title}</h2>
+                    <span className={`px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider ${
+                      e.status === 'published' ? 'bg-green-950 text-green-400 border border-green-800' : 'bg-amber-950 text-amber-400 border border-amber-800'
+                    }`}>
+                      {e.status}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Date: {e.start_at ? new Date(e.start_at).toLocaleDateString() : 'TBD'}
+                  </p>
+                </div>
               </div>
-              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 8, fontSize: 13 }}>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center gap-2 pt-4 md:pt-0 border-t md:border-t-0 border-gray-800 w-full md:w-auto justify-end">
                 {e.status === 'draft' && <PublishButton eventId={e.id} />}
+                
                 {e.status === 'published' && (
                   <>
-                    <Link href={`/scan/${e.id}`} style={{ color: '#4f46e5', fontWeight: 500 }}>Scan tickets</Link>
-                    <Link href={`/organizer/events/${e.id}/scan-overview`} style={{ color: '#4f46e5', fontWeight: 500 }}>Scan overview</Link>
+                    <Link
+                      href={`/scan/${e.id}`}
+                      className="bg-indigo-950 hover:bg-indigo-900 text-indigo-300 border border-indigo-800 px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow"
+                    >
+                      Scan Tickets
+                    </Link>
+                    <Link
+                      href={`/organizer/events/${e.id}/scan-overview`}
+                      className="bg-cyan-950 hover:bg-cyan-900 text-cyan-300 border border-cyan-800 px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow"
+                    >
+                      Scan Overview
+                    </Link>
                   </>
                 )}
-                <Link href={`/organizer/events/${e.id}/orders`} style={{ color: '#4f46e5', fontWeight: 500 }}>Orders</Link>
-                <Link href={`/organizer/events/${e.id}/messages`} style={{ color: '#4f46e5', fontWeight: 500 }}>Messages</Link>
-                <Link href={`/organizer/events/${e.id}/edit`} style={{ color: '#4f46e5', fontWeight: 500 }}>Edit cover</Link>
+
+                <Link
+                  href={`/organizer/events/${e.id}/orders`}
+                  className="bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow"
+                >
+                  Orders
+                </Link>
+
+                <Link
+                  href={`/organizer/events/${e.id}/messages`}
+                  className="bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow"
+                >
+                  Messages
+                </Link>
+
+                <Link
+                  href={`/organizer/events/${e.id}/edit`}
+                  className="bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow"
+                >
+                  Edit Cover
+                </Link>
+
                 {(e.status === 'draft' || e.status === 'published') && (
                   <CancelEventButton eventId={e.id} />
                 )}
               </div>
             </div>
-          </li>
-        ))}
-      </ul>
-    </div>
+          ))}
+        </div>
+      )}
+    </main>
   );
 }

@@ -80,27 +80,57 @@ export default async function AdminEventsPage() {
               <div className="flex flex-wrap items-center gap-2 w-full md:w-auto justify-end pt-3 md:pt-0 border-t md:border-t-0 border-gray-800">
                 <Link
                   href={`/events/${event.slug || event.id}`}
-                  className="bg-gray-800 hover:bg-gray-700 text-indigo-300 text-xs font-medium px-3 py-1.5 rounded border border-gray-700 transition"
+                  className="bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-medium px-3 py-1.5 rounded border border-gray-700 transition"
                 >
                   View Page
                 </Link>
                 <Link
                   href={`/admin/events/${event.id}/scan`}
+                  className="bg-gray-800 hover:bg-gray-700 text-emerald-300 text-xs font-medium px-3 py-1.5 rounded border border-gray-700 transition"
+                >
+                  Scan tickets
+                </Link>
+                <Link
+                  href={`/admin/events/${event.id}/scan-overview`}
                   className="bg-gray-800 hover:bg-gray-700 text-cyan-300 text-xs font-medium px-3 py-1.5 rounded border border-gray-700 transition"
                 >
-                  Scan Tickets
+                  Scan overview
                 </Link>
                 <Link
                   href={`/admin/events/${event.id}/orders`}
-                  className="bg-gray-800 hover:bg-gray-700 text-emerald-300 text-xs font-medium px-3 py-1.5 rounded border border-gray-700 transition"
+                  className="bg-gray-800 hover:bg-gray-700 text-indigo-300 text-xs font-medium px-3 py-1.5 rounded border border-gray-700 transition"
                 >
                   Orders
+                </Link>
+                <Link
+                  href={`/admin/events/${event.id}/messages`}
+                  className="bg-gray-800 hover:bg-gray-700 text-purple-300 text-xs font-medium px-3 py-1.5 rounded border border-gray-700 transition"
+                >
+                  Messages
+                </Link>
+                <Link
+                  href={`/admin/events/${event.id}/edit-cover`}
+                  className="bg-gray-800 hover:bg-gray-700 text-amber-300 text-xs font-medium px-3 py-1.5 rounded border border-gray-700 transition"
+                >
+                  Edit cover
                 </Link>
                 <Link
                   href={`/admin/events/${event.id}/edit`}
                   className="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium px-3 py-1.5 rounded transition shadow"
                 >
                   Edit
+                </Link>
+                <Link
+                  href={`/admin/events/${event.id}/cancel`}
+                  className="bg-gray-800 hover:bg-gray-700 text-orange-400 text-xs font-medium px-3 py-1.5 rounded border border-gray-700 transition"
+                >
+                  Cancel event
+                </Link>
+                <Link
+                  href={`/admin/events/${event.id}/delete`}
+                  className="bg-red-950 hover:bg-red-900 text-red-400 text-xs font-medium px-3 py-1.5 rounded border border-red-800 transition"
+                >
+                  Delete event
                 </Link>
               </div>
             </div>
