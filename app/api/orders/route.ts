@@ -4,21 +4,29 @@ import { nanoid } from 'nanoid';
 
 export async function POST(req: NextRequest) {
   try {
-    const { ticketTypeId, quantity = 1, buyerName, buyerEmail, buyerPhone } = await req.json();
+    const body = await req.json();
+    const { ticketTypeId, quantity = 1, buyerName, buyerEmail, buyerPhone } = body;
 
     if (!ticketTypeId || !buyerName || !buyerEmail || !buyerPhone) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+      return NextResponse.json({ error: 'Missing required fields', received: body }, { status: 400 });
     }
     if (quantity < 1) {
       return NextResponse.json({ error: 'Quantity must be at least 1' }, { status: 400 });
     }
 
-    // 1. Fetch ticket type details
     let tickets = await sql`
       SELECT id, event_id, price_kes, quantity_total, quantity_sold, max_per_order
       FROM ticket_types WHERE id::text = ${ticketTypeId}
     `;
     let ticketType = tickets[0];
+
+    if (!ticketType) {
+      const eventTickets = await sql`
+        SELECT id, event_id, price_kes, quantity_total, quantity_sold, max_per_order
+        FROM ticket_types WHERE event_id::text = ${ticketTypeId} LIMIT 1
+      `;
+      ticketType = eventTickets[0];
+    }
 
     if (!ticketType) {
       const fallback = await sql`
@@ -29,7 +37,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (!ticketType) {
-      return NextResponse.json({ error: 'No tickets available' }, { status: 404 });
+      return NextResponse.json({ error: 'Ticket not found' }, { status: 404 });
     }
 
     const amountKes = Number(ticketType.price_kes || 0) * quantity;
@@ -39,7 +47,6 @@ export async function POST(req: NextRequest) {
     let authorizationUrl = '';
     const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
 
-    // 2. Attempt Paystack initialization if key exists, otherwise fallback gracefully for testing
     if (paystackSecret) {
       try {
         const paystackRes = await fetch('https://api.paystack.co/transaction/initialize', {
@@ -61,11 +68,10 @@ export async function POST(req: NextRequest) {
           authorizationUrl = paystackData.data.authorization_url;
         }
       } catch (paystackErr) {
-        console.warn("Paystack API call failed, proceeding with direct order completion:", paystackErr);
+        console.warn("Paystack API call failed:", paystackErr);
       }
     }
 
-    // 3. Save order in database
     const [order] = await sql`
       INSERT INTO orders (event_id, buyer_name, buyer_email, buyer_phone, total_amount_kes, payment_status, paystack_reference, ticket_type_id, quantity)
       VALUES (${ticketType.event_id}, ${buyerName}, ${buyerEmail}, ${buyerPhone}, ${amountKes}, ${authorizationUrl ? 'pending' : 'paid'}, ${reference}, ${ticketType.id}, ${quantity})

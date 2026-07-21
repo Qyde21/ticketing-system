@@ -1,141 +1,131 @@
-﻿"use client";
+﻿'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
-export default function CheckoutForm({ event }: { event: any }) {
-  const ticketTypes = event.ticketTypes || [];
-  const [selectedTierId, setSelectedTierId] = useState(ticketTypes[0]?.id || "default");
+export default function CheckoutForm({ event, ticketTypes }: { event: any, ticketTypes: any[] }) {
+  const safeTickets = Array.isArray(ticketTypes) ? ticketTypes : [];
+  const defaultTicket = safeTickets[0] || { id: '', name: 'General Admission', price_kes: 0 };
+  
+  const [selectedTicketId, setSelectedTicketId] = useState(defaultTicket.id);
   const [quantity, setQuantity] = useState(1);
-  const [buyerName, setBuyerName] = useState("");
-  const [buyerEmail, setBuyerEmail] = useState("");
-  const [buyerPhone, setBuyerPhone] = useState("");
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
-  const selectedTier = ticketTypes.find((t: any) => t.id === selectedTierId) || ticketTypes[0];
-  const unitPrice = Number(selectedTier?.price || 0);
-  const total = unitPrice * quantity;
+  const selectedTicket = safeTickets.find(t => t && t.id === selectedTicketId) || defaultTicket;
+  const unitPrice = Number(selectedTicket.price_kes || selectedTicket.price || 0);
+  const totalAmount = unitPrice * quantity;
 
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
 
     try {
-      const res = await fetch("/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          eventId: event.id,
-          ticketTypeId: selectedTier.id !== "default" ? selectedTier.id : null,
+          ticketTypeId: selectedTicketId,
           quantity,
-          buyerName,
-          buyerEmail,
-          buyerPhone,
+          buyerName: fullName,
+          buyerEmail: email,
+          buyerPhone: phone,
         }),
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to initialize checkout");
+      const paystackUrl = data.authorizationUrl || data.authorization_url;
 
-      if (data.authorizationUrl) {
-        window.location.href = data.authorizationUrl;
+      if (res.ok && paystackUrl) {
+        window.location.href = paystackUrl;
       } else {
-        throw new Error("No authorization URL returned");
+        alert(data.error || 'Failed to initialize payment');
+        setLoading(false);
       }
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      console.error(err);
+      alert('An error occurred during checkout.');
       setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleCheckout} className="space-y-6 text-white">
-      {error && (
-        <div className="bg-red-900/50 border border-red-700 text-red-200 px-4 py-3 rounded-md text-sm">
-          {error}
-        </div>
-      )}
-
-      {ticketTypes.length > 1 && (
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">Select Ticket Type</label>
-          <select
-            value={selectedTierId}
-            onChange={(e) => setSelectedTierId(e.target.value)}
-            className="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
-          >
-            {ticketTypes.map((tier: any) => (
-              <option key={tier.id} value={tier.id} className="bg-gray-900 text-white">
-                {tier.name} - KES {Number(tier.price || 0)}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
-
+    <form onSubmit={handleCheckout} className="space-y-6 bg-gray-950 border border-gray-800 p-6 rounded-2xl">
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-1">Ticket Quantity</label>
-        <select
-          value={quantity}
-          onChange={(e) => setQuantity(Number(e.target.value))}
-          className="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+        <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Select Ticket Tier</label>
+        <select 
+          value={selectedTicketId} 
+          onChange={(e) => setSelectedTicketId(e.target.value)}
+          className="w-full bg-gray-900 border border-gray-800 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500"
         >
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-            <option key={num} value={num} className="bg-gray-900 text-white">
-              {num} {num === 1 ? "Ticket" : "Tickets"}
+          {safeTickets.map((t) => t && t.id ? (
+            <option key={t.id} value={t.id}>
+              {t.name} - KES {Number(t.price_kes || t.price || 0).toLocaleString()}
             </option>
-          ))}
+          ) : null)}
         </select>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-1">Full Name</label>
-        <input
-          type="text"
-          required
-          value={buyerName}
-          onChange={(e) => setBuyerName(e.target.value)}
-          placeholder="John Doe"
-          className="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Ticket Quantity</label>
+        <input 
+          type="number" 
+          min="1" 
+          max="10" 
+          value={quantity} 
+          onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+          className="w-full bg-gray-900 border border-gray-800 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500"
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-1">Email Address</label>
-        <input
-          type="email"
+        <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Full Name</label>
+        <input 
+          type="text" 
           required
-          value={buyerEmail}
-          onChange={(e) => setBuyerEmail(e.target.value)}
-          placeholder="john@example.com"
-          className="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value={fullName} 
+          onChange={(e) => setFullName(e.target.value)}
+          placeholder="Kirui Gideon"
+          className="w-full bg-gray-900 border border-gray-800 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500"
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-1">Phone Number</label>
-        <input
-          type="tel"
+        <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Email Address</label>
+        <input 
+          type="email" 
           required
-          value={buyerPhone}
-          onChange={(e) => setBuyerPhone(e.target.value)}
-          placeholder="0712345678"
-          className="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value={email} 
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="kiruiqyde@gmail.com"
+          className="w-full bg-gray-900 border border-gray-800 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500"
         />
       </div>
 
-      <div className="bg-gray-900 p-4 rounded-md flex justify-between items-center border border-gray-800">
-        <span className="font-semibold text-gray-300">Total Amount:</span>
-        <span className="text-2xl font-bold text-blue-400">KES {total}</span>
+      <div>
+        <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Phone Number</label>
+        <input 
+          type="text" 
+          required
+          value={phone} 
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="0114525941"
+          className="w-full bg-gray-900 border border-gray-800 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500"
+        />
       </div>
 
-      <button
-        type="submit"
+      <div className="bg-gray-900 border border-gray-800 p-4 rounded-xl flex justify-between items-center">
+        <span className="text-gray-400 text-sm font-bold">Total Amount:</span>
+        <span className="text-cyan-400 font-extrabold text-xl">KES {totalAmount.toLocaleString()}</span>
+      </div>
+
+      <button 
+        type="submit" 
         disabled={loading}
-        className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+        className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold uppercase tracking-wider transition shadow-lg shadow-indigo-950/50 disabled:opacity-50"
       >
-        {loading ? "Processing..." : "Proceed to Paystack"}
+        {loading ? 'Processing...' : 'Proceed to Paystack'}
       </button>
     </form>
   );

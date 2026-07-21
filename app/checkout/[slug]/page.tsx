@@ -1,138 +1,47 @@
-﻿'use client';
+﻿import { sql } from '@/lib/db';
+import { notFound } from 'next/navigation';
+import CheckoutForm from './CheckoutForm';
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+export default async function CheckoutPage({ 
+  params 
+}: { 
+  params: Promise<{ slug: string }> 
+}) {
+  const resolvedParams = await params;
+  const slug = resolvedParams.slug;
 
-export default function CheckoutClientPage({ params }: { params: Promise<{ slug: string }> | { slug: string } }) {
-  const [slug, setSlug] = useState<string>('');
+  let events = await sql`
+    SELECT * FROM events WHERE slug = ${slug} OR id::text = ${slug} LIMIT 1
+  `;
 
-  useEffect(() => {
-    Promise.resolve(params).then((resolved) => {
-      setSlug(resolved.slug);
-    });
-  }, [params]);
-
-  if (!slug) {
-    return (
-      <main className="max-w-2xl mx-auto px-4 py-12 text-white text-center">
-        <p className="text-gray-400">Loading checkout...</p>
-      </main>
-    );
+  if (!events || events.length === 0) {
+    events = await sql`
+      SELECT * FROM events WHERE LOWER(title) LIKE ${'%' + slug.replace(/-/g, ' ').toLowerCase() + '%'} LIMIT 1
+    `;
   }
 
-  return <CheckoutForm identifier={slug} />;
-}
+  if (!events || events.length === 0) {
+    notFound();
+  }
 
-function CheckoutForm({ identifier }: { identifier: string }) {
-  const router = useRouter();
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
+  const event = Array.isArray(events) ? events[0] : (events.rows?.[0] || events);
 
-  const [formData, setFormData] = useState({
-    buyerName: '',
-    buyerEmail: '',
-    buyerPhone: ''
-  });
+  if (!event || !event.id) {
+    notFound();
+  }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
-    setError('');
+  const ticketTypes = await sql`
+    SELECT * FROM ticket_types WHERE event_id = ${event.id}
+  `.catch(() => []);
 
-    try {
-      const res = await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ticketTypeId: identifier,
-          quantity: 1,
-          buyerName: formData.buyerName,
-          buyerEmail: formData.buyerEmail,
-          buyerPhone: formData.buyerPhone
-        })
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to create order');
-      }
-
-      router.push(`/tickets/${data.orderId || identifier}`);
-    } catch (err: any) {
-      setError(err.message);
-      setSubmitting(false);
-    }
-  };
+  const safeTicketTypes = Array.isArray(ticketTypes) ? ticketTypes : (ticketTypes.rows || []);
 
   return (
-    <main className="max-w-2xl mx-auto px-4 py-12 text-white">
-      <div className="mb-6">
-        <Link href={`/events`} className="text-indigo-400 hover:underline text-sm font-semibold">
-          ← Back to Events
-        </Link>
-      </div>
-
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6">
-        <div>
-          <span className="text-xs uppercase tracking-wider font-bold text-indigo-400 bg-indigo-950/60 px-3 py-1 rounded-full border border-indigo-800/50">
-            Checkout
-          </span>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white mt-3">Complete Your Ticket Order</h1>
-        </div>
-
-        {error && (
-          <div className="p-4 bg-red-950 border border-red-800 rounded-xl text-red-400 text-sm">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4 pt-2">
-          <div>
-            <label className="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1">Your Full Name</label>
-            <input 
-              type="text" 
-              required 
-              value={formData.buyerName}
-              onChange={(e) => setFormData({ ...formData, buyerName: e.target.value })}
-              placeholder="John Doe" 
-              className="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-indigo-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1">Email Address</label>
-            <input 
-              type="email" 
-              required 
-              value={formData.buyerEmail}
-              onChange={(e) => setFormData({ ...formData, buyerEmail: e.target.value })}
-              placeholder="john@example.com" 
-              className="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-indigo-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1">Phone Number (M-PESA)</label>
-            <input 
-              type="text" 
-              required 
-              value={formData.buyerPhone}
-              onChange={(e) => setFormData({ ...formData, buyerPhone: e.target.value })}
-              placeholder="0712345678" 
-              className="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-indigo-500"
-            />
-          </div>
-
-          <button 
-            type="submit"
-            disabled={submitting}
-            className="w-full py-4 bg-green-600 hover:bg-green-500 text-white font-bold rounded-xl uppercase tracking-wider text-sm transition shadow-lg shadow-green-950/50 mt-4 cursor-pointer disabled:opacity-50"
-          >
-            {submitting ? 'Processing...' : 'Complete Purchase'}
-          </button>
-        </form>
-      </div>
-    </main>
+    <div className="max-w-2xl mx-auto py-10 px-4 text-white">
+      <h1 className="text-3xl font-bold mb-2">{event.title}</h1>
+      <p className="text-gray-400 mb-6">{event.description}</p>
+      
+      <CheckoutForm event={event} ticketTypes={safeTicketTypes} />
+    </div>
   );
 }
