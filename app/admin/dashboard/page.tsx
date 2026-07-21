@@ -143,13 +143,58 @@ export default async function AdminDashboard() {
                       <p className="text-xs text-gray-400">Tickets Sold</p>
                       <p className="text-sm font-bold text-emerald-400">{ev.totalSold} / {ev.totalCapacity}</p>
                     </div>
-                    <Link 
-                      href={`/events/${ev.slug || ev.id}`}
-                      className="bg-gray-800 hover:bg-gray-700 text-indigo-300 text-xs px-3 py-1.5 rounded transition font-medium border border-gray-700"
-                    >
-                      Full Details &rarr;
-                    </Link>
                   </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 pt-2 pb-3 mb-3 border-b border-gray-800/60 text-xs">
+                  <Link
+                    href={`/admin/events/${ev.id}/scan`}
+                    className="text-gray-300 hover:text-emerald-400 transition"
+                  >
+                    Scan tickets
+                  </Link>
+                  <span className="text-gray-700">|</span>
+                  <Link
+                    href={`/admin/events/${ev.id}/scan-overview`}
+                    className="text-gray-300 hover:text-cyan-400 transition"
+                  >
+                    Scan overview
+                  </Link>
+                  <span className="text-gray-700">|</span>
+                  <Link
+                    href={`/admin/events/${ev.id}/orders`}
+                    className="text-gray-300 hover:text-indigo-400 transition"
+                  >
+                    Orders
+                  </Link>
+                  <span className="text-gray-700">|</span>
+                  <Link
+                    href={`/admin/events/${ev.id}/messages`}
+                    className="text-gray-300 hover:text-purple-400 transition"
+                  >
+                    Messages
+                  </Link>
+                  <span className="text-gray-700">|</span>
+                  <Link
+                    href={`/admin/events/${ev.id}/edit-cover`}
+                    className="text-gray-300 hover:text-amber-400 transition"
+                  >
+                    Edit cover
+                  </Link>
+                  <span className="text-gray-700">|</span>
+                  <Link
+                    href={`/admin/events/${ev.id}/cancel`}
+                    className="text-orange-400 hover:text-orange-300 transition"
+                  >
+                    Cancel event
+                  </Link>
+                  <span className="text-gray-700">|</span>
+                  <Link
+                    href={`/admin/events/${ev.id}/delete`}
+                    className="text-red-400 hover:text-red-300 transition"
+                  >
+                    Delete event
+                  </Link>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
