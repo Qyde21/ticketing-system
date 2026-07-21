@@ -86,6 +86,10 @@ export default async function EventDetailPage({ params }: PageProps) {
               const sold = Number(ticket.quantity_sold) || 0;
               const remaining = Math.max(0, total - sold);
               const isSoldOut = total > 0 && remaining === 0;
+              
+              // Low stock threshold set to 15 tickets
+              const LOW_STOCK_THRESHOLD = 15;
+              const isLowStock = remaining <= LOW_STOCK_THRESHOLD && remaining > 0;
 
               return (
                 <div key={ticket.id} className="flex justify-between items-center p-4 bg-gray-800/80 rounded-lg border border-gray-700">
@@ -99,13 +103,16 @@ export default async function EventDetailPage({ params }: PageProps) {
                       <span className="inline-block bg-red-950 text-red-400 border border-red-800 px-3 py-1 rounded-md text-xs font-bold">
                         SOLD OUT
                       </span>
-                    ) : (
+                    ) : isLowStock ? (
                       <div>
-                        <span className="inline-block bg-indigo-950 text-indigo-300 border border-indigo-800 px-3 py-1 rounded-md text-xs font-bold">
-                          {remaining} Available
+                        <span className="inline-block bg-amber-950 text-amber-300 border border-amber-800 px-3 py-1 rounded-md text-xs font-bold animate-pulse">
+                          Only {remaining} left!
                         </span>
-                        <p className="text-xs text-gray-400 mt-1">{sold} sold of {total}</p>
                       </div>
+                    ) : (
+                      <span className="inline-block bg-emerald-950 text-emerald-300 border border-emerald-800 px-3 py-1 rounded-md text-xs font-bold">
+                        Available
+                      </span>
                     )}
                   </div>
                 </div>
