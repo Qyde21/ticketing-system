@@ -48,10 +48,12 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
     notFound();
   }
 
-  // Reverting to the previous strict check: Only flag as ended if status is 'ended' or date has passed.
+  // Use the correct database column 'start_at' instead of 'date'
   const now = new Date();
-  const eventDate = event.date ? new Date(event.date) : null;
-  const isEnded = event.status === 'ended' || (eventDate !== null && !isNaN(eventDate.getTime()) && eventDate < now);
+  const eventDate = event.start_at ? new Date(event.start_at) : null;
+  
+  // An event is ended if its status is 'completed'/'ended' OR its start_at date is in the past
+  const isEnded = event.status === 'completed' || event.status === 'ended' || (eventDate !== null && !isNaN(eventDate.getTime()) && eventDate < now);
 
   return (
     <main className="max-w-4xl mx-auto px-4 py-8 text-white">
@@ -62,10 +64,10 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
       </div>
 
       <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-2xl">
-        {event.image_url && (
+        {(event.cover_image_url || event.image_url) && (
           <div className="w-full h-72 sm:h-96 relative bg-gray-950">
             <img 
-              src={event.image_url} 
+              src={event.cover_image_url || event.image_url} 
               alt={event.title} 
               className="w-full h-full object-cover"
             />
@@ -92,7 +94,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
             </div>
             <div>
               <span className="text-gray-400 block text-xs">Location</span>
-              <strong className="text-gray-200">{event.location || 'Online'}</strong>
+              <strong className="text-gray-200">{event.venue_name || event.location || 'Online'}</strong>
             </div>
             <div>
               <span className="text-gray-400 block text-xs">Category</span>
