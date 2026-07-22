@@ -1,6 +1,8 @@
 ﻿import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import Link from 'next/link';
+import PublishButton from '../PublishButton';
+import CancelEventButton from '../CancelEventButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -75,8 +77,16 @@ export default async function OrganizerDashboardPage() {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-indigo-400 pt-1">
-                  <Link href={`/admin/events/${event.id}/orders`} className="hover:underline text-cyan-300 bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Orders</Link>
-                  <Link href={`/admin/events/${event.id}`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Manage Details</Link>
+                  <Link href={`/organizer/events/${event.id}/orders`} className="hover:underline text-cyan-300 bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Orders</Link>
+                  <Link href={`/organizer/events/${event.id}/edit`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Manage Details</Link>
+                  <Link href={`/organizer/events/${event.id}/messages`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Messages</Link>
+                  <Link href={`/organizer/events/${event.id}/scan-overview`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Scan Overview</Link>
+                  {event.status !== 'published' && event.status !== 'cancelled' && (
+                    <PublishButton eventId={event.id} />
+                  )}
+                  {event.status !== 'cancelled' && (
+                    <CancelEventButton eventId={event.id} />
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pt-2">

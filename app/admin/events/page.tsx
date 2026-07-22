@@ -96,7 +96,7 @@ export default async function AdminEventsPage({ searchParams }: { searchParams: 
               </div>
 
               <div className="pt-3 border-t border-gray-800 flex justify-between items-center text-xs text-gray-400">
-                <span>{ev.date ? new Date(ev.date).toLocaleDateString() : 'Date TBD'}</span>
+                <span>{ev.start_at ? new Date(ev.start_at).toLocaleDateString() : 'Date TBD'}</span>
                 <Link 
                   href={`/events/${ev.id}`} 
                   target="_blank"
