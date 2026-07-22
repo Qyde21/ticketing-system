@@ -88,9 +88,10 @@ export default async function EventDetailPage({
                 <div>
                   <p className="font-bold text-white">{t.name}</p>
                   <p className="text-xs text-gray-400">
-                    KES {Number(t.price_kes).toLocaleString()} &middot; {soldOut ? 'Sold out' : remaining + ' remaining'}
+                    KES {Number(t.price_kes).toLocaleString()}
+                    {soldOut && <span> &middot; Sold out</span>}
                     {almostSoldOut && (
-                      <span className="text-amber-400 font-bold"> &middot; {percentSold}% sold, almost gone!</span>
+                      <span className="text-amber-400 font-bold"> &middot; Almost sold out!</span>
                     )}
                   </p>
                 </div>

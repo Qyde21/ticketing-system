@@ -65,7 +65,7 @@ export default function EventList({ events, showFilters = true }: { events: any[
                 ) : isSoldOut ? (
                   <div style={{ position: 'absolute', top: 10, right: 10, background: '#dc2626', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>SOLD OUT</div>
                 ) : isAlmostSoldOut ? (
-                  <div style={{ position: 'absolute', top: 10, right: 10, background: '#d97706', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>{percentSold}% SOLD</div>
+                  <div style={{ position: 'absolute', top: 10, right: 10, background: '#d97706', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>ALMOST SOLD OUT</div>
                 ) : null}
               </div>
               <div style={{ padding: 16 }}>
