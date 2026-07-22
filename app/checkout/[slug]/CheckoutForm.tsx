@@ -5,7 +5,7 @@ import { useState } from 'react';
 export default function CheckoutForm({ event, ticketTypes }: { event: any, ticketTypes: any[] }) {
   const safeTickets = Array.isArray(ticketTypes) ? ticketTypes : [];
   const defaultTicket = safeTickets[0] || { id: '', name: 'General Admission', price_kes: 0 };
-  
+
   const [selectedTicketId, setSelectedTicketId] = useState(defaultTicket.id);
   const [quantity, setQuantity] = useState(1);
   const [fullName, setFullName] = useState('');
@@ -26,6 +26,7 @@ export default function CheckoutForm({ event, ticketTypes }: { event: any, ticke
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          eventId: event.id,
           ticketTypeId: selectedTicketId,
           quantity,
           buyerName: fullName,
@@ -54,8 +55,8 @@ export default function CheckoutForm({ event, ticketTypes }: { event: any, ticke
     <form onSubmit={handleCheckout} className="space-y-6 bg-gray-950 border border-gray-800 p-6 rounded-2xl">
       <div>
         <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Select Ticket Tier</label>
-        <select 
-          value={selectedTicketId} 
+        <select
+          value={selectedTicketId}
           onChange={(e) => setSelectedTicketId(e.target.value)}
           className="w-full bg-gray-900 border border-gray-800 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500"
         >
@@ -69,11 +70,11 @@ export default function CheckoutForm({ event, ticketTypes }: { event: any, ticke
 
       <div>
         <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Ticket Quantity</label>
-        <input 
-          type="number" 
-          min="1" 
-          max="10" 
-          value={quantity} 
+        <input
+          type="number"
+          min="1"
+          max="10"
+          value={quantity}
           onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
           className="w-full bg-gray-900 border border-gray-800 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500"
         />
@@ -81,10 +82,10 @@ export default function CheckoutForm({ event, ticketTypes }: { event: any, ticke
 
       <div>
         <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Full Name</label>
-        <input 
-          type="text" 
+        <input
+          type="text"
           required
-          value={fullName} 
+          value={fullName}
           onChange={(e) => setFullName(e.target.value)}
           placeholder="Kirui Gideon"
           className="w-full bg-gray-900 border border-gray-800 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500"
@@ -93,10 +94,10 @@ export default function CheckoutForm({ event, ticketTypes }: { event: any, ticke
 
       <div>
         <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Email Address</label>
-        <input 
-          type="email" 
+        <input
+          type="email"
           required
-          value={email} 
+          value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="kiruiqyde@gmail.com"
           className="w-full bg-gray-900 border border-gray-800 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500"
@@ -105,10 +106,10 @@ export default function CheckoutForm({ event, ticketTypes }: { event: any, ticke
 
       <div>
         <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Phone Number</label>
-        <input 
-          type="text" 
+        <input
+          type="text"
           required
-          value={phone} 
+          value={phone}
           onChange={(e) => setPhone(e.target.value)}
           placeholder="0114525941"
           className="w-full bg-gray-900 border border-gray-800 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500"
@@ -120,8 +121,8 @@ export default function CheckoutForm({ event, ticketTypes }: { event: any, ticke
         <span className="text-cyan-400 font-extrabold text-xl">KES {totalAmount.toLocaleString()}</span>
       </div>
 
-      <button 
-        type="submit" 
+      <button
+        type="submit"
         disabled={loading}
         className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold uppercase tracking-wider transition shadow-lg shadow-indigo-950/50 disabled:opacity-50"
       >

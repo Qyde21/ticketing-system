@@ -49,14 +49,16 @@ export default async function CheckoutPage({ params }: { params: Promise<{ slug:
 
   const eventForForm = {
     id: ticketType.event_id,
-    ticketTypes: [
-      {
-        id: ticketType.id,
-        name: ticketType.name,
-        price: ticketType.price_kes,
-      },
-    ],
+    title: event.title,
   };
+
+  const ticketTypesForForm = [
+    {
+      id: ticketType.id,
+      name: ticketType.name,
+      price_kes: ticketType.price_kes,
+    },
+  ];
 
   return (
     <main className="max-w-2xl mx-auto px-4 py-12 text-white">
@@ -91,7 +93,7 @@ export default async function CheckoutPage({ params }: { params: Promise<{ slug:
           </div>
         </div>
 
-        <CheckoutForm event={eventForForm} />
+        <CheckoutForm event={eventForForm} ticketTypes={ticketTypesForForm} />
       </div>
     </main>
   );
