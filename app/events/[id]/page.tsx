@@ -70,41 +70,44 @@ export default async function EventDetailPage({
 
       <div className="space-y-3">
         <h2 className="text-xl font-bold text-white mb-2">Tickets</h2>
-        {ticketTypes.length === 0 && (
+        {salesClosed ? (
+          <p className="text-gray-400">
+            {isCancelled ? 'Ticket sales are closed because this event was cancelled.' : 'Ticket sales are closed because this event has ended.'}
+          </p>
+        ) : ticketTypes.length === 0 ? (
           <p className="text-gray-400">No tickets are available for this event yet.</p>
-        )}
-        {ticketTypes.map((t: any) => {
-          const total = Number(t.quantity_total || 0);
-          const remaining = Math.max(0, total - Number(t.quantity_sold || 0));
-          const soldOut = remaining <= 0 || salesClosed;
-          const percentSold = total > 0 ? Math.floor((Number(t.quantity_sold || 0) / total) * 100) : 0;
-          const almostSoldOut = total > 0 && !soldOut && percentSold >= 90;
-          return (
-            <div key={t.id} className="flex items-center justify-between bg-gray-900 border border-gray-800 p-4 rounded-xl">
-              <div>
-                <p className="font-bold text-white">{t.name}</p>
-                <p className="text-xs text-gray-400">
-                  KES {Number(t.price_kes).toLocaleString()} &middot; {salesClosed ? (isCancelled ? 'Cancelled' : 'Event ended') : (remaining <= 0 ? 'Sold out' : remaining + ' remaining')}
-                  {almostSoldOut && (
-                    <span className="text-amber-400 font-bold"> &middot; {percentSold}% sold, almost gone!</span>
-                  )}
-                </p>
+        ) : (
+          ticketTypes.map((t: any) => {
+            const total = Number(t.quantity_total || 0);
+            const remaining = Math.max(0, total - Number(t.quantity_sold || 0));
+            const soldOut = remaining <= 0;
+            const percentSold = total > 0 ? Math.floor((Number(t.quantity_sold || 0) / total) * 100) : 0;
+            const almostSoldOut = total > 0 && !soldOut && percentSold >= 90;
+            return (
+              <div key={t.id} className="flex items-center justify-between bg-gray-900 border border-gray-800 p-4 rounded-xl">
+                <div>
+                  <p className="font-bold text-white">{t.name}</p>
+                  <p className="text-xs text-gray-400">
+                    KES {Number(t.price_kes).toLocaleString()} &middot; {soldOut ? 'Sold out' : remaining + ' remaining'}
+                    {almostSoldOut && (
+                      <span className="text-amber-400 font-bold"> &middot; {percentSold}% sold, almost gone!</span>
+                    )}
+                  </p>
+                </div>
+                {soldOut ? (
+                  <span className="px-6 py-3 bg-gray-800 text-gray-500 rounded-xl font-bold uppercase tracking-wider text-sm">Sold Out</span>
+                ) : (
+                  <Link
+                    href={`/checkout/${t.id}`}
+                    className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold uppercase tracking-wider transition shadow-lg shadow-indigo-950/50 text-center text-sm"
+                  >
+                    Buy Ticket
+                  </Link>
+                )}
               </div>
-              {soldOut ? (
-                <span className="px-6 py-3 bg-gray-800 text-gray-500 rounded-xl font-bold uppercase tracking-wider text-sm">
-                  {salesClosed ? (isCancelled ? 'Cancelled' : 'Ended') : 'Sold Out'}
-                </span>
-              ) : (
-                <Link
-                  href={`/checkout/${t.id}`}
-                  className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold uppercase tracking-wider transition shadow-lg shadow-indigo-950/50 text-center text-sm"
-                >
-                  Buy Ticket
-                </Link>
-              )}
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </div>
     </div>
   );
