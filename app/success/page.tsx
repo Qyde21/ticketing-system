@@ -1,14 +1,73 @@
-import { sql } from '@/lib/db';
+'use client';
+
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import TicketList from '@/components/TicketList';
+import { useSearchParams } from 'next/navigation';
 
-export default async function SuccessPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ reference?: string; trxref?: string; reference_code?: string }>
-}) {
-  const resolvedParams = await searchParams;
-  const reference = resolvedParams.reference || resolvedParams.trxref || resolvedParams.reference_code;
+export default function SuccessPage() {
+  const searchParams = useSearchParams();
+  const reference = searchParams.get('reference') || searchParams.get('trxref') || searchParams.get('reference_code');
+
+  const [tickets, setTickets] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [eventTitle, setEventTitle] = useState("Your Event");
+  const [quantity, setQuantity] = useState(1);
+
+  useEffect(() => {
+    if (!reference) {
+      setLoading(false);
+      return;
+    }
+
+    let isMounted = true;
+
+    const fetchTickets = async () => {
+      try {
+        const res = await fetch(`/api/orders/verify?reference=${reference}`);
+        const data = await res.json();
+        
+        if (isMounted && data.tickets && data.tickets.length > 0) {
+          setTickets(data.tickets);
+          setEventTitle(data.tickets[0].event_title || data.tickets[0].eventTitle || "Event Ticket");
+          setQuantity(data.tickets.length);
+          setLoading(false);
+          return true;
+        }
+      } catch (err) {
+        console.error("Polling error:", err);
+      }
+      return false;
+    };
+
+    // Initial check
+    fetchTickets().then((found) => {
+      if (found) return;
+
+      // Poll every 3 seconds if tickets aren't ready yet
+      const interval = setInterval(async () => {
+        const foundAgain = await fetchTickets();
+        if (foundAgain) {
+          clearInterval(interval);
+        }
+      }, 3000);
+
+      // Timeout after 30 seconds to stop polling
+      const timeout = setTimeout(() => {
+        clearInterval(interval);
+        if (isMounted) setLoading(false);
+      }, 30000);
+
+      return () => {
+        clearInterval(interval);
+        clearTimeout(timeout);
+      };
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [reference]);
 
   if (!reference) {
     return (
@@ -22,44 +81,31 @@ export default async function SuccessPage({
     );
   }
 
-  let tickets: any = [];
-  let eventTitle = "Your Event";
-  let quantity = 1;
-  let displayReference = reference;
-
-  try {
-    const result: any = await sql`
-      SELECT * FROM tickets WHERE reference = ${reference} OR payment_reference = ${reference}
-    `;
-    tickets = Array.isArray(result) ? result : (result?.rows || []);
-
-    if (tickets.length > 0) {
-      quantity = tickets.length;
-      eventTitle = tickets[0].event_title || tickets[0].eventTitle || "Event Ticket";
-    }
-  } catch (err) {
-    console.error("Database query error:", err);
-  }
-
   return (
     <div className="max-w-2xl mx-auto py-12 px-4 text-white">
       <div className="bg-gray-900 border border-gray-800 p-8 rounded-3xl shadow-xl">
         <h1 className="text-3xl font-extrabold mb-2 text-center text-green-400">Payment Successful!</h1>
         <p className="text-gray-400 text-center mb-8">Your order has been verified and confirmed.</p>
 
-        {tickets.length === 0 ? (
+        {loading && tickets.length === 0 ? (
+          <div className="bg-yellow-950/40 border border-yellow-800/60 p-8 rounded-2xl text-center space-y-4">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-yellow-400 border-t-transparent"></div>
+            <p className="text-yellow-200 font-medium">Generating your tickets and verifying payment...</p>
+            <p className="text-xs text-gray-400 font-mono">Ref: {reference}</p>
+          </div>
+        ) : tickets.length > 0 ? (
+          <TicketList tickets={tickets} eventTitle={eventTitle} quantity={quantity} />
+        ) : (
           <div className="bg-yellow-950/40 border border-yellow-800/60 p-6 rounded-2xl text-center space-y-4">
-            <p className="text-yellow-200">We are currently processing your ticket generation or recording your payment. If your tickets don't appear immediately, please refresh.</p>
-            <p className="text-xs text-gray-400 font-mono">Ref: {displayReference}</p>
+            <p className="text-yellow-200">We are processing your ticket generation. If your tickets don't appear automatically, please click refresh.</p>
+            <p className="text-xs text-gray-400 font-mono">Ref: {reference}</p>
             <Link
-              href={`/success?reference=${displayReference}`}
+              href={`/success?reference=${reference}`}
               className="inline-block px-6 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-xl text-sm font-semibold transition"
             >
               Refresh
             </Link>
           </div>
-        ) : (
-          <TicketList tickets={tickets} eventTitle={eventTitle} quantity={quantity} />
         )}
       </div>
     </div>
