@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { nanoid } from 'nanoid';
 
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
             email: buyerEmail,
             amount: amountInSubunits,
             reference: reference,
-            callback_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/orders/verify?reference=${reference}`
+            callback_url: `${req.nextUrl.origin}/api/orders/verify?reference=${reference}`
           })
         });
 

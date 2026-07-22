@@ -1,6 +1,8 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import TicketList from "@/components/TicketList";
 import { sql } from "@/lib/db";
+
+export const dynamic = 'force-dynamic';
 
 export default async function SuccessPage({
   searchParams,
@@ -11,16 +13,24 @@ export default async function SuccessPage({
   const reference = resolvedSearchParams.reference;
 
   let order = null;
+  let realTickets: any[] = [];
+
   if (reference) {
     try {
       const orders = await sql`
-        SELECT o.*, e.title as event_title
+        SELECT o.*, e.title as event_title, e.venue_name, e.start_at
         FROM orders o
         LEFT JOIN events e ON o.event_id = e.id
         WHERE o.paystack_reference = ${reference}
         LIMIT 1
       `;
       order = orders[0] || null;
+
+      if (order) {
+        realTickets = await sql`
+          SELECT ticket_code FROM tickets WHERE order_id = ${order.id}
+        `;
+      }
     } catch (err) {
       console.error("Database query failed:", err);
     }
@@ -31,19 +41,21 @@ export default async function SuccessPage({
   const eventTitle = order?.event_title || "TicketHub Event";
   const buyerName = order?.buyer_name || "Valued Guest";
 
-  const tickets = Array.from({ length: quantity }, (_, index) => {
-    const ticketCode = `${displayReference}-${index + 1}`;
-    const qrData = order
-      ? JSON.stringify({
-          ticketNumber: index + 1,
-          totalTickets: quantity,
-          orderId: order.id,
-          event: eventTitle,
-          buyer: buyerName,
-          ticketCode,
-          reference: displayReference
-        })
-      : ticketCode;
+  // Webhooks fire asynchronously and can lag a few seconds behind the redirect,
+  // so real ticket rows may not exist yet even though payment succeeded.
+  const ticketsPending = !!order && order.payment_status === 'paid' && realTickets.length === 0;
+
+  const tickets = realTickets.map((t: any, index: number) => {
+    const ticketCode = t.ticket_code;
+    const qrData = JSON.stringify({
+      ticketNumber: index + 1,
+      totalTickets: quantity,
+      orderId: order?.id,
+      event: eventTitle,
+      buyer: buyerName,
+      ticketCode,
+      reference: displayReference
+    });
     return { ticketCode, qrData };
   });
 
@@ -72,7 +84,24 @@ export default async function SuccessPage({
             <span className="font-mono text-cyan-400 text-xs">{displayReference}</span>
           </div>
 
-          <TicketList tickets={tickets} eventTitle={eventTitle} quantity={quantity} />
+          {ticketsPending ? (
+            <div className="text-center py-6">
+              <p className="text-amber-400 font-semibold mb-2">Your tickets are being generated…</p>
+              <p className="text-xs text-gray-400 mb-4">This usually takes a few seconds. Refresh this page shortly, or check your email — we've sent your tickets there too.</p>
+              
+                href={`/success?reference=${displayReference}`}
+                className="inline-block px-6 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-sm font-semibold transition"
+              >
+                Refresh
+              </a>
+            </div>
+          ) : tickets.length > 0 ? (
+            <TicketList tickets={tickets} eventTitle={eventTitle} quantity={quantity} />
+          ) : (
+            <p className="text-gray-400 text-sm">
+              We couldn't find your tickets yet. Check your email for your confirmation, or contact support with reference <span className="font-mono text-cyan-400">{displayReference}</span>.
+            </p>
+          )}
         </div>
 
         <div className="pt-4">
