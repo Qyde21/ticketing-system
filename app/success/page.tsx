@@ -28,7 +28,7 @@ export default async function SuccessPage({
   let displayReference = reference;
 
   try {
-    const result = await sql`
+    const result: any = await sql`
       SELECT * FROM tickets WHERE reference = ${reference} OR payment_reference = ${reference}
     `;
     tickets = Array.isArray(result) ? result : (result?.rows || []);
