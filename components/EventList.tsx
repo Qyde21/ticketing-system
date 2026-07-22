@@ -46,7 +46,8 @@ export default function EventList({ events, showFilters = true }: { events: any[
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>
         {filteredEvents.map((e: any) => {
           const eventDate = new Date(e.start_at);
-          const isPastEvent = eventDate < new Date();
+          const isPastEvent = e.end_at ? new Date(e.end_at) < new Date() : eventDate < new Date();
+          const isCancelled = e.status === 'cancelled';
           const capacity = Number(e.total_capacity) || 0;
           const sold = Number(e.total_sold) || 0;
           const isSoldOut = capacity > 0 && sold >= capacity;
@@ -57,7 +58,9 @@ export default function EventList({ events, showFilters = true }: { events: any[
             <div key={e.id} style={{ position: 'relative', background: '#121212', borderRadius: 12, overflow: 'hidden', border: '1px solid #1f1f1f', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.5)' }}>
               <div style={{ position: 'relative', height: 180, background: '#1a1a1a' }}>
                 {e.cover_image_url && <img src={e.cover_image_url} alt={e.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
-                {isPastEvent ? (
+                {isCancelled ? (
+                  <div style={{ position: 'absolute', top: 10, right: 10, background: '#7f1d1d', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>CANCELLED</div>
+                ) : isPastEvent ? (
                   <div style={{ position: 'absolute', top: 10, right: 10, background: '#4b5563', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>ENDED</div>
                 ) : isSoldOut ? (
                   <div style={{ position: 'absolute', top: 10, right: 10, background: '#dc2626', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>SOLD OUT</div>

@@ -42,11 +42,26 @@ export default async function EventDetailPage({
   `;
 
   const eventDate = event.start_at || event.start_date || event.date;
+  const eventEndDate = event.end_at || eventDate;
+  const isCancelled = event.status === 'cancelled';
+  const isEnded = eventEndDate ? new Date(eventEndDate) < new Date() : false;
+  const salesClosed = isCancelled || isEnded;
 
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 text-white">
       <h1 className="text-4xl font-extrabold mb-4">{event.title}</h1>
       <p className="text-gray-300 text-lg mb-8 leading-relaxed">{event.description}</p>
+
+      {isCancelled && (
+        <div className="bg-red-950/40 border border-red-800/60 text-red-300 font-semibold px-4 py-3 rounded-xl mb-6">
+          This event has been cancelled.
+        </div>
+      )}
+      {!isCancelled && isEnded && (
+        <div className="bg-gray-800/60 border border-gray-700 text-gray-300 font-semibold px-4 py-3 rounded-xl mb-6">
+          This event has already ended.
+        </div>
+      )}
       
       <div className="bg-gray-900 border border-gray-800 p-6 rounded-2xl mb-8 space-y-3">
         <p><strong className="text-gray-400">Date:</strong> {eventDate ? new Date(eventDate).toLocaleString() : 'TBA'}</p>
@@ -61,7 +76,7 @@ export default async function EventDetailPage({
         {ticketTypes.map((t: any) => {
           const total = Number(t.quantity_total || 0);
           const remaining = Math.max(0, total - Number(t.quantity_sold || 0));
-          const soldOut = remaining <= 0;
+          const soldOut = remaining <= 0 || salesClosed;
           const percentSold = total > 0 ? Math.floor((Number(t.quantity_sold || 0) / total) * 100) : 0;
           const almostSoldOut = total > 0 && !soldOut && percentSold >= 90;
           return (
@@ -69,14 +84,16 @@ export default async function EventDetailPage({
               <div>
                 <p className="font-bold text-white">{t.name}</p>
                 <p className="text-xs text-gray-400">
-                  KES {Number(t.price_kes).toLocaleString()} &middot; {soldOut ? 'Sold out' : remaining + ' remaining'}
+                  KES {Number(t.price_kes).toLocaleString()} &middot; {salesClosed ? (isCancelled ? 'Cancelled' : 'Event ended') : (remaining <= 0 ? 'Sold out' : remaining + ' remaining')}
                   {almostSoldOut && (
                     <span className="text-amber-400 font-bold"> &middot; {percentSold}% sold, almost gone!</span>
                   )}
                 </p>
               </div>
               {soldOut ? (
-                <span className="px-6 py-3 bg-gray-800 text-gray-500 rounded-xl font-bold uppercase tracking-wider text-sm">Sold Out</span>
+                <span className="px-6 py-3 bg-gray-800 text-gray-500 rounded-xl font-bold uppercase tracking-wider text-sm">
+                  {salesClosed ? (isCancelled ? 'Cancelled' : 'Ended') : 'Sold Out'}
+                </span>
               ) : (
                 <Link
                   href={`/checkout/${t.id}`}
