@@ -1,6 +1,6 @@
 ﻿import Link from "next/link";
 import TicketList from "@/components/TicketList";
-import { sql } from "@vercel/postgres";
+import { sql } from "@/lib/db";
 
 export default async function SuccessPage({
   searchParams,
@@ -20,7 +20,7 @@ export default async function SuccessPage({
         WHERE o.paystack_reference = ${reference}
         LIMIT 1
       `;
-      order = orders.rows?.[0] || orders[0];
+      order = orders[0] || null;
     } catch (err) {
       console.error("Database query failed:", err);
     }
