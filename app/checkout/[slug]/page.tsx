@@ -1,4 +1,4 @@
-﻿import { sql } from '@/lib/db';
+import { sql } from '@/lib/db';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import CheckoutForm from './CheckoutForm';
@@ -18,7 +18,7 @@ export default async function CheckoutPage({ params }: { params: Promise<{ slug:
 
   try {
     const ttRes = await sql`
-      SELECT tt.*, e.title as event_title, e.start_at, e.start_date, e.date, e.venue_name, e.location, e.cover_image_url, e.image_url
+      SELECT tt.*, e.title as event_title, e.start_at, e.venue_name, e.cover_image_url
       FROM ticket_types tt
       JOIN events e ON e.id::text = tt.event_id::text
       WHERE tt.id::text = ${ticketIdOrSlug} OR tt.name ILIKE ${ticketIdOrSlug.replace(/-/g, ' ')}
@@ -32,9 +32,9 @@ export default async function CheckoutPage({ params }: { params: Promise<{ slug:
     ticketType = ttRes[0];
     event = {
       title: ticketType.event_title,
-      start_at: ticketType.start_at || ticketType.start_date || ticketType.date,
-      venue_name: ticketType.venue_name || ticketType.location,
-      cover_image_url: ticketType.cover_image_url || ticketType.image_url
+      start_at: ticketType.start_at,
+      venue_name: ticketType.venue_name,
+      cover_image_url: ticketType.cover_image_url
     };
 
   } catch (err) {
