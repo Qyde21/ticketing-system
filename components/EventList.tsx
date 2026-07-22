@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 
@@ -63,6 +63,9 @@ export default function EventList({ events, showFilters = true }: { events: any[
               </div>
               <div style={{ padding: 16 }}>
                 <h3 className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400" style={{ fontSize: 17, marginBottom: 8 }}>{e.title}</h3>
+                <p className="text-gray-400 text-xs mb-1">
+                  {e.start_at ? eventDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : 'Date TBA'}
+                </p>
                 <p className="text-gray-400 text-xs mb-3">{e.venue_name || 'Venue TBD'}</p>
                 <Link href={`/events/${e.slug}`} className="text-indigo-400 hover:text-cyan-400 font-semibold" style={{ fontSize: 13, textDecoration: 'none' }}>View Details &rarr;</Link>
               </div>
