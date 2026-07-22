@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -45,9 +45,9 @@ export default function CheckoutCallbackInner() {
           <h1>Payment successful!</h1>
           <p>Your ticket{ticketCodes.length > 1 ? 's' : ''}:</p>
           <ul>
-            {ticketCodes.map((code) => (
+            {ticketCodes.map((code, idx) => (
               <li key={code}>
-                <Link href={`/tickets/${code}`}>{code}</Link>
+                <Link href={`/tickets/${code}`}>View Ticket #{idx + 1}</Link>
               </li>
             ))}
           </ul>

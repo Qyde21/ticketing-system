@@ -1,4 +1,4 @@
-import { sql } from '@/lib/db';
+﻿import { sql } from '@/lib/db';
 import QRCode from 'qrcode';
 
 export default async function TicketPage({ params }: { params: Promise<{ code: string }> }) {
@@ -27,7 +27,6 @@ export default async function TicketPage({ params }: { params: Promise<{ code: s
       <p>{ticket.ticket_type_name}</p>
       <p>{ticket.venue_name} — {new Date(ticket.start_at).toLocaleString()}</p>
       <img src={qrDataUrl} alt="Ticket QR code" style={{ width: 220, height: 220 }} />
-      <p>Code: {ticket.ticket_code}</p>
       <p>Status: {ticket.status}</p>
     </div>
   );

@@ -64,7 +64,7 @@ export default async function AttendeeDashboard() {
                     <div key={code} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#f9fafb', borderRadius: 6, padding: '8px 12px' }}>
                       <span style={{ fontSize: 12, color: '#6b7280', minWidth: 20 }}>#{index + 1}</span>
                       <Link href={'/tickets/' + code} style={{ color: '#6366f1', fontWeight: 600, fontSize: 13, textDecoration: 'none', flex: 1 }}>
-                        {code}
+                        View Ticket
                       </Link>
                       <ShareTicket code={code} eventTitle={o.title} />
                     </div>

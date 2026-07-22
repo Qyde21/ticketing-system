@@ -1,6 +1,7 @@
-import { sql } from '@/lib/db';
+﻿import { sql } from '@/lib/db';
 import Link from 'next/link';
 import ApproveButton from './ApproveButton';
+import AdminEventActions from '../events/AdminEventActions';
 
 export const dynamic = 'force-dynamic';
 
@@ -148,14 +149,14 @@ export default async function AdminDashboard() {
 
                 <div className="flex flex-wrap items-center gap-2 pt-2 pb-3 mb-3 border-b border-gray-800/60 text-xs">
                   <Link
-                    href={`/admin/events/${ev.id}/scan`}
+                    href={`/admin/scan/${ev.id}`}
                     className="text-gray-300 hover:text-emerald-400 transition"
                   >
                     Scan tickets
                   </Link>
                   <span className="text-gray-700">|</span>
                   <Link
-                    href={`/admin/events/${ev.id}/scan-overview`}
+                    href={`/organizer/events/${ev.id}/scan-overview`}
                     className="text-gray-300 hover:text-cyan-400 transition"
                   >
                     Scan overview
@@ -169,32 +170,20 @@ export default async function AdminDashboard() {
                   </Link>
                   <span className="text-gray-700">|</span>
                   <Link
-                    href={`/admin/events/${ev.id}/messages`}
+                    href={`/organizer/events/${ev.id}/messages`}
                     className="text-gray-300 hover:text-purple-400 transition"
                   >
                     Messages
                   </Link>
                   <span className="text-gray-700">|</span>
                   <Link
-                    href={`/admin/events/${ev.id}/edit-cover`}
+                    href={`/organizer/events/${ev.id}/edit`}
                     className="text-gray-300 hover:text-amber-400 transition"
                   >
                     Edit cover
                   </Link>
                   <span className="text-gray-700">|</span>
-                  <Link
-                    href={`/admin/events/${ev.id}/cancel`}
-                    className="text-orange-400 hover:text-orange-300 transition"
-                  >
-                    Cancel event
-                  </Link>
-                  <span className="text-gray-700">|</span>
-                  <Link
-                    href={`/admin/events/${ev.id}/delete`}
-                    className="text-red-400 hover:text-red-300 transition"
-                  >
-                    Delete event
-                  </Link>
+                  <AdminEventActions eventId={ev.id} status={ev.status} />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">

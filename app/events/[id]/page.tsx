@@ -1,4 +1,4 @@
-import { sql } from '@/lib/db';
+﻿import { sql } from '@/lib/db';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 
@@ -59,14 +59,20 @@ export default async function EventDetailPage({
           <p className="text-gray-400">No tickets are available for this event yet.</p>
         )}
         {ticketTypes.map((t: any) => {
-          const remaining = Math.max(0, Number(t.quantity_total || 0) - Number(t.quantity_sold || 0));
+          const total = Number(t.quantity_total || 0);
+          const remaining = Math.max(0, total - Number(t.quantity_sold || 0));
           const soldOut = remaining <= 0;
+          const percentSold = total > 0 ? Math.floor((Number(t.quantity_sold || 0) / total) * 100) : 0;
+          const almostSoldOut = total > 0 && !soldOut && percentSold >= 90;
           return (
             <div key={t.id} className="flex items-center justify-between bg-gray-900 border border-gray-800 p-4 rounded-xl">
               <div>
                 <p className="font-bold text-white">{t.name}</p>
                 <p className="text-xs text-gray-400">
-                  KES {Number(t.price_kes).toLocaleString()} &middot; {soldOut ? 'Sold out' : `${remaining} remaining`}
+                  KES {Number(t.price_kes).toLocaleString()} &middot; {soldOut ? 'Sold out' : remaining + ' remaining'}
+                  {almostSoldOut && (
+                    <span className="text-amber-400 font-bold"> &middot; {percentSold}% sold, almost gone!</span>
+                  )}
                 </p>
               </div>
               {soldOut ? (

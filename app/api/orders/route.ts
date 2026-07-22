@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { nanoid } from 'nanoid';
 
@@ -38,6 +38,20 @@ export async function POST(req: NextRequest) {
 
     if (!ticketType) {
       return NextResponse.json({ error: 'Ticket not found' }, { status: 404 });
+    }
+
+    const [event] = await sql`
+      SELECT status, start_at, end_at FROM events WHERE id = ${ticketType.event_id}
+    `;
+    if (!event) {
+      return NextResponse.json({ error: 'Event not found' }, { status: 404 });
+    }
+    if (event.status === 'cancelled') {
+      return NextResponse.json({ error: 'This event has been cancelled' }, { status: 400 });
+    }
+    const eventEnd = event.end_at ? new Date(event.end_at) : new Date(event.start_at);
+    if (eventEnd < new Date()) {
+      return NextResponse.json({ error: 'This event has already ended' }, { status: 400 });
     }
 
     const amountKes = Number(ticketType.price_kes || 0) * quantity;

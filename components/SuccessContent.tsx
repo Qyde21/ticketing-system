@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -24,10 +24,13 @@ export default function SuccessContent() {
 
     const fetchTickets = async () => {
       try {
-        const res = await fetch(`/api/orders/verify?reference=${reference}`);
+        const res = await fetch(`/api/orders/${reference}/status`);
+        if (!res.ok) {
+          return false;
+        }
         const data = await res.json();
-        
-        if (isMounted && data.tickets && data.tickets.length > 0) {
+
+        if (isMounted && data.status === 'paid' && data.tickets && data.tickets.length > 0) {
           setTickets(data.tickets);
           setEventTitle(data.tickets[0].event_title || data.tickets[0].eventTitle || "Event Ticket");
           setQuantity(data.tickets.length);

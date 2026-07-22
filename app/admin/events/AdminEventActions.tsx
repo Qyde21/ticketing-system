@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 interface AdminEventActionsProps {
   eventId: string;
@@ -9,7 +9,7 @@ export default function AdminEventActions({ eventId, status }: AdminEventActions
   const handleCancel = async () => {
     if (!confirm('Are you sure you want to cancel this event?')) return;
     try {
-      const res = await fetch(`/api/admin/events/${eventId}/cancel`, { method: 'POST' });
+      const res = await fetch(`/api/events/${eventId}/cancel`, { method: 'PATCH' });
       if (res.ok) {
         window.location.reload();
       } else {

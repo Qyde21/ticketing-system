@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 
@@ -50,6 +50,8 @@ export default function EventList({ events, showFilters = true }: { events: any[
           const capacity = Number(e.total_capacity) || 0;
           const sold = Number(e.total_sold) || 0;
           const isSoldOut = capacity > 0 && sold >= capacity;
+          const percentSold = capacity > 0 ? Math.floor((sold / capacity) * 100) : 0;
+          const isAlmostSoldOut = capacity > 0 && !isSoldOut && percentSold >= 90;
 
           return (
             <div key={e.id} style={{ position: 'relative', background: '#121212', borderRadius: 12, overflow: 'hidden', border: '1px solid #1f1f1f', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.5)' }}>
@@ -59,6 +61,8 @@ export default function EventList({ events, showFilters = true }: { events: any[
                   <div style={{ position: 'absolute', top: 10, right: 10, background: '#4b5563', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>ENDED</div>
                 ) : isSoldOut ? (
                   <div style={{ position: 'absolute', top: 10, right: 10, background: '#dc2626', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>SOLD OUT</div>
+                ) : isAlmostSoldOut ? (
+                  <div style={{ position: 'absolute', top: 10, right: 10, background: '#d97706', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>{percentSold}% SOLD</div>
                 ) : null}
               </div>
               <div style={{ padding: 16 }}>

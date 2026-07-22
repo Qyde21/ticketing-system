@@ -24,19 +24,19 @@ export default function TicketList({ tickets, eventTitle, quantity }: TicketList
             <div className="bg-white p-3 rounded-xl">
               <QRCodeSVG value={t.qrData} size={130} />
             </div>
-            <span className="font-mono text-xs text-gray-400">{t.ticketCode}</span>
             <button 
               type="button"
               onClick={() => {
+                const ticketUrl = `${window.location.origin}/tickets/${t.ticketCode}`;
                 if (typeof navigator !== "undefined" && navigator.share) {
                   navigator.share({
                     title: `${eventTitle} - Ticket #${idx + 1}`,
-                    text: `Here is my ticket #${idx + 1} for ${eventTitle}. Reference: ${t.ticketCode}`,
-                    url: window.location.href,
+                    text: `Here is my ticket #${idx + 1} for ${eventTitle}.`,
+                    url: ticketUrl,
                   }).catch(() => {});
                 } else if (typeof navigator !== "undefined") {
-                  navigator.clipboard.writeText(t.ticketCode);
-                  alert("Ticket code copied to clipboard!");
+                  navigator.clipboard.writeText(ticketUrl);
+                  alert("Ticket link copied to clipboard!");
                 }
               }}
               className="w-full py-2 bg-gray-800 hover:bg-gray-700 text-xs font-bold uppercase tracking-wider text-white rounded-lg transition"
