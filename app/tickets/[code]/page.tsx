@@ -1,5 +1,6 @@
 ﻿import { sql } from '@/lib/db';
 import QRCode from 'qrcode';
+import TicketQRReveal from '@/components/TicketQRReveal';
 
 export default async function TicketPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
@@ -25,8 +26,8 @@ export default async function TicketPage({ params }: { params: Promise<{ code: s
     <div style={{ maxWidth: 400, margin: '2rem auto', textAlign: 'center' }}>
       <h1>{ticket.event_title}</h1>
       <p>{ticket.ticket_type_name}</p>
-      <p>{ticket.venue_name} — {new Date(ticket.start_at).toLocaleString()}</p>
-      <img src={qrDataUrl} alt="Ticket QR code" style={{ width: 220, height: 220 }} />
+      <p>{ticket.venue_name} - {new Date(ticket.start_at).toLocaleString()}</p>
+      <TicketQRReveal qrDataUrl={qrDataUrl} />
       <p>Status: {ticket.status}</p>
     </div>
   );
