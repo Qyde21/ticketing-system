@@ -28,7 +28,7 @@ export default async function AttendeeDashboard() {
     WHERE o.buyer_email = ${lowerEmail}
     AND o.payment_status = 'paid'
     GROUP BY o.id, e.id
-    ORDER BY e.start_at ASC
+    ORDER BY o.created_at DESC
   `;
 
   return (
