@@ -30,7 +30,7 @@ export default function InboxReply({ eventId, recipientId, senderName }: { event
     }
   }
 
-  if (success) return <p className="text-sm text-green-400">Reply sent to {senderName}!</p>;
+  if (success) return <p className="text-sm text-emerald-400">Reply sent to {senderName}!</p>;
 
   return (
     <div>
@@ -46,15 +46,14 @@ export default function InboxReply({ eventId, recipientId, senderName }: { event
             onChange={(e) => setBody(e.target.value)}
             placeholder={`Reply to ${senderName}...`}
             rows={3}
-            className="w-full bg-gray-950 border border-gray-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
-            style={{ resize: 'vertical', boxSizing: 'border-box' }}
+            className="w-full bg-gray-950 border border-gray-800 rounded-lg p-3 text-white text-sm resize-y focus:outline-none focus:border-indigo-500 placeholder:text-gray-500"
           />
-          {error && <p className="text-red-400 text-sm">{error}</p>}
+          {error && <p className="text-red-400 text-sm mt-1">{error}</p>}
           <div className="flex gap-2 mt-2">
             <button
               onClick={handleReply}
               disabled={loading || !body.trim()}
-              className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white px-4 py-2 rounded-lg font-semibold text-sm transition"
+              className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg font-semibold text-sm transition disabled:opacity-50"
             >
               {loading ? 'Sending...' : 'Send Reply'}
             </button>

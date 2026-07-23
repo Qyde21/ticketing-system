@@ -51,26 +51,19 @@ export default function CoverUpload({ eventId }: { eventId: string }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <label className="font-semibold text-sm text-gray-300">Upload new cover image</label>
-      <input
-        type="file"
-        accept="image/*"
-        onChange={handleFileChange}
-        disabled={uploading}
-        className="text-sm text-gray-300 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-indigo-600 file:text-white file:font-semibold file:text-sm hover:file:bg-indigo-500 file:cursor-pointer"
-      />
+      <label className="text-sm font-bold text-gray-400 uppercase tracking-wider">Upload new cover image</label>
+      <input type="file" accept="image/*" onChange={handleFileChange} disabled={uploading} className="text-sm text-gray-300" />
       {uploading && <p className="text-gray-400 text-sm">Uploading...</p>}
       {error && <p className="text-red-400 text-sm">{error}</p>}
-      {success && <p className="text-green-400 text-sm">Cover image updated successfully!</p>}
+      {success && <p className="text-emerald-400 text-sm">Cover image updated successfully!</p>}
       {previewUrl && (
         <img
           src={previewUrl}
           alt="New cover preview"
-          className="w-full rounded-xl"
-          style={{ maxHeight: 200, objectFit: 'cover' }}
+          className="w-full max-h-52 object-cover rounded-xl"
         />
       )}
-      <a href="/organizer/dashboard" className="text-indigo-400 hover:text-cyan-400 text-sm mt-2">
+      <a href="/organizer/dashboard" className="text-indigo-400 hover:text-cyan-400 text-sm mt-1">
         Back to dashboard
       </a>
     </div>

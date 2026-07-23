@@ -8,7 +8,7 @@ export default async function OrganizerMessagesPage({ params }: { params: Promis
   const { id } = await params;
 
   const [event] = await sql`SELECT id, title FROM events WHERE id = ${id}`;
-  if (!event) return <div className="max-w-2xl mx-auto py-16 px-4 text-white text-center">Event not found.</div>;
+  if (!event) return <div className="max-w-2xl mx-auto py-12 px-4 text-white">Event not found.</div>;
 
   const buyers = await sql`
     SELECT DISTINCT u.id, u.full_name, u.email
@@ -30,33 +30,33 @@ export default async function OrganizerMessagesPage({ params }: { params: Promis
   `;
 
   return (
-    <div className="max-w-2xl mx-auto py-10 px-4 text-white">
-      <Link href="/organizer/dashboard" className="text-sm text-indigo-400 hover:underline">Back to dashboard</Link>
-      <h1 className="text-2xl font-extrabold mt-2">Messages &mdash; {event.title}</h1>
-      <p className="text-gray-400 text-sm mb-4">{buyers.length} ticket buyer(s)</p>
+    <div className="max-w-2xl mx-auto py-12 px-4 text-white">
+      <Link href="/organizer/dashboard" className="text-sm text-indigo-400 hover:text-cyan-400">Back to dashboard</Link>
+      <h1 className="text-3xl font-extrabold mt-2 mb-1">Messages — {event.title}</h1>
+      <p className="text-gray-400 text-sm mb-8">{buyers.length} ticket buyer(s)</p>
 
       <MessageComposer eventId={event.id} buyers={buyers as any} />
 
-      <h2 className="text-xl font-bold mt-8 mb-3">Message History</h2>
+      <h2 className="text-xl font-bold text-white mt-10 mb-4">Message History</h2>
       {messages.length === 0 && <p className="text-gray-400">No messages yet.</p>}
-      <ul className="space-y-2.5 list-none p-0">
+      <ul className="space-y-3">
         {messages.map((m: any) => (
           <li key={m.id} className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-            <div className="flex justify-between mb-1.5">
-              <span className="text-sm font-semibold text-white">{m.sender_name}</span>
+            <div className="flex justify-between items-center mb-1.5">
+              <span className="text-sm font-bold text-white">{m.sender_name}</span>
               <span className="text-xs text-gray-500">{new Date(m.created_at).toLocaleString()}</span>
             </div>
             {m.is_broadcast && (
-              <span className="text-xs bg-indigo-950/60 text-indigo-300 border border-indigo-800/50 px-2 py-0.5 rounded-full font-semibold inline-block mb-1.5">
+              <span className="text-xs bg-indigo-950 text-indigo-300 border border-indigo-800 px-2 py-0.5 rounded-full font-semibold mb-1.5 inline-block">
                 Broadcast
               </span>
             )}
             {!m.is_broadcast && m.recipient_name && (
-              <span className="text-xs bg-gray-800 text-gray-300 border border-gray-700 px-2 py-0.5 rounded-full inline-block mb-1.5">
+              <span className="text-xs bg-gray-800 text-gray-300 px-2 py-0.5 rounded-full mb-1.5 inline-block">
                 To: {m.recipient_name}
               </span>
             )}
-            <p className="text-sm text-gray-300 mt-1.5" style={{ lineHeight: 1.6 }}>{m.body}</p>
+            <p className="text-sm text-gray-300 leading-relaxed mt-1.5">{m.body}</p>
           </li>
         ))}
       </ul>

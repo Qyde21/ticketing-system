@@ -42,25 +42,23 @@ export default function MessageComposer({ eventId, buyers }: { eventId: string; 
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 mt-4">
+    <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
       <h2 className="text-lg font-bold text-white mb-4">Send Message</h2>
 
-      <div className="flex gap-3 mb-4">
+      <div className="flex gap-2 mb-4">
         <button
           onClick={() => setIsBroadcast(true)}
-          className={
-            'px-4 py-1.5 rounded-lg font-semibold text-sm transition ' +
-            (isBroadcast ? 'bg-indigo-600 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700')
-          }
+          className={`px-4 py-1.5 rounded-lg font-semibold text-sm transition ${
+            isBroadcast ? 'bg-indigo-600 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+          }`}
         >
           Broadcast to all buyers
         </button>
         <button
           onClick={() => setIsBroadcast(false)}
-          className={
-            'px-4 py-1.5 rounded-lg font-semibold text-sm transition ' +
-            (!isBroadcast ? 'bg-indigo-600 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700')
-          }
+          className={`px-4 py-1.5 rounded-lg font-semibold text-sm transition ${
+            !isBroadcast ? 'bg-indigo-600 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+          }`}
         >
           Direct message
         </button>
@@ -70,7 +68,7 @@ export default function MessageComposer({ eventId, buyers }: { eventId: string; 
         <select
           value={recipientId}
           onChange={(e) => setRecipientId(e.target.value)}
-          className="w-full bg-gray-950 border border-gray-800 rounded-lg px-3 py-2 text-sm text-white mb-3 focus:outline-none focus:border-indigo-500"
+          className="w-full bg-gray-950 border border-gray-800 rounded-lg p-2.5 text-white text-sm mb-3 focus:outline-none focus:border-indigo-500"
         >
           <option value="">Select a buyer...</option>
           {buyers.map((b) => (
@@ -84,17 +82,16 @@ export default function MessageComposer({ eventId, buyers }: { eventId: string; 
         onChange={(e) => setBody(e.target.value)}
         placeholder={isBroadcast ? 'Write a message to all ticket buyers...' : 'Write a direct message...'}
         rows={4}
-        className="w-full bg-gray-950 border border-gray-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
-        style={{ resize: 'vertical', boxSizing: 'border-box' }}
+        className="w-full bg-gray-950 border border-gray-800 rounded-lg p-3 text-white text-sm resize-y focus:outline-none focus:border-indigo-500 placeholder:text-gray-500"
       />
 
       {error && <p className="text-red-400 text-sm my-2">{error}</p>}
-      {success && <p className="text-green-400 text-sm my-2">{success}</p>}
+      {success && <p className="text-emerald-400 text-sm my-2">{success}</p>}
 
       <button
         onClick={handleSend}
         disabled={loading || !body.trim() || (!isBroadcast && !recipientId)}
-        className="mt-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white px-6 py-2.5 rounded-lg font-semibold text-sm transition"
+        className="mt-2 bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-lg font-bold text-sm transition disabled:opacity-50"
       >
         {loading ? 'Sending...' : 'Send Message'}
       </button>
