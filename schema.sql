@@ -1,0 +1,104 @@
+﻿-- Ticketing System -- database schema
+--
+-- NOTE: This file was reconstructed by reading every query in the codebase,
+-- since no migrations/schema file was committed to the repo and the app
+-- connects directly to an existing Neon Postgres database. It should closely
+-- match production, but for a source of truth, run against the real database:
+--
+--   pg_dump --schema-only $DATABASE_URL_UNPOOLED > schema.sql
+--
+-- Use this file to set up a fresh local/dev database when a pg_dump isn't
+-- available.
+
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+CREATE TABLE users (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email         TEXT UNIQUE NOT NULL,
+  phone         TEXT,
+  password_hash TEXT NOT NULL,
+  full_name     TEXT NOT NULL,
+  role          TEXT NOT NULL DEFAULT 'attendee',
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE organizer_profiles (
+  user_id       UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  business_name TEXT,
+  is_verified   BOOLEAN NOT NULL DEFAULT false,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE events (
+  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  organizer_id     UUID NOT NULL REFERENCES users(id),
+  title            TEXT NOT NULL,
+  slug             TEXT UNIQUE NOT NULL,
+  description      TEXT,
+  category         TEXT,
+  venue_name       TEXT,
+  venue_address    TEXT,
+  latitude         DOUBLE PRECISION,
+  longitude        DOUBLE PRECISION,
+  start_at         TIMESTAMPTZ NOT NULL,
+  end_at           TIMESTAMPTZ,
+  status           TEXT NOT NULL DEFAULT 'draft',
+  cover_image_url  TEXT,
+  created_at       TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE event_staff (
+  event_id  UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+  user_id   UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  PRIMARY KEY (event_id, user_id)
+);
+
+CREATE TABLE ticket_types (
+  id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  event_id       UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+  name           TEXT NOT NULL,
+  price_kes      NUMERIC NOT NULL,
+  quantity_total INTEGER NOT NULL,
+  quantity_sold  INTEGER NOT NULL DEFAULT 0,
+  max_per_order  INTEGER NOT NULL DEFAULT 10
+);
+
+CREATE TABLE orders (
+  id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  event_id            UUID NOT NULL REFERENCES events(id),
+  ticket_type_id      UUID NOT NULL REFERENCES ticket_types(id),
+  buyer_name          TEXT NOT NULL,
+  buyer_email         TEXT NOT NULL,
+  buyer_phone         TEXT NOT NULL,
+  quantity            INTEGER NOT NULL DEFAULT 1,
+  total_amount_kes    NUMERIC NOT NULL,
+  payment_status      TEXT NOT NULL DEFAULT 'pending',
+  paystack_reference  TEXT UNIQUE,
+  created_at          TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE tickets (
+  id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_id       UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+  ticket_type_id UUID NOT NULL REFERENCES ticket_types(id),
+  ticket_code    TEXT UNIQUE NOT NULL,
+  holder_name    TEXT,
+  status         TEXT NOT NULL DEFAULT 'valid',
+  checked_in_at  TIMESTAMPTZ
+);
+
+CREATE TABLE messages (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  event_id      UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+  sender_id     UUID NOT NULL REFERENCES users(id),
+  recipient_id  UUID REFERENCES users(id),
+  body          TEXT NOT NULL,
+  is_broadcast  BOOLEAN NOT NULL DEFAULT false,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE payment_events (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_id   UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);

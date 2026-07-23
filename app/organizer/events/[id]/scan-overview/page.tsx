@@ -3,7 +3,6 @@ import { getSession } from '@/lib/auth';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-// Force Next.js to skip build-time static generation and run this fresh on every request
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
@@ -12,17 +11,10 @@ interface PageProps {
 }
 
 export default async function OrganizerScanOverviewPage({ params }: PageProps) {
-  // Await the routing parameters
   const resolvedParams = await params;
   const eventId = resolvedParams.id;
 
-  // Retrieve current user session
   const session = await getSession();
-  
-  // Debug logging on Vercel Server console
-  console.log("--- SCAN OVERVIEW ROUTE ACCESS ---");
-  console.log("Event ID:", eventId);
-  console.log("Session details:", session);
 
   if (!session || !session.userId) {
     redirect('/login');
@@ -35,7 +27,6 @@ export default async function OrganizerScanOverviewPage({ params }: PageProps) {
 
   try {
     if (userRole === 'admin') {
-      // Admin bypass: load event regardless of status or who owns it
       const results = await sql`
         SELECT id, title, venue_name, start_at, organizer_id
         FROM events
@@ -45,7 +36,6 @@ export default async function OrganizerScanOverviewPage({ params }: PageProps) {
         event = results[0];
       }
     } else {
-      // Organizer security check: must be the owner
       const results = await sql`
         SELECT id, title, venue_name, start_at, organizer_id
         FROM events
@@ -59,18 +49,13 @@ export default async function OrganizerScanOverviewPage({ params }: PageProps) {
     console.error("Database query failed:", error);
   }
 
-  // If still no event found, print descriptive error with role info
   if (!event) {
     return (
       <div style={{ maxWidth: 600, margin: '4rem auto', padding: '2rem', background: '#fef2f2', border: '1px solid #fee2e2', borderRadius: 8, fontFamily: 'sans-serif' }}>
-        <h1 style={{ color: '#991b1b', fontSize: 20, marginTop: 0 }}>Access Denied (Debug Panel)</h1>
+        <h1 style={{ color: '#991b1b', fontSize: 20, marginTop: 0 }}>Access Denied</h1>
         <p style={{ color: '#7f1d1d', fontSize: 14 }}>
-          We couldn't load the event or authorize this request.
+          We couldn't load this event, or you don't have permission to view it.
         </p>
-        <div style={{ background: '#fff', padding: 12, borderRadius: 6, marginTop: 12, fontSize: 13, border: '1px solid #f3f4f6' }}>
-          <strong>Your Active Session:</strong>
-          <pre style={{ margin: '8px 0 0 0', color: '#4b5563' }}>{JSON.stringify({ userId, userRole, eventId }, null, 2)}</pre>
-        </div>
         <div style={{ marginTop: 20 }}>
           <Link href="/admin/events" style={{ color: '#6366f1', textDecoration: 'none', fontWeight: 600, fontSize: 14 }}>
             ← Return to Event List
@@ -80,7 +65,6 @@ export default async function OrganizerScanOverviewPage({ params }: PageProps) {
     );
   }
 
-  // Fetch ticket data
   const tickets = await sql`
     SELECT t.ticket_code, t.status, t.holder_name, t.checked_in_at,
            tt.name AS ticket_type
@@ -104,7 +88,6 @@ export default async function OrganizerScanOverviewPage({ params }: PageProps) {
       <h1 style={{ marginTop: 8, color: '#111827' }}>{event.title}</h1>
       <p style={{ color: '#666' }}>{event.venue_name || 'No Venue Specified'} — {event.start_at ? new Date(event.start_at).toLocaleString() : 'No Date'}</p>
 
-      {/* Stats Grid */}
       <div style={{ display: 'flex', gap: 12, marginTop: 16, flexWrap: 'wrap' }}>
         {[
           { label: 'Total tickets', value: total, color: '#6366f1' },
@@ -119,7 +102,6 @@ export default async function OrganizerScanOverviewPage({ params }: PageProps) {
         ))}
       </div>
 
-      {/* Progress Bar */}
       <div style={{ marginTop: 16, background: '#e5e7eb', borderRadius: 99, height: 8, overflow: 'hidden' }}>
         <div style={{ width: `${total > 0 ? (checkedIn / total) * 100 : 0}%`, background: '#16a34a', height: '100%', transition: 'width 0.3s' }} />
       </div>

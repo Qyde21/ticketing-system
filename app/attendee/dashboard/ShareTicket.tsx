@@ -3,7 +3,8 @@ import { useState } from 'react';
 
 export default function ShareTicket({ code, eventTitle }: { code: string; eventTitle: string }) {
   const [copied, setCopied] = useState(false);
-  const ticketUrl = 'https://ticketing-system-phi-eight.vercel.app/tickets/' + code;
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const ticketUrl = origin + '/tickets/' + code;
   const waMessage = 'Here is your ticket for ' + eventTitle + ': ' + ticketUrl;
   const waHref = 'https://wa.me/?text=' + encodeURIComponent(waMessage);
 
