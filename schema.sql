@@ -44,7 +44,8 @@ CREATE TABLE events (
   end_at           TIMESTAMPTZ,
   status           TEXT NOT NULL DEFAULT 'draft',
   cover_image_url  TEXT,
-  created_at       TIMESTAMPTZ NOT NULL DEFAULT now()
+  created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at       TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE event_staff (

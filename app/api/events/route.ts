@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { slugify } from '@/lib/slugify';
@@ -12,10 +12,26 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { title, description, category, venueName, venueAddress, startAt, endAt, coverImageUrl, ticketTypes } = body;
+    const { title, description, category, venueName, venueAddress, startAt, endAt, coverImageUrl, ticketTypes, publishNow } = body;
 
     if (!title || !venueName || !startAt || !Array.isArray(ticketTypes) || ticketTypes.length === 0) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    if (endAt && new Date(endAt) <= new Date(startAt)) {
+      return NextResponse.json({ error: 'End date must be after the start date' }, { status: 400 });
+    }
+
+    for (const tt of ticketTypes) {
+      if (!tt.name || typeof tt.name !== 'string' || !tt.name.trim()) {
+        return NextResponse.json({ error: 'Every ticket type needs a name' }, { status: 400 });
+      }
+      if (typeof tt.priceKes !== 'number' || Number.isNaN(tt.priceKes) || tt.priceKes < 0) {
+        return NextResponse.json({ error: `Invalid price for ticket type "${tt.name}"` }, { status: 400 });
+      }
+      if (!Number.isInteger(tt.quantityTotal) || tt.quantityTotal < 1) {
+        return NextResponse.json({ error: `Quantity for "${tt.name}" must be at least 1` }, { status: 400 });
+      }
     }
 
     let slug = slugify(title);
@@ -26,8 +42,8 @@ export async function POST(req: NextRequest) {
 
     const [event] = await sql`
       INSERT INTO events (organizer_id, title, slug, description, category, venue_name, venue_address, start_at, end_at, status, cover_image_url)
-      VALUES (${session.userId}, ${title}, ${slug}, ${description ?? null}, ${category ?? null}, ${venueName}, ${venueAddress ?? null}, ${startAt}, ${endAt ?? null}, 'draft', ${coverImageUrl ?? null})
-      RETURNING id, slug
+      VALUES (${session.userId}, ${title}, ${slug}, ${description ?? null}, ${category ?? null}, ${venueName}, ${venueAddress ?? null}, ${startAt}, ${endAt ?? null}, ${publishNow ? 'published' : 'draft'}, ${coverImageUrl ?? null})
+      RETURNING id, slug, status
     `;
 
     for (const tt of ticketTypes) {
