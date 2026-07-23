@@ -5,7 +5,8 @@ import { nanoid } from 'nanoid';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { ticketTypeId, quantity = 1, buyerName, buyerEmail, buyerPhone } = body;
+    const { ticketTypeId, quantity = 1, buyerName, buyerEmail: rawBuyerEmail, buyerPhone } = body;
+    const buyerEmail = typeof rawBuyerEmail === 'string' ? rawBuyerEmail.trim().toLowerCase() : rawBuyerEmail;
 
     if (!ticketTypeId || !buyerName || !buyerEmail || !buyerPhone) {
       return NextResponse.json({ error: 'Missing required fields', received: body }, { status: 400 });

@@ -41,28 +41,26 @@ export default async function AdminPayoutsPage() {
   }
 
   return (
-    <div style={{ maxWidth: 800, margin: '2rem auto', padding: '0 1rem' }}>
-      <h1>Platform Payouts</h1>
+    <div style={{ maxWidth: 800, margin: '2rem auto', padding: '0 1rem', color: '#fff' }}>
+      <h1 style={{ color: '#fff' }}>Platform Payouts</h1>
 
-      {/* Platform summary */}
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 32 }}>
         {[
-          { label: 'Total Gross Revenue', value: totalGross, color: '#6366f1' },
-          { label: 'TicketHub Fees (10%)', value: totalFees, color: '#f59e0b' },
-          { label: 'Total Refunded', value: totalRefunded, color: '#dc2626' },
-          { label: 'Net to Organizers', value: totalNet, color: '#16a34a' },
+          { label: 'Total Gross Revenue', value: totalGross, color: '#818cf8' },
+          { label: 'TicketHub Fees (10%)', value: totalFees, color: '#fbbf24' },
+          { label: 'Total Refunded', value: totalRefunded, color: '#f87171' },
+          { label: 'Net to Organizers', value: totalNet, color: '#4ade80' },
         ].map((stat) => (
-          <div key={stat.label} style={{ background: '#fff', borderRadius: 8, padding: '16px 20px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', flex: 1, minWidth: 150 }}>
+          <div key={stat.label} style={{ background: '#111827', border: '1px solid #1f2937', borderRadius: 8, padding: '16px 20px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', flex: 1, minWidth: 150 }}>
             <div style={{ fontSize: 22, fontWeight: 700, color: stat.color }}>
               KES {stat.value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
             </div>
-            <div style={{ fontSize: 12, color: '#666', marginTop: 4 }}>{stat.label}</div>
+            <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 4 }}>{stat.label}</div>
           </div>
         ))}
       </div>
 
-      {/* Per organizer breakdown */}
-      <h2>Per Organizer</h2>
+      <h2 style={{ color: '#fff' }}>Per Organizer</h2>
       {Object.values(grouped).map((org: any) => {
         const orgGross = org.events.reduce((sum: number, e: any) => sum + Number(e.gross_revenue), 0);
         const orgRefunded = org.events.reduce((sum: number, e: any) => sum + Number(e.refunded_amount), 0);
@@ -70,40 +68,38 @@ export default async function AdminPayoutsPage() {
         const orgNet = orgGross - orgRefunded - orgFees;
 
         return (
-          <div key={org.email} style={{ background: '#fff', borderRadius: 8, marginBottom: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
-            {/* Organizer header */}
-            <div style={{ background: '#f9fafb', padding: '12px 16px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+          <div key={org.email} style={{ background: '#111827', border: '1px solid #1f2937', borderRadius: 8, marginBottom: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
+            <div style={{ background: '#0b1220', padding: '12px 16px', borderBottom: '1px solid #1f2937', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
               <div>
-                <strong style={{ color: '#111827' }}>{org.business_name}</strong>
+                <strong style={{ color: '#fff' }}>{org.business_name}</strong>
                 {org.role === 'admin' && <span style={{ marginLeft: 8, fontSize: 11, background: '#fbbf24', color: '#000', padding: '2px 6px', borderRadius: 99, fontWeight: 700 }}>ADMIN</span>}
-                <div style={{ fontSize: 13, color: '#666', marginTop: 2 }}>{org.full_name} — {org.email}</div>
+                <div style={{ fontSize: 13, color: '#9ca3af', marginTop: 2 }}>{org.full_name} — {org.email}</div>
               </div>
               <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: 16, fontWeight: 700, color: '#16a34a' }}>KES {orgNet.toLocaleString(undefined, { maximumFractionDigits: 0 })} net</div>
-                <div style={{ fontSize: 12, color: '#f59e0b' }}>KES {orgFees.toLocaleString(undefined, { maximumFractionDigits: 0 })} fees</div>
-                <div style={{ fontSize: 12, color: '#6366f1' }}>KES {orgGross.toLocaleString(undefined, { maximumFractionDigits: 0 })} gross</div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: '#4ade80' }}>KES {orgNet.toLocaleString(undefined, { maximumFractionDigits: 0 })} net</div>
+                <div style={{ fontSize: 12, color: '#fbbf24' }}>KES {orgFees.toLocaleString(undefined, { maximumFractionDigits: 0 })} fees</div>
+                <div style={{ fontSize: 12, color: '#818cf8' }}>KES {orgGross.toLocaleString(undefined, { maximumFractionDigits: 0 })} gross</div>
               </div>
             </div>
 
-            {/* Per event rows */}
             {org.events.map((e: any) => {
               const gross = Number(e.gross_revenue);
               const refunded = Number(e.refunded_amount);
               const fees = gross * 0.10;
               const net = gross - refunded - fees;
               return (
-                <div key={e.id} style={{ padding: '10px 16px', borderBottom: '1px solid #f3f4f6', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+                <div key={e.id} style={{ padding: '10px 16px', borderBottom: '1px solid #1f2937', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
                   <div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: '#111827' }}>{e.title}</div>
-                    <div style={{ fontSize: 12, color: '#666' }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: '#fff' }}>{e.title}</div>
+                    <div style={{ fontSize: 12, color: '#9ca3af' }}>
                       {new Date(e.start_at).toLocaleDateString()} · {e.status} · {e.paid_orders} paid · {e.refunded_orders} refunded
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: '#16a34a' }}>KES {net.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
-                    <div style={{ fontSize: 11, color: '#f59e0b' }}>KES {fees.toLocaleString(undefined, { maximumFractionDigits: 0 })} fee</div>
-                    {refunded > 0 && <div style={{ fontSize: 11, color: '#dc2626' }}>-KES {refunded.toLocaleString()} refunded</div>}
-                    <div style={{ fontSize: 11, color: '#6b7280' }}>KES {gross.toLocaleString()} gross</div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: '#4ade80' }}>KES {net.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
+                    <div style={{ fontSize: 11, color: '#fbbf24' }}>KES {fees.toLocaleString(undefined, { maximumFractionDigits: 0 })} fee</div>
+                    {refunded > 0 && <div style={{ fontSize: 11, color: '#f87171' }}>-KES {refunded.toLocaleString()} refunded</div>}
+                    <div style={{ fontSize: 11, color: '#818cf8' }}>KES {gross.toLocaleString()} gross</div>
                   </div>
                 </div>
               );
@@ -112,7 +108,7 @@ export default async function AdminPayoutsPage() {
         );
       })}
 
-      <p style={{ fontSize: 12, color: '#999', marginTop: 16 }}>
+      <p style={{ fontSize: 12, color: '#9ca3af', marginTop: 16 }}>
         Note: Paystack also deducts payment processing fees before settlement.
       </p>
     </div>
