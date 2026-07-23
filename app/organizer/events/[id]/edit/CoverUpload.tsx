@@ -50,20 +50,27 @@ export default function CoverUpload({ eventId }: { eventId: string }) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      <label style={{ fontWeight: 600 }}>Upload new cover image</label>
-      <input type="file" accept="image/*" onChange={handleFileChange} disabled={uploading} />
-      {uploading && <p style={{ color: '#666' }}>Uploading...</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {success && <p style={{ color: 'green' }}>Cover image updated successfully!</p>}
+    <div className="flex flex-col gap-3">
+      <label className="font-semibold text-sm text-gray-300">Upload new cover image</label>
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+        disabled={uploading}
+        className="text-sm text-gray-300 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-indigo-600 file:text-white file:font-semibold file:text-sm hover:file:bg-indigo-500 file:cursor-pointer"
+      />
+      {uploading && <p className="text-gray-400 text-sm">Uploading...</p>}
+      {error && <p className="text-red-400 text-sm">{error}</p>}
+      {success && <p className="text-green-400 text-sm">Cover image updated successfully!</p>}
       {previewUrl && (
         <img
           src={previewUrl}
           alt="New cover preview"
-          style={{ width: '100%', maxHeight: 200, objectFit: 'cover', borderRadius: 8 }}
+          className="w-full rounded-xl"
+          style={{ maxHeight: 200, objectFit: 'cover' }}
         />
       )}
-      <a href="/organizer/dashboard" style={{ color: '#6366f1', marginTop: 8 }}>
+      <a href="/organizer/dashboard" className="text-indigo-400 hover:text-cyan-400 text-sm mt-2">
         Back to dashboard
       </a>
     </div>

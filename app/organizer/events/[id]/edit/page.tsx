@@ -9,22 +9,23 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
   `;
 
   if (!event) {
-    return <div style={{ margin: '2rem' }}>Event not found.</div>;
+    return <div className="max-w-md mx-auto py-16 px-4 text-white text-center">Event not found.</div>;
   }
 
   return (
-    <div style={{ maxWidth: 500, margin: '2rem auto' }}>
-      <h1>Edit Cover Image</h1>
-      <h2>{event.title}</h2>
+    <div className="max-w-md mx-auto py-10 px-4 text-white">
+      <h1 className="text-2xl font-extrabold mb-1">Edit Cover Image</h1>
+      <h2 className="text-gray-400 text-sm mb-4">{event.title}</h2>
       {event.cover_image_url && (
         <img
           src={event.cover_image_url}
           alt="Current cover"
-          style={{ width: '100%', maxHeight: 200, objectFit: 'cover', borderRadius: 8, marginBottom: 16 }}
+          className="w-full rounded-xl mb-4"
+          style={{ maxHeight: 200, objectFit: 'cover' }}
         />
       )}
       {!event.cover_image_url && (
-        <p style={{ color: '#888', marginBottom: 16 }}>No cover image yet.</p>
+        <p className="text-gray-500 mb-4">No cover image yet.</p>
       )}
       <CoverUpload eventId={event.id} />
     </div>

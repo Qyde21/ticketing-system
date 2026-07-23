@@ -30,24 +30,38 @@ export default function InboxReply({ eventId, recipientId, senderName }: { event
     }
   }
 
-  if (success) return <p style={{ fontSize: 13, color: 'green' }}>Reply sent to {senderName}!</p>;
+  if (success) return <p className="text-sm text-green-400">Reply sent to {senderName}!</p>;
 
   return (
     <div>
       {!open && (
-        <button onClick={() => setOpen(true)} style={{ fontSize: 13, color: '#6366f1', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+        <button onClick={() => setOpen(true)} className="text-sm text-indigo-400 hover:text-cyan-400 bg-transparent border-none cursor-pointer p-0">
           Reply to {senderName}
         </button>
       )}
       {open && (
-        <div style={{ marginTop: 8 }}>
-          <textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder={`Reply to ${senderName}...`} rows={3} style={{ width: '100%', padding: '8px 12px', borderRadius: 6, border: '1px solid #e5e7eb', fontSize: 14, resize: 'vertical', boxSizing: 'border-box' }} />
-          {error && <p style={{ color: 'red', fontSize: 13 }}>{error}</p>}
-          <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-            <button onClick={handleReply} disabled={loading || !body.trim()} style={{ background: '#6366f1', color: '#fff', padding: '8px 16px', borderRadius: 6, border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
+        <div className="mt-2">
+          <textarea
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            placeholder={`Reply to ${senderName}...`}
+            rows={3}
+            className="w-full bg-gray-950 border border-gray-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+            style={{ resize: 'vertical', boxSizing: 'border-box' }}
+          />
+          {error && <p className="text-red-400 text-sm">{error}</p>}
+          <div className="flex gap-2 mt-2">
+            <button
+              onClick={handleReply}
+              disabled={loading || !body.trim()}
+              className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white px-4 py-2 rounded-lg font-semibold text-sm transition"
+            >
               {loading ? 'Sending...' : 'Send Reply'}
             </button>
-            <button onClick={() => setOpen(false)} style={{ background: '#f3f4f6', color: '#374151', padding: '8px 16px', borderRadius: 6, border: 'none', cursor: 'pointer', fontSize: 13 }}>
+            <button
+              onClick={() => setOpen(false)}
+              className="bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2 rounded-lg text-sm transition"
+            >
               Cancel
             </button>
           </div>

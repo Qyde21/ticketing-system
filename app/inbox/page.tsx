@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 export default async function InboxPage() {
   const session = await getSession();
   if (!session) {
-    return <div style={{ margin: '2rem' }}>Please log in to view your inbox.</div>;
+    return <div className="max-w-2xl mx-auto py-16 px-4 text-white text-center">Please log in to view your inbox.</div>;
   }
 
   const messages = await sql`
@@ -22,25 +22,25 @@ export default async function InboxPage() {
   `;
 
   return (
-    <div style={{ maxWidth: 700, margin: '2rem auto', padding: '0 1rem' }}>
-      <h1>Your Inbox</h1>
-      <p style={{ color: '#666' }}>{messages.length} message(s)</p>
+    <div className="max-w-2xl mx-auto py-10 px-4 text-white">
+      <h1 className="text-3xl font-extrabold mb-1">Your Inbox</h1>
+      <p className="text-gray-400 text-sm mb-6">{messages.length} message(s)</p>
 
       {messages.length === 0 && (
-        <div style={{ background: '#fff', borderRadius: 8, padding: 32, textAlign: 'center', color: '#666', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-10 text-center text-gray-400">
           No messages yet. Messages from event organizers will appear here.
         </div>
       )}
 
-      <ul style={{ listStyle: 'none', padding: 0 }}>
+      <ul className="space-y-3 list-none p-0">
         {messages.map((m: any) => (
-          <li key={m.id} style={{ background: '#fff', borderRadius: 8, padding: 20, marginBottom: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-              <span style={{ fontSize: 13, fontWeight: 700, color: '#6366f1' }}>{m.event_title}</span>
-              <span style={{ fontSize: 12, color: '#999' }}>{new Date(m.created_at).toLocaleString()}</span>
+          <li key={m.id} className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+            <div className="flex justify-between mb-1">
+              <span className="text-sm font-bold text-indigo-400">{m.event_title}</span>
+              <span className="text-xs text-gray-500">{new Date(m.created_at).toLocaleString()}</span>
             </div>
-            <div style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>From: {m.sender_name}</div>
-            <p style={{ margin: '0 0 12px', fontSize: 14, color: '#374151', lineHeight: 1.7 }}>{m.body}</p>
+            <div className="text-sm text-gray-400 mb-2">From: {m.sender_name}</div>
+            <p className="text-sm text-gray-300 mb-3" style={{ lineHeight: 1.7 }}>{m.body}</p>
             <InboxReply eventId={m.event_id} recipientId={m.sender_id} senderName={m.sender_name} />
           </li>
         ))}

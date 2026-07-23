@@ -42,20 +42,36 @@ export default function MessageComposer({ eventId, buyers }: { eventId: string; 
   }
 
   return (
-    <div style={{ background: '#fff', borderRadius: 8, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.08)', marginTop: 16 }}>
-      <h2 style={{ margin: '0 0 16px', fontSize: 18 }}>Send Message</h2>
+    <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 mt-4">
+      <h2 className="text-lg font-bold text-white mb-4">Send Message</h2>
 
-      <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
-        <button onClick={() => setIsBroadcast(true)} style={{ padding: '6px 16px', borderRadius: 6, border: 'none', cursor: 'pointer', background: isBroadcast ? '#6366f1' : '#f3f4f6', color: isBroadcast ? '#fff' : '#374151', fontWeight: 600, fontSize: 13 }}>
+      <div className="flex gap-3 mb-4">
+        <button
+          onClick={() => setIsBroadcast(true)}
+          className={
+            'px-4 py-1.5 rounded-lg font-semibold text-sm transition ' +
+            (isBroadcast ? 'bg-indigo-600 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700')
+          }
+        >
           Broadcast to all buyers
         </button>
-        <button onClick={() => setIsBroadcast(false)} style={{ padding: '6px 16px', borderRadius: 6, border: 'none', cursor: 'pointer', background: !isBroadcast ? '#6366f1' : '#f3f4f6', color: !isBroadcast ? '#fff' : '#374151', fontWeight: 600, fontSize: 13 }}>
+        <button
+          onClick={() => setIsBroadcast(false)}
+          className={
+            'px-4 py-1.5 rounded-lg font-semibold text-sm transition ' +
+            (!isBroadcast ? 'bg-indigo-600 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700')
+          }
+        >
           Direct message
         </button>
       </div>
 
       {!isBroadcast && (
-        <select value={recipientId} onChange={(e) => setRecipientId(e.target.value)} style={{ width: '100%', padding: '8px 12px', borderRadius: 6, border: '1px solid #e5e7eb', marginBottom: 12, fontSize: 14 }}>
+        <select
+          value={recipientId}
+          onChange={(e) => setRecipientId(e.target.value)}
+          className="w-full bg-gray-950 border border-gray-800 rounded-lg px-3 py-2 text-sm text-white mb-3 focus:outline-none focus:border-indigo-500"
+        >
           <option value="">Select a buyer...</option>
           {buyers.map((b) => (
             <option key={b.id} value={b.id}>{b.full_name} ({b.email})</option>
@@ -63,12 +79,23 @@ export default function MessageComposer({ eventId, buyers }: { eventId: string; 
         </select>
       )}
 
-      <textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder={isBroadcast ? 'Write a message to all ticket buyers...' : 'Write a direct message...'} rows={4} style={{ width: '100%', padding: '8px 12px', borderRadius: 6, border: '1px solid #e5e7eb', fontSize: 14, resize: 'vertical', boxSizing: 'border-box' }} />
+      <textarea
+        value={body}
+        onChange={(e) => setBody(e.target.value)}
+        placeholder={isBroadcast ? 'Write a message to all ticket buyers...' : 'Write a direct message...'}
+        rows={4}
+        className="w-full bg-gray-950 border border-gray-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+        style={{ resize: 'vertical', boxSizing: 'border-box' }}
+      />
 
-      {error && <p style={{ color: 'red', fontSize: 13, margin: '8px 0' }}>{error}</p>}
-      {success && <p style={{ color: 'green', fontSize: 13, margin: '8px 0' }}>{success}</p>}
+      {error && <p className="text-red-400 text-sm my-2">{error}</p>}
+      {success && <p className="text-green-400 text-sm my-2">{success}</p>}
 
-      <button onClick={handleSend} disabled={loading || !body.trim() || (!isBroadcast && !recipientId)} style={{ marginTop: 8, background: '#6366f1', color: '#fff', padding: '10px 24px', borderRadius: 6, border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
+      <button
+        onClick={handleSend}
+        disabled={loading || !body.trim() || (!isBroadcast && !recipientId)}
+        className="mt-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white px-6 py-2.5 rounded-lg font-semibold text-sm transition"
+      >
         {loading ? 'Sending...' : 'Send Message'}
       </button>
     </div>

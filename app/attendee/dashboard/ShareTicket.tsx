@@ -15,11 +15,25 @@ export default function ShareTicket({ code, eventTitle }: { code: string; eventT
   }
 
   return (
-    <div style={{ display: 'flex', gap: 6 }}>
-      <button onClick={handleCopy} style={{ fontSize: 11, padding: '3px 8px', borderRadius: 4, border: '1px solid #e5e7eb', background: copied ? '#d4edda' : '#fff', color: copied ? '#155724' : '#374151', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+    <div className="flex gap-1.5">
+      <button
+        onClick={handleCopy}
+        className={
+          'text-xs px-2 py-1 rounded border whitespace-nowrap transition ' +
+          (copied
+            ? 'bg-green-900/40 border-green-700 text-green-300'
+            : 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700')
+        }
+      >
         {copied ? 'Copied!' : 'Copy link'}
       </button>
-      <a href={waHref} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, padding: '3px 8px', borderRadius: 4, border: '1px solid #25D366', background: '#25D366', color: '#fff', textDecoration: 'none', whiteSpace: 'nowrap' }}>
+      
+        href={waHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-xs px-2 py-1 rounded whitespace-nowrap text-white"
+        style={{ background: '#25D366' }}
+      >
         Share
       </a>
     </div>
