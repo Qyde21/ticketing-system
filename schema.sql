@@ -107,3 +107,12 @@ CREATE TABLE payment_events (
   order_id   UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Tracks failed login attempts for rate limiting (by email and by IP).
+-- Rows older than 1 hour are cleaned up automatically on each login request.
+CREATE TABLE login_attempts (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email      TEXT NOT NULL,
+  ip         TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
