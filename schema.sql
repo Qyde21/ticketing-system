@@ -116,3 +116,13 @@ CREATE TABLE login_attempts (
   ip         TEXT NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Stores hashed, single-use password reset tokens. The raw token is only
+-- ever emailed to the user; only its SHA-256 hash is stored here.
+CREATE TABLE password_reset_tokens (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  token_hash TEXT UNIQUE NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);

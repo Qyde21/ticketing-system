@@ -10,10 +10,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
+    const normalizedEmail = String(email).trim().toLowerCase();
+
     // Signup can only create attendees or organizers — never admin
     const finalRole = role === 'organizer' ? 'organizer' : 'attendee';
 
-    const existing = await sql`SELECT id FROM users WHERE email = ${email}`;
+    const existing = await sql`SELECT id FROM users WHERE email = ${normalizedEmail}`;
     if (existing.length > 0) {
       return NextResponse.json({ error: 'Email already registered' }, { status: 409 });
     }
@@ -22,7 +24,7 @@ export async function POST(req: NextRequest) {
 
     const [user] = await sql`
       INSERT INTO users (email, phone, password_hash, full_name, role)
-      VALUES (${email}, ${phone ?? null}, ${passwordHash}, ${fullName}, ${finalRole})
+      VALUES (${normalizedEmail}, ${phone ?? null}, ${passwordHash}, ${fullName}, ${finalRole})
       RETURNING id, email, full_name, role
     `;
 

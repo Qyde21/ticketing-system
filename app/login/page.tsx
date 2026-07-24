@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import PasswordInput from '@/components/PasswordInput';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -65,14 +66,19 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-indigo-300 mb-2">Password</label>
-            <input
-              type="password"
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-xs font-bold uppercase tracking-wider text-indigo-300">Password</label>
+              <Link href="/forgot-password" className="text-xs text-indigo-400 hover:underline font-semibold">
+                Forgot password?
+              </Link>
+            </div>
+            <PasswordInput
+              value={password}
+              onChange={setPassword}
               required
               placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition"
+              autoComplete="current-password"
             />
           </div>
 

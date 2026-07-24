@@ -3,6 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
+import PasswordInput from '@/components/PasswordInput';
 
 function SignupForm() {
   const searchParams = useSearchParams();
@@ -134,13 +135,13 @@ function SignupForm() {
 
             <div>
               <label className="block text-sm font-medium text-slate-300">Password</label>
-              <input
-                type="password"
-                required
+              <PasswordInput
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full rounded-md bg-slate-950 border border-slate-800 px-3 py-2 text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-sm"
+                onChange={setPassword}
+                required
                 placeholder="••••••••"
+                className="mt-1 block w-full rounded-md bg-slate-950 border border-slate-800 px-3 py-2 text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-sm"
+                autoComplete="new-password"
               />
             </div>
 
