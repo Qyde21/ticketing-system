@@ -30,7 +30,7 @@ export default function InboxMessageList({ initialMessages }: { initialMessages:
         const data = await res.json();
         if (cancelled || !Array.isArray(data.messages)) return;
 
-        const incomingIds = new Set(data.messages.map((m: Message) => m.id));
+        const incomingIds = new Set<string>(data.messages.map((m: Message) => m.id));
         const isNew = [...incomingIds].some((id) => !knownIds.current.has(id));
 
         knownIds.current = incomingIds;
