@@ -63,6 +63,7 @@ export default function NavbarShell({ userEmail, userRole }: NavbarShellProps) {
                   <Link href="/admin/organizers" className={getLinkClass('/admin/organizers')}>Organizers</Link>
                   <Link href="/admin/events" className={getLinkClass('/admin/events')}>All Events</Link>
                   <Link href="/admin/payouts" className={getLinkClass('/admin/payouts')}>Payouts</Link>
+                  <Link href="/inbox" className={getLinkClass('/inbox')}>Inbox</Link>
                 </>
               )}
 
@@ -134,6 +135,7 @@ export default function NavbarShell({ userEmail, userRole }: NavbarShellProps) {
                   <Link href="/admin/organizers" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/admin/organizers')}>Organizers</Link>
                   <Link href="/admin/events" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/admin/events')}>All Events</Link>
                   <Link href="/admin/payouts" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/admin/payouts')}>Payouts</Link>
+                  <Link href="/inbox" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/inbox')}>Inbox</Link>
                 </>
               )}
 
