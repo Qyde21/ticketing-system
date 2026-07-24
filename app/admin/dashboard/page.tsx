@@ -1,4 +1,4 @@
-﻿import { sql } from '@/lib/db';
+import { sql } from '@/lib/db';
 import Link from 'next/link';
 import ApproveButton from './ApproveButton';
 import AdminEventActions from '../events/AdminEventActions';
@@ -165,7 +165,7 @@ export default async function AdminDashboard() {
                   <Link
                     href={`/admin/events/${ev.id}/orders`}
                     className="text-gray-300 hover:text-indigo-400 transition"
-                  >
+                >
                     Orders
                   </Link>
                   <span className="text-gray-700">|</span>
@@ -195,9 +195,14 @@ export default async function AdminDashboard() {
                       </div>
                       <div className="mt-2 flex justify-between text-gray-400">
                         <span>Sold: <strong className="text-emerald-400">{tier.sold}</strong></span>
-                        <span>Remaining: <strong className="text-amber-400">{tier.remaining}</strong></span>
+                        <span>Remaining: <strong className={tier.remaining <= 0 ? 'text-red-500 font-extrabold' : 'text-amber-400'}>{tier.remaining}</strong></span>
                         <span>Total: {tier.total}</span>
                       </div>
+                      {tier.remaining <= 0 && (
+                        <span className="inline-block mt-2 text-[10px] font-bold uppercase tracking-wider text-red-400 bg-red-950/50 border border-red-800 rounded px-2 py-0.5">
+                          Sold Out
+                        </span>
+                      )}
                       <div className="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden mt-2">
                         <div 
                           className="bg-indigo-500 h-full" 

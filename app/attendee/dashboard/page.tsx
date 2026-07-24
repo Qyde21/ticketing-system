@@ -1,4 +1,4 @@
-﻿import { sql } from '@/lib/db';
+import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import Link from 'next/link';
 import ShareTicket from './ShareTicket';
@@ -33,8 +33,18 @@ export default async function AttendeeDashboard() {
 
   return (
     <div className="max-w-2xl mx-auto py-12 px-4 text-white">
-      <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">My Tickets</h1>
-      <p className="text-gray-400 text-sm mt-1 mb-8">{orders.length} paid order(s)</p>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">My Tickets</h1>
+          <p className="text-gray-400 text-sm mt-1">{orders.length} paid order(s)</p>
+        </div>
+        <Link
+          href="/inbox"
+          className="flex items-center gap-2 bg-gray-900 hover:bg-gray-800 border border-gray-800 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition shrink-0"
+        >
+          Inbox
+        </Link>
+      </div>
 
       {orders.length === 0 && (
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center text-gray-400">

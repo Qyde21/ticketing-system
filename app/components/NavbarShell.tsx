@@ -74,7 +74,10 @@ export default function NavbarShell({ userEmail, userRole }: NavbarShellProps) {
               )}
 
               {userRole === 'attendee' && (
-                <Link href="/attendee/dashboard" className={getLinkClass('/attendee/dashboard')}>My Tickets</Link>
+                <>
+                  <Link href="/attendee/dashboard" className={getLinkClass('/attendee/dashboard')}>My Tickets</Link>
+                  <Link href="/inbox" className={getLinkClass('/inbox')}>Inbox</Link>
+                </>
               )}
 
               <button 
@@ -142,7 +145,10 @@ export default function NavbarShell({ userEmail, userRole }: NavbarShellProps) {
               )}
 
               {userRole === 'attendee' && (
-                <Link href="/attendee/dashboard" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/attendee/dashboard')}>My Tickets</Link>
+                <>
+                  <Link href="/attendee/dashboard" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/attendee/dashboard')}>My Tickets</Link>
+                  <Link href="/inbox" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/inbox')}>Inbox</Link>
+                </>
               )}
 
               <button 

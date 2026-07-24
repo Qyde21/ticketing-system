@@ -105,9 +105,14 @@ export default async function OrganizerDashboardPage() {
                         </div>
                         <div className="flex justify-between text-xs text-gray-400">
                           <span>Sold: <strong className="text-white">{sold}</strong></span>
-                          <span>Remaining: <strong className="text-white">{remaining}</strong></span>
+                          <span>Remaining: <strong className={remaining <= 0 ? 'text-red-500 font-extrabold' : 'text-white'}>{remaining}</strong></span>
                           <span>Total: <strong className="text-white">{ticket.quantity_total}</strong></span>
                         </div>
+                        {remaining <= 0 && (
+                          <span className="inline-block text-[10px] font-bold uppercase tracking-wider text-red-400 bg-red-950/50 border border-red-800 rounded px-2 py-0.5">
+                            Sold Out
+                          </span>
+                        )}
                         <div className="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden">
                           <div className="bg-cyan-500 h-full rounded-full transition-all" style={{ width: `${progress}%` }} />
                         </div>

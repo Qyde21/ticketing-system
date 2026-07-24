@@ -14,6 +14,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
 
+    if (user.status === 'suspended') {
+      return NextResponse.json({ error: 'This account has been suspended. Contact support for help.' }, { status: 403 });
+    }
+
     await setSessionCookie({ userId: user.id, email: user.email, role: user.role });
 
     return NextResponse.json({
