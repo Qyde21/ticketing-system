@@ -1,4 +1,4 @@
-﻿import { sql } from '@/lib/db';
+import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import Link from 'next/link';
 import OrganizerActionBtn from './OrganizerActionBtn';
@@ -12,77 +12,29 @@ export default async function AdminOrganizersPage() {
     return <div className="max-w-6xl mx-auto px-4 py-8 text-white">Unauthorized access.</div>;
   }
 
-  let organizers: any[] = [];
-
-  try {
-    // Fetch users and events independently to match them safely
-    const users = await sql`SELECT * FROM users`.catch(() => []);
-    const events = await sql`SELECT id, organizer_id, status, created_at FROM events`.catch(() => []);
-
-    console.log("DEBUG USERS TABLE RAW:", users);
-
-    const userMap = new Map();
-    if (Array.isArray(users)) {
-      users.forEach((u: any) => {
-        if (!u) return;
-        const uId = String(u.id || u.user_id || '').trim();
-        if (!uId) return;
-
-        // Extract the best possible name from available columns
-        const displayName = u.name || u.full_name || u.username || u.display_name || u.email?.split('@')[0] || `Organizer #${uId.slice(0, 6)}`;
-
-        userMap.set(uId, {
-          id: uId,
-          name: displayName,
-          email: u.email || `${displayName.toLowerCase()}@tickethub.com`,
-          status: u.status || 'active',
-          created_at: u.created_at,
-          total_events: 0,
-          published_events: 0,
-        });
-      });
-    }
-
-    const organizerMap = new Map();
-
-    if (Array.isArray(events)) {
-      events.forEach((ev: any) => {
-        if (!ev || ev.organizer_id == null) return;
-        const orgId = String(ev.organizer_id).trim();
-
-        if (!organizerMap.has(orgId)) {
-          const matchedUser = userMap.get(orgId) || {
-            id: orgId,
-            name: `Organizer #${orgId.slice(0, 6)}`,
-            email: `organizer_${orgId.slice(0, 6)}@tickethub.com`,
-            status: 'active',
-            created_at: ev.created_at,
-            total_events: 0,
-            published_events: 0,
-          };
-          organizerMap.set(orgId, { ...matchedUser });
-        }
-
-        const orgData = organizerMap.get(orgId);
-        orgData.total_events += 1;
-        if (ev.status === 'published') {
-          orgData.published_events += 1;
-        }
-      });
-    }
-
-    organizers = Array.from(organizerMap.values());
-  } catch (err) {
-    console.error("Error loading organizers:", err);
-    organizers = [];
-  }
+  const organizers = await sql`
+    SELECT
+      u.id,
+      COALESCE(op.business_name, u.full_name) AS name,
+      u.email,
+      u.status,
+      u.created_at,
+      COUNT(e.id) AS total_events,
+      COUNT(e.id) FILTER (WHERE e.status = 'published') AS published_events
+    FROM users u
+    LEFT JOIN organizer_profiles op ON op.user_id = u.id
+    LEFT JOIN events e ON e.organizer_id = u.id
+    WHERE u.role = 'organizer'
+    GROUP BY u.id, op.business_name
+    ORDER BY u.created_at DESC
+  `;
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-8 text-white">
       <div className="flex justify-between items-center mb-8 pb-4 border-b border-gray-800">
         <div>
           <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Organizer Management</h1>
-          <p className="text-gray-400 text-sm mt-1">Monitor active event creators and manage their hosting status</p>
+          <p className="text-gray-400 text-sm mt-1">Monitor event creators and manage their hosting status</p>
         </div>
         <div className="bg-gray-900 border border-gray-800 px-4 py-2 rounded-xl text-sm text-gray-300 shadow">
           Total Organizers: <strong className="text-cyan-400">{organizers.length}</strong>
@@ -91,13 +43,13 @@ export default async function AdminOrganizersPage() {
 
       {organizers.length === 0 ? (
         <div className="text-center py-16 bg-gray-900 border border-gray-800 rounded-2xl shadow-xl text-gray-400">
-          No organizers found with active events.
+          No organizers found.
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {organizers.map((org: any) => (
-            <div 
-              key={org.id} 
+            <div
+              key={org.id}
               className="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between space-y-6 transition hover:border-gray-700"
             >
               <div className="space-y-3">

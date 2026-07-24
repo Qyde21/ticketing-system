@@ -20,7 +20,11 @@ export default function RefundButton({ orderId }: { orderId: string }) {
   }
 
   return (
-    <button onClick={handleRefund} disabled={loading} style={{ marginLeft: 8 }}>
+    <button
+      onClick={handleRefund}
+      disabled={loading}
+      className="bg-red-950/40 hover:bg-red-900/60 text-red-400 border border-red-800/60 font-semibold px-3 py-1.5 rounded-lg text-xs transition disabled:opacity-50 ml-2"
+    >
       {loading ? 'Refunding...' : 'Refund'}
     </button>
   );
