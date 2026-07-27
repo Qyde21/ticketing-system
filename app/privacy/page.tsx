@@ -1,13 +1,13 @@
 ﻿export default function PrivacyPage() {
   return (
-    <div style={{ maxWidth: 700, margin: '3rem auto', padding: '0 1.5rem' }}>
-      <h1 style={{ fontSize: 32, fontWeight: 800, color: '#111827', marginBottom: 8 }}>Privacy Policy</h1>
-      <p style={{ color: '#6b7280', fontSize: 14, marginBottom: 32 }}>Last updated: July 2026</p>
+    <div className="max-w-2xl mx-auto px-6 py-16 text-white">
+      <h1 className="text-3xl font-extrabold mb-2">Privacy Policy</h1>
+      <p className="text-gray-400 text-sm mb-8">Last updated: July 2026</p>
 
       {[
         {
           title: '1. Information We Collect',
-          body: 'We collect your name, email address, and phone number when you sign up or purchase a ticket. We also collect payment information which is processed securely by Paystack — we do not store your card details.',
+          body: 'We collect your name, email address, and phone number when you sign up or purchase a ticket. We also collect payment information which is processed securely by Paystack - we do not store your card details.',
         },
         {
           title: '2. How We Use Your Information',
@@ -34,9 +34,9 @@
           body: 'For privacy-related questions, contact us at support@tickethub.co.ke or via WhatsApp at +254 114 525 941.',
         },
       ].map((section) => (
-        <section key={section.title} style={{ marginBottom: 28 }}>
-          <h2 style={{ fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 8 }}>{section.title}</h2>
-          <p style={{ color: '#374151', lineHeight: 1.8, margin: 0 }}>{section.body}</p>
+        <section key={section.title} className="mb-7">
+          <h2 className="text-lg font-bold text-white mb-2">{section.title}</h2>
+          <p className="text-gray-300" style={{ lineHeight: 1.8 }}>{section.body}</p>
         </section>
       ))}
     </div>

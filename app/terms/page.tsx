@@ -1,8 +1,8 @@
 ﻿export default function TermsPage() {
   return (
-    <div style={{ maxWidth: 700, margin: '3rem auto', padding: '0 1.5rem' }}>
-      <h1 style={{ fontSize: 32, fontWeight: 800, color: '#111827', marginBottom: 8 }}>Terms of Service</h1>
-      <p style={{ color: '#6b7280', fontSize: 14, marginBottom: 32 }}>Last updated: July 2026</p>
+    <div className="max-w-2xl mx-auto px-6 py-16 text-white">
+      <h1 className="text-3xl font-extrabold mb-2">Terms of Service</h1>
+      <p className="text-gray-400 text-sm mb-8">Last updated: July 2026</p>
 
       {[
         {
@@ -38,9 +38,9 @@
           body: 'For questions about these terms, contact us at support@tickethub.co.ke.',
         },
       ].map((section) => (
-        <section key={section.title} style={{ marginBottom: 28 }}>
-          <h2 style={{ fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 8 }}>{section.title}</h2>
-          <p style={{ color: '#374151', lineHeight: 1.8, margin: 0 }}>{section.body}</p>
+        <section key={section.title} className="mb-7">
+          <h2 className="text-lg font-bold text-white mb-2">{section.title}</h2>
+          <p className="text-gray-300" style={{ lineHeight: 1.8 }}>{section.body}</p>
         </section>
       ))}
     </div>

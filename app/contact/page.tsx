@@ -33,38 +33,41 @@ export default function ContactPage() {
     }
   }
 
-  return (
-    <div style={{ maxWidth: 600, margin: '3rem auto', padding: '0 1.5rem' }}>
-      <h1 style={{ fontSize: 32, fontWeight: 800, color: '#111827', marginBottom: 8 }}>Contact Us</h1>
-      <p style={{ color: '#6b7280', marginBottom: 32 }}>We typically respond within 24 hours. You can also reach us instantly on WhatsApp.</p>
+  const inputClass = 'w-full bg-gray-950 border border-gray-800 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition';
+  const labelClass = 'block text-xs font-semibold text-gray-300 mb-1.5';
 
-      <div style={{ display: 'flex', gap: 16, marginBottom: 32, flexWrap: 'wrap' }}>
-        <a href="https://wa.me/254114525941" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#25D366', color: '#fff', padding: '10px 20px', borderRadius: 8, fontWeight: 600, textDecoration: 'none', fontSize: 14 }}>
+  return (
+    <div className="max-w-xl mx-auto px-6 py-16 text-white">
+      <h1 className="text-3xl font-extrabold mb-2">Contact Us</h1>
+      <p className="text-gray-400 mb-8">We typically respond within 24 hours. You can also reach us instantly on WhatsApp.</p>
+
+      <div className="flex gap-3 mb-8 flex-wrap">
+        <a href="https://wa.me/254114525941" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white py-2.5 px-5 rounded-lg font-semibold text-sm" style={{ background: '#25D366' }}>
           WhatsApp Support
         </a>
-        <a href="mailto:support@tickethub.co.ke" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#f3f4f6', color: '#111827', padding: '10px 20px', borderRadius: 8, fontWeight: 600, textDecoration: 'none', fontSize: 14 }}>
+        <a href="mailto:support@tickethub.co.ke" className="inline-flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-white py-2.5 px-5 rounded-lg font-semibold text-sm transition">
           support@tickethub.co.ke
         </a>
       </div>
 
       {success ? (
-        <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: 24, textAlign: 'center' }}>
-          <h2 style={{ color: '#16a34a', margin: '0 0 8px' }}>Message sent!</h2>
-          <p style={{ color: '#166534', margin: 0 }}>Thank you for reaching out. We will get back to you within 24 hours.</p>
+        <div className="bg-green-950/40 border border-green-800/50 rounded-xl p-6 text-center">
+          <h2 className="text-green-400 font-bold mb-1">Message sent!</h2>
+          <p className="text-green-300 text-sm">Thank you for reaching out. We will get back to you within 24 hours.</p>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 4px rgba(0,0,0,0.08)', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <form onSubmit={handleSubmit} className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-4">
           <div>
-            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 4 }}>Full name</label>
-            <input value={name} onChange={(e) => setName(e.target.value)} required placeholder="Your name" style={{ width: '100%', padding: '8px 12px', borderRadius: 6, border: '1px solid #e5e7eb', fontSize: 14, boxSizing: 'border-box' }} />
+            <label className={labelClass}>Full name</label>
+            <input value={name} onChange={(e) => setName(e.target.value)} required placeholder="Your name" className={inputClass} />
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 4 }}>Email address</label>
-            <input value={email} onChange={(e) => setEmail(e.target.value)} required type="email" placeholder="your@email.com" style={{ width: '100%', padding: '8px 12px', borderRadius: 6, border: '1px solid #e5e7eb', fontSize: 14, boxSizing: 'border-box' }} />
+            <label className={labelClass}>Email address</label>
+            <input value={email} onChange={(e) => setEmail(e.target.value)} required type="email" placeholder="your@email.com" className={inputClass} />
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 4 }}>Subject</label>
-            <select value={subject} onChange={(e) => setSubject(e.target.value)} required style={{ width: '100%', padding: '8px 12px', borderRadius: 6, border: '1px solid #e5e7eb', fontSize: 14, boxSizing: 'border-box' }}>
+            <label className={labelClass}>Subject</label>
+            <select value={subject} onChange={(e) => setSubject(e.target.value)} required className={inputClass}>
               <option value="">Select a subject...</option>
               <option value="Ticket issue">Ticket issue</option>
               <option value="Payment problem">Payment problem</option>
@@ -75,11 +78,11 @@ export default function ContactPage() {
             </select>
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 4 }}>Message</label>
-            <textarea value={message} onChange={(e) => setMessage(e.target.value)} required placeholder="Describe your issue or question..." rows={5} style={{ width: '100%', padding: '8px 12px', borderRadius: 6, border: '1px solid #e5e7eb', fontSize: 14, resize: 'vertical', boxSizing: 'border-box' }} />
+            <label className={labelClass}>Message</label>
+            <textarea value={message} onChange={(e) => setMessage(e.target.value)} required placeholder="Describe your issue or question..." rows={5} className={inputClass} style={{ resize: 'vertical' }} />
           </div>
-          {error && <p style={{ color: '#dc2626', fontSize: 13, margin: 0 }}>{error}</p>}
-          <button type="submit" disabled={loading} style={{ background: '#6366f1', color: '#fff', padding: '12px 0', borderRadius: 8, fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer' }}>
+          {error && <p className="text-red-400 text-sm">{error}</p>}
+          <button type="submit" disabled={loading} className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white py-3 rounded-lg font-bold text-sm transition">
             {loading ? 'Sending...' : 'Send Message'}
           </button>
         </form>

@@ -2,21 +2,21 @@
 
 export default function PricingPage() {
   return (
-    <div style={{ maxWidth: 800, margin: '3rem auto', padding: '0 1.5rem' }}>
-      <div style={{ textAlign: 'center', marginBottom: 48 }}>
-        <h1 style={{ fontSize: 36, fontWeight: 800, color: '#111827', marginBottom: 8 }}>Simple, Transparent Pricing</h1>
-        <p style={{ color: '#6b7280', fontSize: 18 }}>No hidden fees. Only pay when you sell tickets.</p>
+    <div className="max-w-3xl mx-auto px-6 py-16 text-white">
+      <div className="text-center mb-12">
+        <h1 className="text-4xl font-extrabold mb-2">Simple, Transparent Pricing</h1>
+        <p className="text-gray-400 text-lg">No hidden fees. Only pay when you sell tickets.</p>
       </div>
 
       {/* Pricing cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 24, marginBottom: 48 }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-12">
 
         {/* Attendee */}
-        <div style={{ background: '#fff', borderRadius: 12, padding: 32, boxShadow: '0 1px 4px rgba(0,0,0,0.08)', border: '1px solid #e5e7eb' }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#6366f1', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 }}>Attendee</div>
-          <div style={{ fontSize: 48, fontWeight: 800, color: '#111827', marginBottom: 4 }}>Free</div>
-          <p style={{ color: '#6b7280', fontSize: 14, marginBottom: 24 }}>Sign up and buy tickets at no extra cost</p>
-          <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8">
+          <div className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-3">Attendee</div>
+          <div className="text-5xl font-extrabold text-white mb-1">Free</div>
+          <p className="text-gray-400 text-sm mb-6">Sign up and buy tickets at no extra cost</p>
+          <ul className="flex flex-col gap-2.5 mb-6 list-none p-0">
             {[
               'Free account creation',
               'Browse all events',
@@ -24,25 +24,25 @@ export default function PricingPage() {
               'Instant QR-code ticket by email',
               'WhatsApp support',
             ].map((item) => (
-              <li key={item} style={{ display: 'flex', gap: 8, fontSize: 14, color: '#374151' }}>
-                <span style={{ color: '#16a34a', fontWeight: 700 }}>✓</span> {item}
+              <li key={item} className="flex gap-2 text-sm text-gray-300">
+                <span className="text-emerald-400 font-bold">&#10003;</span> {item}
               </li>
             ))}
           </ul>
-          <Link href="/signup" style={{ display: 'block', textAlign: 'center', background: '#f3f4f6', color: '#111827', padding: '10px 0', borderRadius: 8, fontWeight: 600, textDecoration: 'none', fontSize: 14 }}>
+          <Link href="/signup" className="block text-center bg-gray-800 hover:bg-gray-700 text-white py-2.5 rounded-lg font-semibold text-sm transition">
             Sign up free
           </Link>
         </div>
 
         {/* Organizer */}
-        <div style={{ background: '#6366f1', borderRadius: 12, padding: 32, boxShadow: '0 4px 20px rgba(99,102,241,0.3)', border: '1px solid #6366f1', position: 'relative' }}>
-          <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#fbbf24', color: '#000', fontSize: 11, fontWeight: 800, padding: '4px 12px', borderRadius: 99, whiteSpace: 'nowrap' }}>
+        <div className="relative bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-2xl p-8 shadow-lg shadow-indigo-950/50">
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-400 text-black text-xs font-extrabold px-3 py-1 rounded-full whitespace-nowrap">
             MOST POPULAR
           </div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#c7d2fe', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 }}>Organizer</div>
-          <div style={{ fontSize: 48, fontWeight: 800, color: '#fff', marginBottom: 4 }}>10%</div>
-          <p style={{ color: '#c7d2fe', fontSize: 14, marginBottom: 24 }}>Per ticket sold. No upfront costs.</p>
-          <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div className="text-xs font-bold text-indigo-200 uppercase tracking-wider mb-3">Organizer</div>
+          <div className="text-5xl font-extrabold text-white mb-1">10%</div>
+          <p className="text-indigo-200 text-sm mb-6">Per ticket sold. No upfront costs.</p>
+          <ul className="flex flex-col gap-2.5 mb-6 list-none p-0">
             {[
               'Free account creation',
               'Create unlimited events',
@@ -53,12 +53,12 @@ export default function PricingPage() {
               'Payout tracking',
               'WhatsApp support',
             ].map((item) => (
-              <li key={item} style={{ display: 'flex', gap: 8, fontSize: 14, color: '#e0e7ff' }}>
-                <span style={{ color: '#fbbf24', fontWeight: 700 }}>✓</span> {item}
+              <li key={item} className="flex gap-2 text-sm text-indigo-100">
+                <span className="text-amber-400 font-bold">&#10003;</span> {item}
               </li>
             ))}
           </ul>
-          <Link href="/signup?role=organizer" style={{ display: 'block', textAlign: 'center', background: '#fbbf24', color: '#000', padding: '10px 0', borderRadius: 8, fontWeight: 700, textDecoration: 'none', fontSize: 14 }}>
+          <Link href="/signup?role=organizer" className="block text-center bg-amber-400 hover:bg-amber-300 text-black py-2.5 rounded-lg font-bold text-sm transition">
             Start selling tickets
           </Link>
         </div>
@@ -66,17 +66,17 @@ export default function PricingPage() {
       </div>
 
       {/* FAQ section */}
-      <div style={{ background: '#fff', borderRadius: 12, padding: 32, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
-        <h2 style={{ fontSize: 22, fontWeight: 700, color: '#111827', marginBottom: 24 }}>Pricing FAQ</h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8">
+        <h2 className="text-xl font-bold text-white mb-6">Pricing FAQ</h2>
+        <div className="flex flex-col gap-5">
           {[
             {
               q: 'How does the 10% fee work?',
-              a: 'For every ticket sold, TicketHub deducts a 10% service fee from the ticket price. For example, if you sell a KES 1,000 ticket, you receive KES 900. The fee is automatically deducted — no invoices or manual payments needed.',
+              a: 'For every ticket sold, TicketHub deducts a 10% service fee from the ticket price. For example, if you sell a KES 1,000 ticket, you receive KES 900. The fee is automatically deducted - no invoices or manual payments needed.',
             },
             {
               q: 'Are there any other fees?',
-              a: 'Paystack charges a separate payment processing fee (typically 1.5% + KES 100 per transaction for local cards, and 3.9% for international cards). This is charged by Paystack directly and is separate from TicketHub\'s 10% fee.',
+              a: "Paystack charges a separate payment processing fee (typically 1.5% + KES 100 per transaction for local cards, and 3.9% for international cards). This is charged by Paystack directly and is separate from TicketHub's 10% fee.",
             },
             {
               q: 'When do I get paid?',
@@ -91,18 +91,18 @@ export default function PricingPage() {
               a: 'No minimum. You can sell as few or as many tickets as you like.',
             },
           ].map((item) => (
-            <div key={item.q} style={{ borderBottom: '1px solid #f3f4f6', paddingBottom: 20 }}>
-              <h3 style={{ fontSize: 15, fontWeight: 700, color: '#111827', marginBottom: 6, marginTop: 0 }}>{item.q}</h3>
-              <p style={{ fontSize: 14, color: '#374151', lineHeight: 1.7, margin: 0 }}>{item.a}</p>
+            <div key={item.q} className="border-b border-gray-800 pb-5 last:border-0 last:pb-0">
+              <h3 className="text-sm font-bold text-white mb-1.5">{item.q}</h3>
+              <p className="text-sm text-gray-400" style={{ lineHeight: 1.7 }}>{item.a}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* CTA */}
-      <div style={{ textAlign: 'center', marginTop: 48 }}>
-        <p style={{ color: '#6b7280', marginBottom: 16 }}>Ready to start selling tickets?</p>
-        <Link href="/signup?role=organizer" style={{ display: 'inline-block', background: '#6366f1', color: '#fff', padding: '12px 32px', borderRadius: 8, fontWeight: 700, textDecoration: 'none', fontSize: 16 }}>
+      <div className="text-center mt-12">
+        <p className="text-gray-400 mb-4">Ready to start selling tickets?</p>
+        <Link href="/signup?role=organizer" className="inline-block bg-indigo-600 hover:bg-indigo-500 text-white py-3 px-8 rounded-lg font-bold text-base transition shadow-lg shadow-indigo-950/50">
           Create your organizer account
         </Link>
       </div>

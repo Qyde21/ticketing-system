@@ -43,23 +43,23 @@
 
 export default function FAQPage() {
   return (
-    <div style={{ maxWidth: 700, margin: '3rem auto', padding: '0 1.5rem' }}>
-      <h1 style={{ fontSize: 32, fontWeight: 800, color: '#111827', marginBottom: 8 }}>Frequently Asked Questions</h1>
-      <p style={{ color: '#6b7280', fontSize: 16, marginBottom: 32 }}>Everything you need to know about TicketHub</p>
+    <div className="max-w-2xl mx-auto px-6 py-16 text-white">
+      <h1 className="text-3xl font-extrabold mb-2">Frequently Asked Questions</h1>
+      <p className="text-gray-400 text-base mb-8">Everything you need to know about TicketHub</p>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div className="flex flex-col gap-4">
         {faqs.map((faq, i) => (
-          <div key={i} style={{ background: '#fff', borderRadius: 8, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.08)', borderLeft: '4px solid #6366f1' }}>
-            <h3 style={{ margin: '0 0 8px', fontSize: 16, fontWeight: 700, color: '#111827' }}>{faq.q}</h3>
-            <p style={{ margin: 0, color: '#374151', lineHeight: 1.7, fontSize: 14 }}>{faq.a}</p>
+          <div key={i} className="bg-gray-900 border-l-4 border-indigo-500 rounded-xl p-5">
+            <h3 className="text-base font-bold text-white mb-2">{faq.q}</h3>
+            <p className="text-sm text-gray-300" style={{ lineHeight: 1.7 }}>{faq.a}</p>
           </div>
         ))}
       </div>
 
-      <div style={{ marginTop: 40, padding: 20, background: '#f0fdf4', borderRadius: 8, border: '1px solid #bbf7d0' }}>
-        <p style={{ margin: 0, fontSize: 14, color: '#166534' }}>
+      <div className="mt-10 p-5 bg-green-950/30 border border-green-800/40 rounded-xl">
+        <p className="text-sm text-green-300">
           Still have questions?{' '}
-          <a href="https://wa.me/254114525941" target="_blank" rel="noopener noreferrer" style={{ color: '#16a34a', fontWeight: 600 }}>
+          <a href="https://wa.me/254114525941" target="_blank" rel="noopener noreferrer" className="text-green-400 font-semibold hover:underline">
             Chat with us on WhatsApp
           </a>
         </p>
