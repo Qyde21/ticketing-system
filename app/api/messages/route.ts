@@ -70,6 +70,36 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Recipient required for direct messages' }, { status: 400 });
   }
 
+  if (isOrganizer) {
+    // Organizer/admin can only message actual paid buyers of this event.
+    const [buyerMatch] = await sql`
+      SELECT 1 FROM orders o
+      JOIN users u ON u.email = o.buyer_email
+      WHERE o.event_id = ${eventId} AND o.payment_status = 'paid' AND u.id = ${recipientId}
+      LIMIT 1
+    `;
+    if (!buyerMatch) {
+      return NextResponse.json({ error: 'Recipient is not a buyer of this event' }, { status: 403 });
+    }
+  } else {
+    // Sender must be a paid buyer of this event, and can only message its organizer or an admin.
+    const senderEmail = session.email.toLowerCase();
+    const [buyerCheck] = await sql`
+      SELECT 1 FROM orders
+      WHERE event_id = ${eventId} AND payment_status = 'paid' AND LOWER(buyer_email) = ${senderEmail}
+      LIMIT 1
+    `;
+    if (!buyerCheck) {
+      return NextResponse.json({ error: 'You are not authorized to message about this event' }, { status: 403 });
+    }
+
+    const [recipientUser] = await sql`SELECT id, role FROM users WHERE id = ${recipientId}`;
+    const recipientIsOrganizerOrAdmin = !!recipientUser && (recipientId === event.organizer_id || recipientUser.role === 'admin');
+    if (!recipientIsOrganizerOrAdmin) {
+      return NextResponse.json({ error: 'You can only message the event organizer' }, { status: 403 });
+    }
+  }
+
   await sql`
     INSERT INTO messages (event_id, sender_id, recipient_id, body, is_broadcast)
     VALUES (${eventId}, ${session.userId}, ${recipientId}, ${body}, false)

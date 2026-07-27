@@ -110,8 +110,12 @@ CREATE TABLE payment_events (
 
 -- Tracks failed login attempts for rate limiting (by email and by IP).
 -- Rows older than 1 hour are cleaned up automatically on each login request.
+-- Tracks failed login attempts and other rate-limited requests (e.g. password
+-- reset requests), scoped by `type` so different endpoints don't share a
+-- counter. Rows older than 1 hour are cleaned up automatically on each request.
 CREATE TABLE login_attempts (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  type       TEXT NOT NULL DEFAULT 'login', -- 'login' | 'forgot_password'
   email      TEXT NOT NULL,
   ip         TEXT NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()

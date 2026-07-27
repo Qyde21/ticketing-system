@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { sendPasswordResetEmail } from '@/lib/email';
+import { checkRateLimit, recordAttempt, getClientIp } from '@/lib/rateLimit';
 import crypto from 'crypto';
 
 const GENERIC_MESSAGE = 'If an account with that email exists, we have sent a password reset link.';
+const MAX_ATTEMPTS = 5;
+const WINDOW_MINUTES = 15;
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,7 +15,24 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     }
 
+    const ip = getClientIp(req);
     const normalizedEmail = String(email).trim().toLowerCase();
+
+    const allowed = await checkRateLimit({
+      type: 'forgot_password',
+      email: normalizedEmail,
+      ip,
+      maxAttempts: MAX_ATTEMPTS,
+      windowMinutes: WINDOW_MINUTES,
+    });
+    if (!allowed) {
+      return NextResponse.json(
+        { error: 'Too many reset requests. Please try again in a few minutes.' },
+        { status: 429 }
+      );
+    }
+
+    await recordAttempt('forgot_password', normalizedEmail, ip);
 
     const [user] = await sql`SELECT id, email FROM users WHERE email = ${normalizedEmail}`;
 
