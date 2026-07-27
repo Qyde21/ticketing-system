@@ -11,27 +11,23 @@ export async function GET(req: NextRequest) {
 
   try {
     const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
-    
-    if (paystackSecret) {
-      const verifyRes = await fetch(`https://api.paystack.co/transaction/verify/${reference}`, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${paystackSecret}`,
-          'Content-Type': 'application/json'
-        }
-      });
 
-      const verifyData = await verifyRes.json();
-      
-      if (verifyData.status && verifyData.data?.status === 'success') {
-        await sql`
-          UPDATE orders 
-          SET payment_status = 'paid' 
-          WHERE paystack_reference = ${reference}
-        `;
+    if (!paystackSecret) {
+      console.error('PAYSTACK_SECRET_KEY is not configured - cannot verify payment');
+      return NextResponse.redirect(new URL('/?error=verification_unavailable', req.url));
+    }
+
+    const verifyRes = await fetch(`https://api.paystack.co/transaction/verify/${reference}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${paystackSecret}`,
+        'Content-Type': 'application/json'
       }
-    } else {
-      // Fallback if secret key isn't set during testing
+    });
+
+    const verifyData = await verifyRes.json();
+
+    if (verifyData.status && verifyData.data?.status === 'success') {
       await sql`
         UPDATE orders 
         SET payment_status = 'paid' 

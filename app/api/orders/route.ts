@@ -1,6 +1,7 @@
 ﻿import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { nanoid } from 'nanoid';
+import { finalizePaidOrder } from '@/lib/tickets';
 
 export async function POST(req: NextRequest) {
   try {
@@ -41,6 +42,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Ticket not found' }, { status: 404 });
     }
 
+    const remaining = Number(ticketType.quantity_total || 0) - Number(ticketType.quantity_sold || 0);
+    if (quantity > remaining) {
+      return NextResponse.json({ error: `Only ${Math.max(0, remaining)} ticket(s) remaining for this tier` }, { status: 400 });
+    }
+    if (ticketType.max_per_order && quantity > ticketType.max_per_order) {
+      return NextResponse.json({ error: `Maximum ${ticketType.max_per_order} tickets per order` }, { status: 400 });
+    }
+
     const [event] = await sql`
       SELECT status, start_at, end_at FROM events WHERE id = ${ticketType.event_id}
     `;
@@ -58,11 +67,18 @@ export async function POST(req: NextRequest) {
     const amountKes = Number(ticketType.price_kes || 0) * quantity;
     const amountInSubunits = Math.round(amountKes * 100);
     const reference = `tk-${nanoid(16)}`;
+    const isFree = amountKes <= 0;
 
     let authorizationUrl = '';
-    const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
 
-    if (paystackSecret) {
+    if (!isFree) {
+      const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
+
+      if (!paystackSecret) {
+        console.error('PAYSTACK_SECRET_KEY is not configured');
+        return NextResponse.json({ error: 'Payments are not configured right now. Please contact support.' }, { status: 503 });
+      }
+
       try {
         const paystackRes = await fetch('https://api.paystack.co/transaction/initialize', {
           method: 'POST',
@@ -81,23 +97,32 @@ export async function POST(req: NextRequest) {
         const paystackData = await paystackRes.json();
         if (paystackData.status && paystackData.data?.authorization_url) {
           authorizationUrl = paystackData.data.authorization_url;
+        } else {
+          console.error('Paystack did not return an authorization URL:', paystackData);
+          return NextResponse.json({ error: 'Unable to start payment right now. Please try again shortly.' }, { status: 502 });
         }
       } catch (paystackErr) {
-        console.warn("Paystack API call failed:", paystackErr);
+        console.error('Paystack API call failed:', paystackErr);
+        return NextResponse.json({ error: 'Unable to reach the payment provider. Please try again shortly.' }, { status: 502 });
       }
     }
 
     const [order] = await sql`
       INSERT INTO orders (event_id, buyer_name, buyer_email, buyer_phone, total_amount_kes, payment_status, paystack_reference, ticket_type_id, quantity)
-      VALUES (${ticketType.event_id}, ${buyerName}, ${buyerEmail}, ${buyerPhone}, ${amountKes}, ${authorizationUrl ? 'pending' : 'paid'}, ${reference}, ${ticketType.id}, ${quantity})
+      VALUES (${ticketType.event_id}, ${buyerName}, ${buyerEmail}, ${buyerPhone}, ${amountKes}, ${isFree ? 'paid' : 'pending'}, ${reference}, ${ticketType.id}, ${quantity})
       RETURNING id
     `;
+
+    if (isFree) {
+      await finalizePaidOrder(order.id, req.nextUrl.origin);
+    }
 
     return NextResponse.json({ 
       success: true, 
       orderId: order.id, 
       reference, 
-      authorizationUrl: authorizationUrl || null
+      authorizationUrl: authorizationUrl || null,
+      isFree
     });
 
   } catch (err: any) {
