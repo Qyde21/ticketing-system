@@ -1,4 +1,4 @@
-﻿import { sql } from '@/lib/db';
+import { sql } from '@/lib/db';
 import Scanner from './Scanner';
 
 export const dynamic = 'force-dynamic';
@@ -9,7 +9,7 @@ export default async function ScanPage({ params }: { params: Promise<{ eventId: 
   const [event] = await sql`SELECT id, title FROM events WHERE id = ${eventId}`;
 
   if (!event) {
-    return <div style={{ margin: '2rem' }}>Event not found.</div>;
+    return <div className="max-w-md mx-auto py-12 px-4 text-white">Event not found.</div>;
   }
 
   const [counts] = await sql`
@@ -23,28 +23,28 @@ export default async function ScanPage({ params }: { params: Promise<{ eventId: 
   `;
 
   return (
-    <div style={{ maxWidth: 500, margin: '2rem auto', padding: '0 1rem' }}>
-      <h1>Check-in: {event.title}</h1>
+    <div className="max-w-md mx-auto py-8 px-4 text-white">
+      <h1 className="text-xl font-extrabold mb-4">Check-in: {event.title}</h1>
 
       {/* Live counter */}
-      <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
-        <div style={{ flex: 1, background: '#fff', borderRadius: 8, padding: '12px 16px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', textAlign: 'center' }}>
-          <div style={{ fontSize: 28, fontWeight: 700, color: '#16a34a' }}>{counts.checked_in}</div>
-          <div style={{ fontSize: 12, color: '#666', marginTop: 2 }}>Checked in</div>
+      <div className="flex gap-3 mb-5">
+        <div className="flex-1 bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-center">
+          <div className="text-2xl font-bold text-emerald-400">{counts.checked_in}</div>
+          <div className="text-xs text-gray-400 mt-0.5">Checked in</div>
         </div>
-        <div style={{ flex: 1, background: '#fff', borderRadius: 8, padding: '12px 16px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', textAlign: 'center' }}>
-          <div style={{ fontSize: 28, fontWeight: 700, color: '#f59e0b' }}>{counts.remaining}</div>
-          <div style={{ fontSize: 12, color: '#666', marginTop: 2 }}>Not yet in</div>
+        <div className="flex-1 bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-center">
+          <div className="text-2xl font-bold text-amber-400">{counts.remaining}</div>
+          <div className="text-xs text-gray-400 mt-0.5">Not yet in</div>
         </div>
-        <div style={{ flex: 1, background: '#fff', borderRadius: 8, padding: '12px 16px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', textAlign: 'center' }}>
-          <div style={{ fontSize: 28, fontWeight: 700, color: '#6366f1' }}>{counts.total}</div>
-          <div style={{ fontSize: 12, color: '#666', marginTop: 2 }}>Total</div>
+        <div className="flex-1 bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-center">
+          <div className="text-2xl font-bold text-indigo-400">{counts.total}</div>
+          <div className="text-xs text-gray-400 mt-0.5">Total</div>
         </div>
       </div>
 
       {/* Progress bar */}
-      <div style={{ background: '#e5e7eb', borderRadius: 99, height: 8, overflow: 'hidden', marginBottom: 20 }}>
-        <div style={{ width: (Number(counts.total) > 0 ? Math.round((Number(counts.checked_in) / Number(counts.total)) * 100) : 0) + '%', background: '#16a34a', height: '100%', transition: 'width 0.3s' }} />
+      <div className="bg-gray-800 rounded-full overflow-hidden mb-5" style={{ height: 8 }}>
+        <div className="bg-emerald-500 h-full transition-all" style={{ width: (Number(counts.total) > 0 ? Math.round((Number(counts.checked_in) / Number(counts.total)) * 100) : 0) + '%' }} />
       </div>
 
       <Scanner eventId={event.id} initialCheckedIn={Number(counts.checked_in)} initialTotal={Number(counts.total)} />
