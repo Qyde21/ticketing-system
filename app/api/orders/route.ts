@@ -2,11 +2,12 @@
 import { sql } from '@/lib/db';
 import { nanoid } from 'nanoid';
 import { finalizePaidOrder } from '@/lib/tickets';
+import { validatePromoCode } from '@/lib/promoCodes';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { ticketTypeId, quantity = 1, buyerName, buyerEmail: rawBuyerEmail, buyerPhone } = body;
+    const { ticketTypeId, quantity = 1, buyerName, buyerEmail: rawBuyerEmail, buyerPhone, promoCode } = body;
     const buyerEmail = typeof rawBuyerEmail === 'string' ? rawBuyerEmail.trim().toLowerCase() : rawBuyerEmail;
 
     if (!ticketTypeId || !buyerName || !buyerEmail || !buyerPhone) {
@@ -64,7 +65,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'This event has already ended' }, { status: 400 });
     }
 
-    const amountKes = Number(ticketType.price_kes || 0) * quantity;
+    const subtotalKes = Number(ticketType.price_kes || 0) * quantity;
+
+    let amountKes = subtotalKes;
+    let promoCodeId: string | null = null;
+    let discountAmountKes = 0;
+
+    if (promoCode && String(promoCode).trim()) {
+      const promoResult = await validatePromoCode(ticketType.event_id, promoCode, subtotalKes);
+      if (!promoResult.valid) {
+        return NextResponse.json({ error: promoResult.error || 'Invalid promo code' }, { status: 400 });
+      }
+      promoCodeId = promoResult.promoCodeId!;
+      discountAmountKes = promoResult.discountAmount!;
+      amountKes = promoResult.finalAmount!;
+    }
+
     const amountInSubunits = Math.round(amountKes * 100);
     const reference = `tk-${nanoid(16)}`;
     const isFree = amountKes <= 0;
@@ -108,8 +124,8 @@ export async function POST(req: NextRequest) {
     }
 
     const [order] = await sql`
-      INSERT INTO orders (event_id, buyer_name, buyer_email, buyer_phone, total_amount_kes, payment_status, paystack_reference, ticket_type_id, quantity)
-      VALUES (${ticketType.event_id}, ${buyerName}, ${buyerEmail}, ${buyerPhone}, ${amountKes}, ${isFree ? 'paid' : 'pending'}, ${reference}, ${ticketType.id}, ${quantity})
+      INSERT INTO orders (event_id, buyer_name, buyer_email, buyer_phone, total_amount_kes, promo_code_id, discount_amount_kes, payment_status, paystack_reference, ticket_type_id, quantity)
+      VALUES (${ticketType.event_id}, ${buyerName}, ${buyerEmail}, ${buyerPhone}, ${amountKes}, ${promoCodeId}, ${discountAmountKes}, ${isFree ? 'paid' : 'pending'}, ${reference}, ${ticketType.id}, ${quantity})
       RETURNING id
     `;
 

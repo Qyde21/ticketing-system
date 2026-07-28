@@ -10,7 +10,7 @@ import { sendTicketEmail } from '@/lib/email';
  */
 export async function finalizePaidOrder(orderId: string, baseUrl: string): Promise<string[]> {
   const [order] = await sql`
-    SELECT id, payment_status, ticket_type_id, quantity, buyer_name, buyer_email, event_id
+    SELECT id, payment_status, ticket_type_id, quantity, buyer_name, buyer_email, event_id, promo_code_id
     FROM orders WHERE id = ${orderId}
   `;
 
@@ -24,6 +24,10 @@ export async function finalizePaidOrder(orderId: string, baseUrl: string): Promi
     // Order was already marked paid but has no tickets yet (e.g. race condition) - fall through and generate them.
   } else {
     await sql`UPDATE orders SET payment_status = 'paid' WHERE id = ${order.id}`;
+
+    if (order.promo_code_id) {
+      await sql`UPDATE promo_codes SET uses_count = uses_count + 1 WHERE id = ${order.promo_code_id}`;
+    }
   }
 
   const generatedCodes: string[] = [];

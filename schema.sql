@@ -65,6 +65,20 @@ CREATE TABLE ticket_types (
   max_per_order  INTEGER NOT NULL DEFAULT 10
 );
 
+CREATE TABLE promo_codes (
+  id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  event_id       UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+  code           TEXT NOT NULL,
+  discount_type  TEXT NOT NULL DEFAULT 'percent', -- 'percent' | 'fixed'
+  discount_value NUMERIC NOT NULL,
+  max_uses       INTEGER, -- NULL means unlimited
+  uses_count     INTEGER NOT NULL DEFAULT 0,
+  expires_at     TIMESTAMPTZ, -- NULL means never expires
+  active         BOOLEAN NOT NULL DEFAULT true,
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (event_id, code)
+);
+
 CREATE TABLE orders (
   id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   event_id            UUID NOT NULL REFERENCES events(id),
@@ -74,6 +88,8 @@ CREATE TABLE orders (
   buyer_phone         TEXT NOT NULL,
   quantity            INTEGER NOT NULL DEFAULT 1,
   total_amount_kes    NUMERIC NOT NULL,
+  promo_code_id       UUID REFERENCES promo_codes(id),
+  discount_amount_kes NUMERIC NOT NULL DEFAULT 0,
   payment_status      TEXT NOT NULL DEFAULT 'pending', -- 'pending' | 'paid' | 'refunded'
   paystack_reference  TEXT UNIQUE,
   created_at          TIMESTAMPTZ NOT NULL DEFAULT now()

@@ -1,6 +1,6 @@
-﻿'use client';
+'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function CheckoutForm({ event, ticketTypes }: { event: any, ticketTypes: any[] }) {
   const safeTickets = Array.isArray(ticketTypes) ? ticketTypes : [];
@@ -13,9 +13,76 @@ export default function CheckoutForm({ event, ticketTypes }: { event: any, ticke
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const [promoInput, setPromoInput] = useState('');
+  const [promoStatus, setPromoStatus] = useState<'idle' | 'checking' | 'applied' | 'error'>('idle');
+  const [promoError, setPromoError] = useState('');
+  const [appliedPromo, setAppliedPromo] = useState<{
+    code: string;
+    discountAmount: number;
+    finalAmount: number;
+    discountType: string;
+    discountValue: number;
+  } | null>(null);
+
   const selectedTicket = safeTickets.find(t => t && t.id === selectedTicketId) || defaultTicket;
   const unitPrice = Number(selectedTicket.price_kes || selectedTicket.price || 0);
-  const totalAmount = unitPrice * quantity;
+  const subtotal = unitPrice * quantity;
+  const totalAmount = appliedPromo ? appliedPromo.finalAmount : subtotal;
+
+  // If the buyer changes their ticket tier or quantity, the previously applied
+  // discount no longer matches the new subtotal, so they need to re-apply it.
+  useEffect(() => {
+    if (appliedPromo) {
+      setAppliedPromo(null);
+      setPromoStatus('idle');
+      setPromoError('');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedTicketId, quantity]);
+
+  const handleApplyPromo = async () => {
+    if (!promoInput.trim()) return;
+    setPromoStatus('checking');
+    setPromoError('');
+
+    try {
+      const res = await fetch('/api/promo-codes/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          eventId: event.id,
+          ticketTypeId: selectedTicketId,
+          quantity,
+          code: promoInput,
+        }),
+      });
+      const data = await res.json();
+
+      if (res.ok && data.valid) {
+        setAppliedPromo({
+          code: promoInput.trim().toUpperCase(),
+          discountAmount: data.discountAmount,
+          finalAmount: data.finalAmount,
+          discountType: data.discountType,
+          discountValue: data.discountValue,
+        });
+        setPromoStatus('applied');
+      } else {
+        setPromoStatus('error');
+        setPromoError(data.error || 'Invalid promo code');
+      }
+    } catch (err) {
+      setPromoStatus('error');
+      setPromoError('Could not check promo code. Please try again.');
+    }
+  };
+
+  const handleRemovePromo = () => {
+    setAppliedPromo(null);
+    setPromoStatus('idle');
+    setPromoInput('');
+    setPromoError('');
+  };
 
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,6 +99,7 @@ export default function CheckoutForm({ event, ticketTypes }: { event: any, ticke
           buyerName: fullName,
           buyerEmail: email,
           buyerPhone: phone,
+          promoCode: appliedPromo ? appliedPromo.code : undefined,
         }),
       });
 
@@ -40,6 +108,8 @@ export default function CheckoutForm({ event, ticketTypes }: { event: any, ticke
 
       if (res.ok && paystackUrl) {
         window.location.href = paystackUrl;
+      } else if (res.ok && data.isFree && data.reference) {
+        window.location.href = `/success?reference=${data.reference}`;
       } else {
         alert(data.error || 'Failed to initialize payment');
         setLoading(false);
@@ -116,17 +186,76 @@ export default function CheckoutForm({ event, ticketTypes }: { event: any, ticke
         />
       </div>
 
-      <div className="bg-gray-900 border border-gray-800 p-4 rounded-xl flex justify-between items-center">
-        <span className="text-gray-400 text-sm font-bold">Total Amount:</span>
-        <span className="text-cyan-400 font-extrabold text-xl">KES {totalAmount.toLocaleString()}</span>
+      <div>
+        <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Promo Code</label>
+        {appliedPromo ? (
+          <div className="flex items-center justify-between bg-emerald-950/40 border border-emerald-800/50 rounded-xl p-3">
+            <div>
+              <span className="text-emerald-300 font-bold text-sm">{appliedPromo.code}</span>
+              <span className="text-emerald-400 text-xs ml-2">
+                ({appliedPromo.discountType === 'percent' ? `${appliedPromo.discountValue}% off` : `KES ${appliedPromo.discountValue.toLocaleString()} off`})
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={handleRemovePromo}
+              className="text-xs text-gray-400 hover:text-red-400 font-semibold"
+            >
+              Remove
+            </button>
+          </div>
+        ) : (
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={promoInput}
+              onChange={(e) => setPromoInput(e.target.value)}
+              placeholder="Enter code"
+              className="flex-1 bg-gray-900 border border-gray-800 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500 uppercase"
+            />
+            <button
+              type="button"
+              onClick={handleApplyPromo}
+              disabled={promoStatus === 'checking' || !promoInput.trim()}
+              className="px-5 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 text-white rounded-xl font-bold text-sm transition"
+            >
+              {promoStatus === 'checking' ? '...' : 'Apply'}
+            </button>
+          </div>
+        )}
+        {promoStatus === 'error' && (
+          <p className="text-red-400 text-xs mt-1.5">{promoError}</p>
+        )}
+      </div>
+
+      <div className="bg-gray-900 border border-gray-800 p-4 rounded-xl">
+        {appliedPromo && (
+          <div className="flex justify-between items-center text-xs text-gray-400 mb-2 pb-2 border-b border-gray-800">
+            <span>Subtotal</span>
+            <span>KES {subtotal.toLocaleString()}</span>
+          </div>
+        )}
+        {appliedPromo && (
+          <div className="flex justify-between items-center text-xs text-emerald-400 mb-2">
+            <span>Discount</span>
+            <span>-KES {appliedPromo.discountAmount.toLocaleString()}</span>
+          </div>
+        )}
+        <div className="flex justify-between items-center">
+          <span className="text-gray-400 text-sm font-bold">Total Amount:</span>
+          <span className="text-cyan-400 font-extrabold text-xl">{totalAmount > 0 ? `KES ${totalAmount.toLocaleString()}` : 'FREE'}</span>
+        </div>
       </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold uppercase tracking-wider transition shadow-lg shadow-indigo-950/50 disabled:opacity-50"
+        className={
+          'w-full py-3 text-white rounded-xl font-bold uppercase tracking-wider transition shadow-lg disabled:opacity-50 ' +
+          (totalAmount > 0 ? 'bg-indigo-600 hover:bg-indigo-500 shadow-indigo-950/50' : 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-950/50')
+        }
       >
-        {loading ? 'Processing...' : 'Proceed to Paystack'}
+        {loading ? 'Processing...' : totalAmount > 0 ? 'Proceed to Paystack' : 'Get Free Ticket'}
       </button>
     </form>
   );
