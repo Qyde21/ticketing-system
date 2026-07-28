@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import TicketList from '@/components/TicketList';
+import AddToCalendarButton from '@/components/AddToCalendarButton';
 import { useSearchParams } from 'next/navigation';
 
 export default function SuccessContent() {
@@ -13,6 +14,7 @@ export default function SuccessContent() {
   const [loading, setLoading] = useState(true);
   const [eventTitle, setEventTitle] = useState("Your Event");
   const [quantity, setQuantity] = useState(1);
+  const [eventInfo, setEventInfo] = useState<{ venueName?: string; startAt?: string; endAt?: string } | null>(null);
 
   useEffect(() => {
     if (!reference) {
@@ -34,6 +36,13 @@ export default function SuccessContent() {
           setTickets(data.tickets);
           setEventTitle(data.tickets[0].event_title || data.tickets[0].eventTitle || "Event Ticket");
           setQuantity(data.tickets.length);
+          if (data.event) {
+            setEventInfo({
+              venueName: data.event.venueName,
+              startAt: data.event.startAt,
+              endAt: data.event.endAt,
+            });
+          }
           setLoading(false);
           return true;
         }
@@ -94,7 +103,20 @@ export default function SuccessContent() {
             <p className="text-xs text-gray-400 font-mono">Ref: {reference}</p>
           </div>
         ) : tickets.length > 0 ? (
-          <TicketList tickets={tickets} eventTitle={eventTitle} quantity={quantity} />
+          <>
+            <TicketList tickets={tickets} eventTitle={eventTitle} quantity={quantity} />
+            {eventInfo && eventInfo.startAt && (
+              <div className="mt-5 pt-5 border-t border-gray-800">
+                <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Don&apos;t forget!</p>
+                <AddToCalendarButton
+                  title={eventTitle}
+                  location={eventInfo.venueName}
+                  startAt={eventInfo.startAt}
+                  endAt={eventInfo.endAt}
+                />
+              </div>
+            )}
+          </>
         ) : (
           <div className="bg-yellow-950/40 border border-yellow-800/60 p-6 rounded-2xl text-center space-y-4">
             <p className="text-yellow-200">We are processing your ticket generation. If your tickets don't appear automatically, please click refresh.</p>

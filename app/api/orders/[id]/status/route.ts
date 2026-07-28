@@ -5,7 +5,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const { id } = await params;
 
   const [order] = await sql`
-    SELECT o.id, o.payment_status, e.title AS event_title
+    SELECT o.id, o.payment_status, e.title AS event_title, e.venue_name, e.start_at, e.end_at
     FROM orders o
     JOIN events e ON e.id = o.event_id
     WHERE o.paystack_reference = ${id}
@@ -29,5 +29,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     status: order.payment_status,
     ticketCodes: tickets.map((t) => t.ticketCode),
     tickets,
+    event: {
+      title: order.event_title,
+      venueName: order.venue_name,
+      startAt: order.start_at,
+      endAt: order.end_at,
+    },
   });
 }

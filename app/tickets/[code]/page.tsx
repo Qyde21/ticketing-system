@@ -1,6 +1,7 @@
 ﻿import { sql } from '@/lib/db';
 import QRCode from 'qrcode';
 import TicketQRReveal from '@/components/TicketQRReveal';
+import AddToCalendarButton from '@/components/AddToCalendarButton';
 
 export default async function TicketPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
@@ -8,7 +9,7 @@ export default async function TicketPage({ params }: { params: Promise<{ code: s
   const [ticket] = await sql`
     SELECT t.ticket_code, t.holder_name, t.status, t.checked_in_at,
            tt.name AS ticket_type_name,
-           e.title AS event_title, e.venue_name, e.start_at
+           e.title AS event_title, e.venue_name, e.start_at, e.end_at
     FROM tickets t
     JOIN ticket_types tt ON tt.id = t.ticket_type_id
     JOIN orders o ON o.id = t.order_id
@@ -29,6 +30,14 @@ export default async function TicketPage({ params }: { params: Promise<{ code: s
       <p>{ticket.venue_name} - {new Date(ticket.start_at).toLocaleString()}</p>
       <TicketQRReveal qrDataUrl={qrDataUrl} />
       <p>Status: {ticket.status}</p>
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12 }}>
+        <AddToCalendarButton
+          title={ticket.event_title}
+          location={ticket.venue_name}
+          startAt={ticket.start_at}
+          endAt={ticket.end_at}
+        />
+      </div>
     </div>
   );
 }
