@@ -175,3 +175,30 @@ export async function sendWaitlistSpotAvailableEmail(params: {
     `,
   });
 }
+
+export async function sendEventReminderEmail(params: {
+  toEmail: string;
+  buyerName: string;
+  eventTitle: string;
+  venueName: string;
+  startAt: string;
+  quantity: number;
+}) {
+  await resend.emails.send({
+    from: 'TicketHub <onboarding@resend.dev>',
+    to: params.toEmail,
+    subject: `Reminder: ${params.eventTitle} is coming up!`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+        <h2>Your event is coming up!</h2>
+        <p>Hi ${params.buyerName},</p>
+        <p>Just a friendly reminder that <strong>${params.eventTitle}</strong> is happening soon.</p>
+        <p><strong>Venue:</strong> ${params.venueName}<br/>
+        <strong>Date:</strong> ${new Date(params.startAt).toLocaleString()}<br/>
+        <strong>Tickets:</strong> ${params.quantity}</p>
+        <p>Don't forget to bring your QR code ticket for check-in. You can find it in your TicketHub account under "My Tickets".</p>
+        <p style="color: #888; font-size: 12px; margin-top: 24px;">Sent by TicketHub</p>
+      </div>
+    `,
+  });
+}

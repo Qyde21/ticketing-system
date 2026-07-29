@@ -102,6 +102,7 @@ CREATE TABLE orders (
   discount_amount_kes NUMERIC NOT NULL DEFAULT 0,
   payment_status      TEXT NOT NULL DEFAULT 'pending', -- 'pending' | 'paid' | 'refunded'
   paystack_reference  TEXT UNIQUE,
+  reminder_sent_at     TIMESTAMPTZ,
   created_at          TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
