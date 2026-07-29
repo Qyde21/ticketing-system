@@ -34,8 +34,8 @@ export async function finalizePaidOrder(orderId: string, baseUrl: string): Promi
   for (let i = 0; i < order.quantity; i++) {
     const ticketCode = nanoid(10).toUpperCase();
     await sql`
-      INSERT INTO tickets (order_id, ticket_type_id, ticket_code, holder_name, status)
-      VALUES (${order.id}, ${order.ticket_type_id}, ${ticketCode}, ${order.buyer_name}, 'valid')
+      INSERT INTO tickets (order_id, ticket_type_id, ticket_code, holder_name, holder_email, status)
+      VALUES (${order.id}, ${order.ticket_type_id}, ${ticketCode}, ${order.buyer_name}, ${order.buyer_email}, 'valid')
     `;
     generatedCodes.push(ticketCode);
   }

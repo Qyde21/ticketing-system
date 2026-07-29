@@ -76,3 +76,56 @@ export async function sendPasswordResetEmail(params: {
     `,
   });
 }
+
+export async function sendTicketTransferredToNewHolderEmail(params: {
+  toEmail: string;
+  newHolderName: string;
+  fromName: string;
+  eventTitle: string;
+  venueName: string;
+  startAt: string;
+  ticketCode: string;
+  baseUrl: string;
+}) {
+  await resend.emails.send({
+    from: 'TicketHub <onboarding@resend.dev>',
+    to: params.toEmail,
+    subject: `${params.fromName} sent you a ticket for ${params.eventTitle}`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+        <h2>You've received a ticket!</h2>
+        <p>Hi ${params.newHolderName},</p>
+        <p>${params.fromName} has transferred their ticket for <strong>${params.eventTitle}</strong> to you.</p>
+        <p><strong>Venue:</strong> ${params.venueName}<br/>
+        <strong>Date:</strong> ${new Date(params.startAt).toLocaleString()}</p>
+        <p><a href="${params.baseUrl}/tickets/${params.ticketCode}" style="display: inline-block; background: #4f46e5; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600;">View Your Ticket</a></p>
+        <p>Show this QR code at the entrance for check-in.</p>
+        <p style="color: #888; font-size: 12px; margin-top: 24px;">Sent by TicketHub</p>
+      </div>
+    `,
+  });
+}
+
+export async function sendTicketTransferConfirmationEmail(params: {
+  toEmail: string;
+  originalHolderName: string;
+  newHolderName: string;
+  newHolderEmail: string;
+  eventTitle: string;
+  ticketCode: string;
+}) {
+  await resend.emails.send({
+    from: 'TicketHub <onboarding@resend.dev>',
+    to: params.toEmail,
+    subject: `Ticket transferred for ${params.eventTitle}`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+        <h2>Ticket transfer confirmed</h2>
+        <p>Hi ${params.originalHolderName},</p>
+        <p>Your ticket for <strong>${params.eventTitle}</strong> has been successfully transferred to ${params.newHolderName} (${params.newHolderEmail}).</p>
+        <p>This ticket is no longer valid for your entry - the new holder will use it to check in at the event.</p>
+        <p style="color: #888; font-size: 12px; margin-top: 24px;">Sent by TicketHub</p>
+      </div>
+    `,
+  });
+}

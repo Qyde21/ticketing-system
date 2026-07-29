@@ -101,6 +101,7 @@ CREATE TABLE tickets (
   ticket_type_id UUID NOT NULL REFERENCES ticket_types(id),
   ticket_code    TEXT UNIQUE NOT NULL,
   holder_name    TEXT,
+  holder_email   TEXT,
   status         TEXT NOT NULL DEFAULT 'valid', -- 'valid' | 'used' | 'cancelled'
   checked_in_at  TIMESTAMPTZ
 );

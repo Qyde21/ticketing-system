@@ -28,6 +28,7 @@ export default async function TicketPage({ params }: { params: Promise<{ code: s
       <h1>{ticket.event_title}</h1>
       <p>{ticket.ticket_type_name}</p>
       <p>{ticket.venue_name} - {new Date(ticket.start_at).toLocaleString()}</p>
+      {ticket.holder_name && <p>Ticket holder: {ticket.holder_name}</p>}
       <TicketQRReveal qrDataUrl={qrDataUrl} />
       <p>Status: {ticket.status}</p>
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12 }}>
