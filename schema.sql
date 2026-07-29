@@ -65,6 +65,16 @@ CREATE TABLE ticket_types (
   max_per_order  INTEGER NOT NULL DEFAULT 10
 );
 
+CREATE TABLE waitlist_entries (
+  id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  ticket_type_id UUID NOT NULL REFERENCES ticket_types(id) ON DELETE CASCADE,
+  name           TEXT NOT NULL,
+  email          TEXT NOT NULL,
+  notified_at    TIMESTAMPTZ,
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (ticket_type_id, email)
+);
+
 CREATE TABLE promo_codes (
   id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   event_id       UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,

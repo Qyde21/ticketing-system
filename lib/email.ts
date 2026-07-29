@@ -129,3 +129,49 @@ export async function sendTicketTransferConfirmationEmail(params: {
     `,
   });
 }
+
+export async function sendWaitlistConfirmationEmail(params: {
+  toEmail: string;
+  name: string;
+  eventTitle: string;
+  ticketTypeName: string;
+}) {
+  await resend.emails.send({
+    from: 'TicketHub <onboarding@resend.dev>',
+    to: params.toEmail,
+    subject: `You're on the waitlist for ${params.eventTitle}`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+        <h2>You're on the waitlist!</h2>
+        <p>Hi ${params.name},</p>
+        <p>The <strong>${params.ticketTypeName}</strong> tier for <strong>${params.eventTitle}</strong> is currently sold out, but you've been added to the waitlist.</p>
+        <p>If a spot opens up (for example from a cancellation), we'll email you right away with a link to buy - on a first-come, first-served basis, so keep an eye on your inbox.</p>
+        <p style="color: #888; font-size: 12px; margin-top: 24px;">Sent by TicketHub</p>
+      </div>
+    `,
+  });
+}
+
+export async function sendWaitlistSpotAvailableEmail(params: {
+  toEmail: string;
+  name: string;
+  eventTitle: string;
+  ticketTypeName: string;
+  checkoutUrl: string;
+}) {
+  await resend.emails.send({
+    from: 'TicketHub <onboarding@resend.dev>',
+    to: params.toEmail,
+    subject: `A spot just opened up for ${params.eventTitle}!`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+        <h2>A spot just opened up!</h2>
+        <p>Hi ${params.name},</p>
+        <p>Good news - a <strong>${params.ticketTypeName}</strong> ticket for <strong>${params.eventTitle}</strong> just became available. You're on the waitlist, so you're getting first chance at it.</p>
+        <p><a href="${params.checkoutUrl}" style="display: inline-block; background: #4f46e5; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600;">Buy Now</a></p>
+        <p>This is first-come, first-served, so grab it soon before it's gone again.</p>
+        <p style="color: #888; font-size: 12px; margin-top: 24px;">Sent by TicketHub</p>
+      </div>
+    `,
+  });
+}

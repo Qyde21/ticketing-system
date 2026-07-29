@@ -3,6 +3,7 @@ import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { refundTransaction } from '@/lib/paystack';
 import { sendCancellationEmail } from '@/lib/email';
+import { notifyWaitlistIfSpotsFreed } from '@/lib/waitlist';
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
@@ -14,6 +15,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const [order] = await sql`
     SELECT o.id, o.payment_status, o.paystack_reference, o.buyer_name, o.buyer_email,
+           o.ticket_type_id, o.quantity,
            e.title AS event_title, e.organizer_id
     FROM orders o
     JOIN events e ON e.id = o.event_id
@@ -39,6 +41,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   await sql`UPDATE orders SET payment_status = 'refunded' WHERE id = ${order.id}`;
   await sql`UPDATE tickets SET status = 'cancelled' WHERE order_id = ${order.id}`;
+  await sql`
+    UPDATE ticket_types SET quantity_sold = GREATEST(0, quantity_sold - ${order.quantity})
+    WHERE id = ${order.ticket_type_id}
+  `;
 
   try {
     console.log('Sending cancellation email to:', order.buyer_email);
@@ -51,6 +57,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     console.log('Cancellation email sent successfully');
   } catch (emailErr) {
     console.error('Failed to send cancellation email:', emailErr);
+  }
+
+  try {
+    await notifyWaitlistIfSpotsFreed(order.ticket_type_id, order.quantity, req.nextUrl.origin);
+  } catch (waitlistErr) {
+    console.error('Failed to notify waitlist:', waitlistErr);
   }
 
   return NextResponse.json({ success: true });

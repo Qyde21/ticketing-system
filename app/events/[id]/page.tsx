@@ -1,6 +1,7 @@
 ﻿import { sql } from '@/lib/db';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import JoinWaitlistButton from '@/components/JoinWaitlistButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -131,7 +132,7 @@ export default async function EventDetailPage({
                   </p>
                 </div>
                 {soldOut ? (
-                  <span className="px-6 py-3 bg-gray-800 text-gray-500 rounded-xl font-bold uppercase tracking-wider text-sm">Sold Out</span>
+                  <JoinWaitlistButton ticketTypeId={t.id} />
                 ) : (
                   <Link
                     href={`/checkout/${t.id}`}
