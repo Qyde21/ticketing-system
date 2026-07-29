@@ -1,6 +1,6 @@
 ﻿'use client';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import ImageUpload from './ImageUpload';
 
 interface TicketTypeInput {
@@ -13,8 +13,11 @@ const inputClass =
   'w-full bg-gray-900 border border-gray-800 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500 placeholder:text-gray-500';
 const labelClass = 'block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2';
 
-export default function NewEventPage() {
+function NewEventForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const duplicateFrom = searchParams.get('duplicateFrom');
+
   const [title, setTitle] = useState('');
   const [coverImageUrl, setCoverImageUrl] = useState('');
   const [description, setDescription] = useState('');
@@ -29,6 +32,33 @@ export default function NewEventPage() {
   ]);
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [loadingDuplicate, setLoadingDuplicate] = useState(!!duplicateFrom);
+
+  useEffect(() => {
+    if (!duplicateFrom) return;
+
+    (async () => {
+      try {
+        const res = await fetch(`/api/events/${duplicateFrom}/duplicate-data`);
+        if (res.ok) {
+          const data = await res.json();
+          setTitle(data.title || '');
+          setDescription(data.description || '');
+          setCategory(data.category || '');
+          setVenueName(data.venueName || '');
+          setVenueAddress(data.venueAddress || '');
+          setCoverImageUrl(data.coverImageUrl || '');
+          if (data.ticketTypes && data.ticketTypes.length > 0) {
+            setTicketTypes(data.ticketTypes);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load event to duplicate:', err);
+      } finally {
+        setLoadingDuplicate(false);
+      }
+    })();
+  }, [duplicateFrom]);
 
   function updateTicketType(index: number, field: keyof TicketTypeInput, value: string) {
     setTicketTypes((prev) => prev.map((tt, i) => (i === index ? { ...tt, [field]: value } : tt)));
@@ -97,8 +127,18 @@ export default function NewEventPage() {
   return (
     <form onSubmit={handleSubmit} className="max-w-xl mx-auto py-12 px-4 text-white space-y-6">
       <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">
-        Create Event
+        {duplicateFrom ? 'Duplicate Event' : 'Create Event'}
       </h1>
+
+      {loadingDuplicate && (
+        <p className="text-gray-400 text-sm">Loading event details to duplicate...</p>
+      )}
+
+      {duplicateFrom && !loadingDuplicate && (
+        <p className="text-amber-400 text-sm bg-amber-950/30 border border-amber-800/40 rounded-xl px-4 py-3">
+          Details copied from the original event. Don&apos;t forget to set a new date below before creating.
+        </p>
+      )}
 
       <div>
         <label className={labelClass}>Event title</label>
@@ -184,5 +224,13 @@ export default function NewEventPage() {
         {submitting ? 'Creating...' : 'Create Event'}
       </button>
     </form>
+  );
+}
+
+export default function NewEventPage() {
+  return (
+    <Suspense fallback={<div className="max-w-xl mx-auto py-12 px-4 text-white">Loading...</div>}>
+      <NewEventForm />
+    </Suspense>
   );
 }
