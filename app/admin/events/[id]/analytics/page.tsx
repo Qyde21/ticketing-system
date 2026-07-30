@@ -1,6 +1,7 @@
 import { sql } from "@/lib/db";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import SalesTrendChart from "@/components/SalesTrendChart";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -19,6 +20,12 @@ export default async function AdminEventAnalyticsPage({ params }: PageProps) {
   const ticketTypes = await sql`
     SELECT id, name, price_kes, price, quantity_total, quantity_sold 
     FROM ticket_types 
+    WHERE event_id = ${event.id}
+  `;
+
+  const orders = await sql`
+    SELECT created_at, total_amount_kes, payment_status, quantity
+    FROM orders
     WHERE event_id = ${event.id}
   `;
 
@@ -82,6 +89,8 @@ export default async function AdminEventAnalyticsPage({ params }: PageProps) {
           </p>
         </div>
       </div>
+
+      <SalesTrendChart orders={orders as any} />
 
       <div className="bg-gray-900 p-6 rounded-lg border border-gray-800 shadow-lg">
         <h2 className="text-xl font-bold mb-4 text-indigo-300">Ticket Tier Breakdown</h2>

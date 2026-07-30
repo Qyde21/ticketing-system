@@ -2,6 +2,7 @@
 import { getSession } from '@/lib/auth';
 import Link from 'next/link';
 import RefundButton from './RefundButton';
+import SalesTrendChart from '@/components/SalesTrendChart';
 
 export const dynamic = 'force-dynamic';
 
@@ -67,7 +68,9 @@ export default async function EventOrdersPage({ params }: { params: Promise<{ id
           No orders found for this event yet.
         </div>
       ) : (
-        <div className="space-y-4">
+        <>
+          <SalesTrendChart orders={orders as any} />
+          <div className="space-y-4">
           {orders.map((order: any) => (
             <div
               key={order.id}
@@ -102,7 +105,8 @@ export default async function EventOrdersPage({ params }: { params: Promise<{ id
               </div>
             </div>
           ))}
-        </div>
+          </div>
+        </>
       )}
     </main>
   );
