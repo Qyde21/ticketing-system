@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
-import { verifyPassword, setSessionCookie } from '@/lib/auth';
+import { verifyPassword, setSessionCookie, signPendingTwoFactorToken } from '@/lib/auth';
 import { checkRateLimit, recordAttempt, getClientIp } from '@/lib/rateLimit';
 
 const MAX_ATTEMPTS = 10;
@@ -38,6 +38,11 @@ export async function POST(req: NextRequest) {
 
     if (user.status === 'suspended') {
       return NextResponse.json({ error: 'This account has been suspended. Contact support for help.' }, { status: 403 });
+    }
+
+    if (user.totp_enabled) {
+      const pendingToken = await signPendingTwoFactorToken(user.id);
+      return NextResponse.json({ twoFactorRequired: true, pendingToken });
     }
 
     await setSessionCookie({ userId: user.id, email: user.email, role: user.role });

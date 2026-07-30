@@ -20,7 +20,19 @@ CREATE TABLE users (
   full_name     TEXT NOT NULL,
   role          TEXT NOT NULL DEFAULT 'attendee', -- 'attendee' | 'organizer' | 'admin'
   status        TEXT NOT NULL DEFAULT 'active', -- 'active' | 'suspended'
+  totp_secret   TEXT, -- base32 TOTP secret, only set once 2FA setup begins
+  totp_enabled  BOOLEAN NOT NULL DEFAULT false,
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Single-use backup codes for account recovery if the authenticator device is lost.
+-- Codes are stored as SHA-256 hashes, never in plain text.
+CREATE TABLE totp_backup_codes (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  code_hash  TEXT NOT NULL,
+  used       BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE organizer_profiles (

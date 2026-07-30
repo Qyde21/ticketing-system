@@ -61,3 +61,26 @@ export async function clearSessionCookie() {
   const cookieStore = await cookies();
   cookieStore.delete(COOKIE_NAME);
 }
+
+/**
+ * A short-lived token issued after a correct password but before the 2FA
+ * code is verified. It carries no session privileges on its own - it just
+ * proves "this request already passed the password check for this user."
+ */
+export async function signPendingTwoFactorToken(userId: string): Promise<string> {
+  return new SignJWT({ userId, purpose: '2fa_pending' })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('5m')
+    .sign(JWT_SECRET);
+}
+
+export async function verifyPendingTwoFactorToken(token: string): Promise<{ userId: string } | null> {
+  try {
+    const { payload } = await jwtVerify(token, JWT_SECRET);
+    if (payload.purpose !== '2fa_pending' || typeof payload.userId !== 'string') return null;
+    return { userId: payload.userId };
+  } catch {
+    return null;
+  }
+}
