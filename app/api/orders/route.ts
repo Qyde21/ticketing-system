@@ -60,6 +60,9 @@ export async function POST(req: NextRequest) {
     if (event.status === 'cancelled') {
       return NextResponse.json({ error: 'This event has been cancelled' }, { status: 400 });
     }
+    if (event.status !== 'published') {
+      return NextResponse.json({ error: 'This event is not currently available for ticket sales' }, { status: 400 });
+    }
     const eventEnd = event.end_at ? new Date(event.end_at) : new Date(event.start_at);
     if (eventEnd < new Date()) {
       return NextResponse.json({ error: 'This event has already ended' }, { status: 400 });

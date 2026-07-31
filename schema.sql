@@ -55,7 +55,7 @@ CREATE TABLE events (
   longitude        DOUBLE PRECISION,
   start_at         TIMESTAMPTZ NOT NULL,
   end_at           TIMESTAMPTZ,
-  status           TEXT NOT NULL DEFAULT 'draft', -- 'draft' | 'published' | 'cancelled'
+  status           TEXT NOT NULL DEFAULT 'draft', -- 'draft' | 'pending_review' | 'published' | 'cancelled'
   cover_image_url  TEXT,
   created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at       TIMESTAMPTZ NOT NULL DEFAULT now()

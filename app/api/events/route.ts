@@ -40,9 +40,11 @@ export async function POST(req: NextRequest) {
       slug = `${slug}-${nanoid(6).toLowerCase()}`;
     }
 
+    const initialStatus = publishNow ? (session.role === 'admin' ? 'published' : 'pending_review') : 'draft';
+
     const [event] = await sql`
       INSERT INTO events (organizer_id, title, slug, description, category, venue_name, venue_address, start_at, end_at, status, cover_image_url)
-      VALUES (${session.userId}, ${title}, ${slug}, ${description ?? null}, ${category ?? null}, ${venueName}, ${venueAddress ?? null}, ${startAt}, ${endAt ?? null}, ${publishNow ? 'published' : 'draft'}, ${coverImageUrl ?? null})
+      VALUES (${session.userId}, ${title}, ${slug}, ${description ?? null}, ${category ?? null}, ${venueName}, ${venueAddress ?? null}, ${startAt}, ${endAt ?? null}, ${initialStatus}, ${coverImageUrl ?? null})
       RETURNING id, slug, status
     `;
 

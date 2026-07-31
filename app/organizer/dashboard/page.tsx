@@ -56,9 +56,12 @@ export default async function OrganizerDashboardPage() {
                     <div className="flex items-center gap-3">
                       <h2 className="text-xl font-bold text-white">{event.title}</h2>
                       <span className={`px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider ${
-                        event.status === 'published' ? 'bg-green-950 text-green-400 border border-green-800' : 'bg-gray-800 text-gray-400'
+                        event.status === 'published' ? 'bg-green-950 text-green-400 border border-green-800'
+                        : event.status === 'pending_review' ? 'bg-amber-950 text-amber-400 border border-amber-800'
+                        : event.status === 'cancelled' ? 'bg-red-950 text-red-400 border border-red-800'
+                        : 'bg-gray-800 text-gray-400'
                       }`}>
-                        {event.status}
+                        {event.status === 'pending_review' ? 'Pending Review' : event.status}
                       </span>
                     </div>
                     <p className="text-xs text-gray-500 mt-1">Created: {new Date(event.created_at).toLocaleDateString()}</p>
@@ -83,8 +86,13 @@ export default async function OrganizerDashboardPage() {
                   <Link href={`/organizer/events/${event.id}/scan-overview`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Scan Overview</Link>
                   <Link href={`/organizer/events/${event.id}/promo-codes`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Promo Codes</Link>
                   <Link href={`/organizer/events/new?duplicateFrom=${event.id}`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Duplicate</Link>
-                  {event.status !== 'published' && event.status !== 'cancelled' && (
+                  {event.status === 'draft' && (
                     <PublishButton eventId={event.id} />
+                  )}
+                  {event.status === 'pending_review' && (
+                    <span className="bg-amber-950/50 text-amber-300 border border-amber-800/50 px-3 py-1.5 rounded-lg font-semibold">
+                      Awaiting Admin Review
+                    </span>
                   )}
                   {event.status !== 'cancelled' && (
                     <CancelEventButton eventId={event.id} />

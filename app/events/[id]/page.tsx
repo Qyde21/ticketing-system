@@ -51,7 +51,8 @@ export default async function EventDetailPage({
   const eventEndDate = event.end_at || eventDate;
   const isCancelled = event.status === 'cancelled';
   const isEnded = eventEndDate ? new Date(eventEndDate) < new Date() : false;
-  const salesClosed = isCancelled || isEnded;
+  const notYetPublished = event.status === 'draft' || event.status === 'pending_review';
+  const salesClosed = isCancelled || isEnded || notYetPublished;
 
   const eventUrl = `https://ticketing-system-phi-eight.vercel.app/events/${event.slug || event.id}`;
   const shareText = `Check out ${event.title} on TicketHub!`;
@@ -113,6 +114,11 @@ export default async function EventDetailPage({
           This event has already ended.
         </div>
       )}
+      {!isCancelled && !isEnded && notYetPublished && (
+        <div className="bg-amber-950/40 border border-amber-800/60 text-amber-300 font-semibold px-4 py-3 rounded-xl mb-6">
+          This event is not yet live. Ticket sales will open once it has been approved.
+        </div>
+      )}
       
       <div className="bg-gray-900 border border-gray-800 p-6 rounded-2xl mb-8 space-y-3">
         <p><strong className="text-gray-400">Date:</strong> {eventDate ? new Date(eventDate).toLocaleString() : 'TBA'}</p>
@@ -123,7 +129,11 @@ export default async function EventDetailPage({
         <h2 className="text-xl font-bold text-white mb-2">Tickets</h2>
         {salesClosed ? (
           <p className="text-gray-400">
-            {isCancelled ? 'Ticket sales are closed because this event was cancelled.' : 'Ticket sales are closed because this event has ended.'}
+            {isCancelled
+              ? 'Ticket sales are closed because this event was cancelled.'
+              : isEnded
+              ? 'Ticket sales are closed because this event has ended.'
+              : 'Ticket sales will open once this event has been approved.'}
           </p>
         ) : ticketTypes.length === 0 ? (
           <p className="text-gray-400">No tickets are available for this event yet.</p>

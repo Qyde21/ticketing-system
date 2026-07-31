@@ -202,3 +202,48 @@ export async function sendEventReminderEmail(params: {
     `,
   });
 }
+
+export async function sendEventApprovedEmail(params: {
+  toEmail: string;
+  organizerName: string;
+  eventTitle: string;
+  eventUrl: string;
+}) {
+  await resend.emails.send({
+    from: 'TicketHub <onboarding@resend.dev>',
+    to: params.toEmail,
+    subject: `${params.eventTitle} has been approved and is now live!`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+        <h2>Your event is live!</h2>
+        <p>Hi ${params.organizerName},</p>
+        <p>Good news - <strong>${params.eventTitle}</strong> has been reviewed and approved. It's now live and visible to buyers on TicketHub.</p>
+        <p><a href="${params.eventUrl}" style="display: inline-block; background: #4f46e5; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600;">View Your Event</a></p>
+        <p style="color: #888; font-size: 12px; margin-top: 24px;">Sent by TicketHub</p>
+      </div>
+    `,
+  });
+}
+
+export async function sendEventRejectedEmail(params: {
+  toEmail: string;
+  organizerName: string;
+  eventTitle: string;
+  reason?: string;
+}) {
+  await resend.emails.send({
+    from: 'TicketHub <onboarding@resend.dev>',
+    to: params.toEmail,
+    subject: `${params.eventTitle} needs some changes before it can go live`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+        <h2>Your event needs a few changes</h2>
+        <p>Hi ${params.organizerName},</p>
+        <p>We reviewed <strong>${params.eventTitle}</strong> and it needs some changes before it can be published. It has been moved back to draft in your dashboard.</p>
+        ${params.reason ? `<p><strong>Feedback from our team:</strong><br/>${params.reason}</p>` : ''}
+        <p>Please make the necessary updates and resubmit for review.</p>
+        <p style="color: #888; font-size: 12px; margin-top: 24px;">Sent by TicketHub</p>
+      </div>
+    `,
+  });
+}

@@ -13,13 +13,17 @@ export default function PublishButton({ eventId }: { eventId: string }) {
     if (res.ok) {
       router.refresh();
     } else {
-      alert('Failed to publish event');
+      alert('Failed to submit event for review');
     }
   }
 
   return (
-    <button onClick={handlePublish} disabled={loading}>
-      {loading ? 'Publishing...' : 'Publish'}
+    <button
+      onClick={handlePublish}
+      disabled={loading}
+      className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white px-3 py-1.5 rounded-lg font-semibold transition"
+    >
+      {loading ? 'Submitting...' : 'Submit for Review'}
     </button>
   );
 }

@@ -86,9 +86,12 @@ export default async function AdminEventsPage({ searchParams }: { searchParams: 
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="text-lg font-bold text-white line-clamp-1">{ev.title}</h3>
                   <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                    ev.status === 'published' ? 'bg-green-950 text-green-400 border border-green-800' : 'bg-yellow-950 text-yellow-400 border border-yellow-800'
+                    ev.status === 'published' ? 'bg-green-950 text-green-400 border border-green-800'
+                    : ev.status === 'pending_review' ? 'bg-amber-950 text-amber-400 border border-amber-800'
+                    : ev.status === 'cancelled' ? 'bg-red-950 text-red-400 border border-red-800'
+                    : 'bg-gray-800 text-gray-400 border border-gray-700'
                   }`}>
-                    {ev.status || 'draft'}
+                    {ev.status === 'pending_review' ? 'Pending Review' : (ev.status || 'draft')}
                   </span>
                 </div>
                 <p className="text-xs text-indigo-300 mb-2">Organizer: {ev.organizer_name || ev.organizer_email || 'Unknown'}</p>

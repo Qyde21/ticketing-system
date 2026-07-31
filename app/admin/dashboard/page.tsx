@@ -2,6 +2,7 @@ import { sql } from '@/lib/db';
 import Link from 'next/link';
 import ApproveButton from './ApproveButton';
 import AdminEventActions from '../events/AdminEventActions';
+import EventApprovalActions from './EventApprovalActions';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,6 +23,15 @@ export default async function AdminDashboard() {
     JOIN users u ON u.id = op.user_id
     WHERE op.is_verified = false
     ORDER BY op.created_at ASC
+  `;
+
+  const pendingEvents = await sql`
+    SELECT e.id, e.title, e.start_at, e.venue_name, e.updated_at,
+           u.full_name AS organizer_name, u.email AS organizer_email
+    FROM events e
+    JOIN users u ON u.id = e.organizer_id
+    WHERE e.status = 'pending_review'
+    ORDER BY e.updated_at ASC
   `;
 
   const events = await sql`
@@ -113,6 +123,53 @@ export default async function AdminDashboard() {
         </div>
       </div>
 
+      <section className="bg-gray-900 border border-amber-800/50 rounded-xl p-6 shadow-xl mb-10">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-bold text-amber-300">
+            Pending Event Approvals ({pendingEvents.length})
+          </h2>
+        </div>
+
+        {pendingEvents.length === 0 ? (
+          <div className="text-center py-8 text-gray-400 bg-gray-800/40 rounded-lg border border-gray-800">
+            No events waiting for review. All clear!
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-gray-800 text-xs text-amber-400 uppercase tracking-wider">
+                  <th className="py-3 px-4">Event</th>
+                  <th className="py-3 px-4">Organizer</th>
+                  <th className="py-3 px-4">Date &amp; Venue</th>
+                  <th className="py-3 px-4">Submitted</th>
+                  <th className="py-3 px-4 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-800 text-sm">
+                {pendingEvents.map((ev: any) => (
+                  <tr key={ev.id} className="hover:bg-gray-800/50 transition">
+                    <td className="py-4 px-4 font-semibold text-white">{ev.title}</td>
+                    <td className="py-4 px-4 text-gray-300">
+                      {ev.organizer_name}
+                      <div className="text-xs text-gray-500">{ev.organizer_email}</div>
+                    </td>
+                    <td className="py-4 px-4 text-gray-400 text-xs">
+                      {ev.start_at ? new Date(ev.start_at).toLocaleDateString() : 'TBA'}
+                      <div>{ev.venue_name}</div>
+                    </td>
+                    <td className="py-4 px-4 text-gray-400 text-xs">{new Date(ev.updated_at).toLocaleDateString()}</td>
+                    <td className="py-4 px-4 text-right">
+                      <EventApprovalActions eventId={ev.id} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
       <section className="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-xl mb-10">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-indigo-300">
@@ -129,8 +186,13 @@ export default async function AdminDashboard() {
                   <div>
                     <div className="flex items-center gap-3">
                       <h3 className="text-lg font-bold text-white">{ev.title}</h3>
-                      <span className={`text-[10px] px-2 py-0.5 rounded uppercase font-bold tracking-wider ${ev.status === 'published' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-amber-950 text-amber-400 border border-amber-800'}`}>
-                        {ev.status || 'Draft'}
+                      <span className={`text-[10px] px-2 py-0.5 rounded uppercase font-bold tracking-wider ${
+                        ev.status === 'published' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
+                        : ev.status === 'pending_review' ? 'bg-amber-950 text-amber-400 border border-amber-800'
+                        : ev.status === 'cancelled' ? 'bg-red-950 text-red-400 border border-red-800'
+                        : 'bg-gray-800 text-gray-400 border border-gray-700'
+                      }`}>
+                        {ev.status === 'pending_review' ? 'Pending Review' : (ev.status || 'Draft')}
                       </span>
                     </div>
                     <p className="text-xs text-gray-400 mt-1">Created: {ev.created_at ? new Date(ev.created_at).toLocaleDateString() : 'N/A'}</p>
