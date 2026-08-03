@@ -3,10 +3,13 @@ import { nanoid } from 'nanoid';
 import { sendTicketEmail } from '@/lib/email';
 
 /**
- * Marks an order as paid, generates real ticket rows, increments the ticket
- * type's sold count, and emails the buyer their tickets. Safe to call more
- * than once for the same order - if it's already paid, it just returns the
- * existing ticket codes instead of generating duplicates.
+ * Marks an order as paid, generates real ticket rows, and emails the buyer.
+ * Safe to call more than once for the same order — if tickets already exist,
+ * returns those codes instead of generating duplicates.
+ *
+ * Inventory (quantity_sold) is reserved atomically when the order is created
+ * (see app/api/orders/route.ts). This function must NOT increment quantity_sold
+ * again, or pending holds would be double-counted.
  */
 export async function finalizePaidOrder(orderId: string, baseUrl: string): Promise<string[]> {
   const [order] = await sql`
@@ -16,13 +19,17 @@ export async function finalizePaidOrder(orderId: string, baseUrl: string): Promi
 
   if (!order) return [];
 
-  if (order.payment_status === 'paid') {
-    const existing = await sql`SELECT ticket_code FROM tickets WHERE order_id = ${order.id}`;
-    if (existing.length > 0) {
-      return existing.map((t: any) => t.ticket_code);
+  // Already finalized with tickets — return existing codes (idempotent).
+  const existing = await sql`SELECT ticket_code FROM tickets WHERE order_id = ${order.id}`;
+  if (existing.length > 0) {
+    if (order.payment_status !== 'paid') {
+      await sql`UPDATE orders SET payment_status = 'paid' WHERE id = ${order.id}`;
     }
-    // Order was already marked paid but has no tickets yet (e.g. race condition) - fall through and generate them.
-  } else {
+    return existing.map((t: { ticket_code: string }) => t.ticket_code);
+  }
+
+  // Mark paid if still pending. Promo use is counted only on the first transition to paid.
+  if (order.payment_status !== 'paid') {
     await sql`UPDATE orders SET payment_status = 'paid' WHERE id = ${order.id}`;
 
     if (order.promo_code_id) {
@@ -40,27 +47,26 @@ export async function finalizePaidOrder(orderId: string, baseUrl: string): Promi
     generatedCodes.push(ticketCode);
   }
 
-  await sql`
-    UPDATE ticket_types SET quantity_sold = quantity_sold + ${order.quantity}
-    WHERE id = ${order.ticket_type_id}
-  `;
+  // quantity_sold is reserved atomically at order creation — do not increment here.
 
   const [eventDetails] = await sql`
     SELECT title, venue_name, start_at FROM events WHERE id = ${order.event_id}
   `;
 
-  try {
-    await sendTicketEmail({
-      toEmail: order.buyer_email,
-      buyerName: order.buyer_name,
-      eventTitle: eventDetails.title,
-      venueName: eventDetails.venue_name,
-      startAt: eventDetails.start_at,
-      ticketCodes: generatedCodes,
-      baseUrl,
-    });
-  } catch (emailErr) {
-    console.error('Failed to send ticket email:', emailErr);
+  if (eventDetails) {
+    try {
+      await sendTicketEmail({
+        toEmail: order.buyer_email,
+        buyerName: order.buyer_name,
+        eventTitle: eventDetails.title,
+        venueName: eventDetails.venue_name,
+        startAt: eventDetails.start_at,
+        ticketCodes: generatedCodes,
+        baseUrl,
+      });
+    } catch (emailErr) {
+      console.error('Failed to send ticket email:', emailErr);
+    }
   }
 
   return generatedCodes;

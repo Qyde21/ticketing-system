@@ -26,13 +26,15 @@ export async function POST(req: NextRequest) {
       FROM orders WHERE paystack_reference = ${reference}
     `;
 
-    if (order && order.payment_status !== 'paid') {
+    if (order) {
       const paidAmountKes = event.data.amount / 100;
       if (Math.abs(paidAmountKes - Number(order.total_amount_kes)) > 0.01) {
         console.error('Amount mismatch for order', order.id);
         return NextResponse.json({ received: true });
       }
 
+      // Idempotent: creates tickets if missing, even when status was already 'paid'
+      // (e.g. legacy verify path that only flipped the flag).
       await finalizePaidOrder(order.id, req.nextUrl.origin);
     }
   }

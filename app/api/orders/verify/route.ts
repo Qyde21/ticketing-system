@@ -1,6 +1,12 @@
-﻿import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
+import { finalizePaidOrder } from '@/lib/tickets';
 
+/**
+ * Paystack redirects the buyer here after payment.
+ * Must both confirm payment with Paystack AND issue tickets (via finalizePaidOrder).
+ * Safe to run alongside the webhook — finalizePaidOrder is idempotent.
+ */
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const reference = searchParams.get('reference');
@@ -21,24 +27,36 @@ export async function GET(req: NextRequest) {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${paystackSecret}`,
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     });
 
     const verifyData = await verifyRes.json();
 
     if (verifyData.status && verifyData.data?.status === 'success') {
-      await sql`
-        UPDATE orders 
-        SET payment_status = 'paid' 
-        WHERE paystack_reference = ${reference}
+      const [order] = await sql`
+        SELECT id, payment_status, total_amount_kes
+        FROM orders WHERE paystack_reference = ${reference}
       `;
+
+      if (order) {
+        const paidAmountKes = Number(verifyData.data.amount) / 100;
+        if (Math.abs(paidAmountKes - Number(order.total_amount_kes)) > 0.01) {
+          console.error('Amount mismatch on verify for order', order.id, {
+            paid: paidAmountKes,
+            expected: order.total_amount_kes,
+          });
+          return NextResponse.redirect(new URL(`/?error=amount_mismatch&reference=${reference}`, req.url));
+        }
+
+        // Issues tickets + marks paid. No-op if webhook already finalized.
+        await finalizePaidOrder(order.id, req.nextUrl.origin);
+      }
     }
 
-    // Redirect user to a success confirmation view or home with success flag
     return NextResponse.redirect(new URL(`/success?reference=${reference}`, req.url));
   } catch (err) {
-    console.error("Verification error:", err);
+    console.error('Verification error:', err);
     return NextResponse.redirect(new URL('/?error=verification_failed', req.url));
   }
 }

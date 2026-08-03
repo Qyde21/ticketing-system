@@ -126,7 +126,8 @@ CREATE TABLE tickets (
   holder_name    TEXT,
   holder_email   TEXT,
   status         TEXT NOT NULL DEFAULT 'valid', -- 'valid' | 'used' | 'cancelled'
-  checked_in_at  TIMESTAMPTZ
+  checked_in_at  TIMESTAMPTZ,
+  checked_in_by  UUID REFERENCES users(id) -- staff/admin/organizer who scanned the ticket
 );
 
 CREATE TABLE messages (
