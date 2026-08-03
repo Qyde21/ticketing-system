@@ -21,16 +21,37 @@ export default async function TicketPage({ params }: { params: Promise<{ code: s
     return <div style={{ maxWidth: 500, margin: '2rem auto' }}>Ticket not found.</div>;
   }
 
-  const qrDataUrl = await QRCode.toDataURL(ticket.ticket_code);
+  const qrDataUrl = await QRCode.toDataURL(String(ticket.ticket_code));
+  const isUsed = ticket.status === 'used';
 
   return (
-    <div style={{ maxWidth: 400, margin: '2rem auto', textAlign: 'center' }}>
-      <h1>{ticket.event_title}</h1>
-      <p>{ticket.ticket_type_name}</p>
-      <p>{ticket.venue_name} - {new Date(ticket.start_at).toLocaleString()}</p>
+    <div style={{ maxWidth: 400, margin: '2rem auto', textAlign: 'center', color: '#fff', padding: '0 16px' }}>
+      <h1 style={{ fontSize: 22, fontWeight: 800 }}>{ticket.event_title}</h1>
+      <p style={{ color: '#9ca3af' }}>{ticket.ticket_type_name}</p>
+      <p style={{ color: '#9ca3af' }}>
+        {ticket.venue_name} — {new Date(ticket.start_at).toLocaleString()}
+      </p>
       {ticket.holder_name && <p>Ticket holder: {ticket.holder_name}</p>}
-      <TicketQRReveal qrDataUrl={qrDataUrl} />
-      <p>Status: {ticket.status}</p>
+
+      {isUsed ? (
+        <div style={{ margin: '24px auto', padding: 16, borderRadius: 12, background: '#7f1d1d', border: '1px solid #991b1b', color: '#fecaca', fontWeight: 700 }}>
+          Already scanned
+          {ticket.checked_in_at && (
+            <div style={{ fontWeight: 400, fontSize: 13, marginTop: 6 }}>
+              {new Date(ticket.checked_in_at).toLocaleString()}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div style={{ margin: '20px 0' }}>
+          <TicketQRReveal qrDataUrl={qrDataUrl} ticketCode={String(ticket.ticket_code)} />
+        </div>
+      )}
+
+      <p style={{ color: '#6b7280', fontSize: 13 }}>
+        Status: <strong style={{ color: isUsed ? '#f87171' : '#34d399' }}>{ticket.status}</strong>
+      </p>
+
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12 }}>
         <AddToCalendarButton
           title={ticket.event_title}

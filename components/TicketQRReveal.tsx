@@ -1,47 +1,19 @@
-﻿"use client";
+﻿'use client';
+import TicketBarcode from '@/components/TicketBarcode';
 
-import { useState } from "react";
-
-export default function TicketQRReveal({ qrDataUrl }: { qrDataUrl: string }) {
-  const [revealed, setRevealed] = useState(false);
-
-  if (revealed) {
-    return (
-      <button
-        type="button"
-        onClick={() => setRevealed(false)}
-        title="Tap to hide"
-        style={{ border: "none", background: "none", cursor: "pointer", padding: 0 }}
-      >
-        <img src={qrDataUrl} alt="Ticket QR code" style={{ width: 220, height: 220 }} />
-      </button>
-    );
-  }
-
+export default function TicketQRReveal({ qrDataUrl, ticketCode }: { qrDataUrl: string; ticketCode: string }) {
+  const code = String(ticketCode || '').trim();
   return (
-    <button
-      type="button"
-      onClick={() => setRevealed(true)}
-      style={{
-        width: 220,
-        height: 220,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 8,
-        background: "#1f1f1f",
-        border: "1px dashed #444",
-        borderRadius: 12,
-        color: "#999",
-        cursor: "pointer",
-        margin: "0 auto"
-      }}
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-      </svg>
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Tap to Reveal QR Code</span>
-    </button>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, width: '100%' }}>
+      <div style={{ background: '#fff', padding: 12, borderRadius: 12, border: '1px solid #e5e7eb' }}>
+        <img src={qrDataUrl} alt={'QR ' + code} width={200} height={200} style={{ display: 'block', width: 200, height: 200 }} />
+      </div>
+      <p style={{ margin: 0, fontSize: 12, color: '#9ca3af', fontWeight: 600 }}>QR code</p>
+      <div style={{ width: '100%', maxWidth: 340 }}>
+        <TicketBarcode value={code} height={84} />
+      </div>
+      <p style={{ margin: 0, fontSize: 12, color: '#9ca3af', fontWeight: 600 }}>Barcode · scan either at the door</p>
+      <p style={{ margin: 0, fontFamily: 'ui-monospace, monospace', letterSpacing: 2, color: '#a5b4fc', fontSize: 14, fontWeight: 700 }}>{code}</p>
+    </div>
   );
 }
