@@ -25,6 +25,12 @@ export default async function OrganizerDashboardPage() {
           <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Events & Ticket Inventory Analytics</h1>
           <p className="text-gray-400 text-sm mt-1">Real-time status breakdown and ticket sales overview</p>
         </div>
+        <Link
+          href="/organizer/events/new"
+          className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-4 py-2 rounded-lg transition shadow text-sm"
+        >
+          + Create Event
+        </Link>
       </div>
 
       {events.length === 0 ? (
