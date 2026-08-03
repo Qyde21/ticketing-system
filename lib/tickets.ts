@@ -1,10 +1,10 @@
-import { sql } from '@/lib/db';
+﻿import { sql } from '@/lib/db';
 import { nanoid } from 'nanoid';
 import { sendTicketEmail } from '@/lib/email';
 
 /**
  * Marks an order as paid, generates real ticket rows, and emails the buyer.
- * Safe to call more than once for the same order — if tickets already exist,
+ * Safe to call more than once for the same order â€” if tickets already exist,
  * returns those codes instead of generating duplicates.
  *
  * Inventory (quantity_sold) is reserved atomically when the order is created
@@ -19,13 +19,13 @@ export async function finalizePaidOrder(orderId: string, baseUrl: string): Promi
 
   if (!order) return [];
 
-  // Already finalized with tickets — return existing codes (idempotent).
+  // Already finalized with tickets â€” return existing codes (idempotent).
   const existing = await sql`SELECT ticket_code FROM tickets WHERE order_id = ${order.id}`;
   if (existing.length > 0) {
     if (order.payment_status !== 'paid') {
       await sql`UPDATE orders SET payment_status = 'paid' WHERE id = ${order.id}`;
     }
-    return existing.map((t: { ticket_code: string }) => t.ticket_code);
+    return existing.map((t) => String(t.ticket_code));
   }
 
   // Mark paid if still pending. Promo use is counted only on the first transition to paid.
@@ -47,7 +47,7 @@ export async function finalizePaidOrder(orderId: string, baseUrl: string): Promi
     generatedCodes.push(ticketCode);
   }
 
-  // quantity_sold is reserved atomically at order creation — do not increment here.
+  // quantity_sold is reserved atomically at order creation â€” do not increment here.
 
   const [eventDetails] = await sql`
     SELECT title, venue_name, start_at FROM events WHERE id = ${order.event_id}
@@ -71,3 +71,4 @@ export async function finalizePaidOrder(orderId: string, baseUrl: string): Promi
 
   return generatedCodes;
 }
+
