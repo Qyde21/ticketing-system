@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
-import { hashPassword, setSessionCookie } from '@/lib/auth';
+import { hashPassword } from '@/lib/auth';
+import { sendVerificationEmail } from '@/lib/email';
+import crypto from 'crypto';
 
 export async function POST(req: NextRequest) {
   try {
@@ -8,6 +10,9 @@ export async function POST(req: NextRequest) {
 
     if (!email || !password || !fullName) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+    if (String(password).length < 8) {
+      return NextResponse.json({ error: 'Password must be at least 8 characters' }, { status: 400 });
     }
 
     const normalizedEmail = String(email).trim().toLowerCase();
@@ -23,8 +28,8 @@ export async function POST(req: NextRequest) {
     const passwordHash = await hashPassword(password);
 
     const [user] = await sql`
-      INSERT INTO users (email, phone, password_hash, full_name, role)
-      VALUES (${normalizedEmail}, ${phone ?? null}, ${passwordHash}, ${fullName}, ${finalRole})
+      INSERT INTO users (email, phone, password_hash, full_name, role, email_verified)
+      VALUES (${normalizedEmail}, ${phone ?? null}, ${passwordHash}, ${fullName}, ${finalRole}, false)
       RETURNING id, email, full_name, role
     `;
 
@@ -35,9 +40,31 @@ export async function POST(req: NextRequest) {
       `;
     }
 
-    await setSessionCookie({ userId: user.id, email: user.email, role: user.role });
+    // Generate a verification token (same pattern as password reset: random raw
+    // token emailed to the user, only a SHA-256 hash of it stored server-side).
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-    return NextResponse.json({ user }, { status: 201 });
+    await sql`
+      INSERT INTO email_verification_tokens (user_id, token_hash, expires_at)
+      VALUES (${user.id}, ${tokenHash}, ${expiresAt.toISOString()})
+    `;
+
+    const verifyUrl = `${req.nextUrl.origin}/api/auth/verify-email?token=${rawToken}`;
+
+    try {
+      await sendVerificationEmail({ toEmail: user.email, fullName: user.full_name, verifyUrl });
+    } catch (emailErr) {
+      console.error('Failed to send verification email:', emailErr);
+    }
+
+    // Deliberately NOT logging the user in here — no session cookie is set.
+    // They only get a session once they click the link in verify-email/route.ts.
+    return NextResponse.json(
+      { message: 'Account created. Please check your email to confirm your account.', email: user.email },
+      { status: 201 }
+    );
   } catch (err) {
     console.error('Signup error:', err);
     return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });

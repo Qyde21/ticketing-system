@@ -1,12 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { finalizePaidOrder } from '@/lib/tickets';
 
-/**
- * Paystack redirects the buyer here after payment.
- * Must both confirm payment with Paystack AND issue tickets (via finalizePaidOrder).
- * Safe to run alongside the webhook — finalizePaidOrder is idempotent.
- */
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const reference = searchParams.get('reference');
@@ -27,8 +22,8 @@ export async function GET(req: NextRequest) {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${paystackSecret}`,
-        'Content-Type': 'application/json',
-      },
+        'Content-Type': 'application/json'
+      }
     });
 
     const verifyData = await verifyRes.json();
@@ -39,24 +34,30 @@ export async function GET(req: NextRequest) {
         FROM orders WHERE paystack_reference = ${reference}
       `;
 
-      if (order) {
-        const paidAmountKes = Number(verifyData.data.amount) / 100;
+      if (order && order.payment_status !== 'paid') {
+        // Cross-check the amount Paystack actually confirms against what we
+        // charged for, same as the webhook does — defense in depth in case
+        // a reference is ever reused or tampered with.
+        const paidAmountKes = verifyData.data.amount / 100;
         if (Math.abs(paidAmountKes - Number(order.total_amount_kes)) > 0.01) {
-          console.error('Amount mismatch on verify for order', order.id, {
-            paid: paidAmountKes,
-            expected: order.total_amount_kes,
-          });
-          return NextResponse.redirect(new URL(`/?error=amount_mismatch&reference=${reference}`, req.url));
+          console.error('Amount mismatch for order', order.id, 'via verify redirect');
+          return NextResponse.redirect(new URL('/?error=verification_failed', req.url));
         }
 
-        // Issues tickets + marks paid. No-op if webhook already finalized.
+        // Use the same shared function the webhook uses — this generates the
+        // actual ticket codes, increments sold counts, and emails the buyer.
+        // Calling this (instead of a raw UPDATE) also means if the webhook
+        // fires later for the same order, its `payment_status !== 'paid'`
+        // guard will correctly skip re-processing rather than silently
+        // never issuing tickets at all.
         await finalizePaidOrder(order.id, req.nextUrl.origin);
       }
     }
 
+    // Redirect user to a success confirmation view or home with success flag
     return NextResponse.redirect(new URL(`/success?reference=${reference}`, req.url));
   } catch (err) {
-    console.error('Verification error:', err);
+    console.error("Verification error:", err);
     return NextResponse.redirect(new URL('/?error=verification_failed', req.url));
   }
 }

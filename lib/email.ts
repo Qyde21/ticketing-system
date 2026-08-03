@@ -57,6 +57,27 @@ export async function sendCancellationEmail(params: {
   });
 }
 
+export async function sendVerificationEmail(params: {
+  toEmail: string;
+  fullName: string;
+  verifyUrl: string;
+}) {
+  await resend.emails.send({
+    from: 'TicketHub <onboarding@resend.dev>',
+    to: params.toEmail,
+    subject: 'Confirm your TicketHub account',
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+        <h2>Welcome to TicketHub, ${params.fullName}!</h2>
+        <p>Please confirm your email address to activate your account.</p>
+        <p><a href="${params.verifyUrl}" style="display: inline-block; background: #059669; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600;">Confirm Email Address</a></p>
+        <p>This link will expire in 24 hours. If you did not create this account, you can safely ignore this email.</p>
+        <p style="color: #888; font-size: 12px; margin-top: 24px;">Sent by TicketHub</p>
+      </div>
+    `,
+  });
+}
+
 export async function sendPasswordResetEmail(params: {
   toEmail: string;
   resetUrl: string;

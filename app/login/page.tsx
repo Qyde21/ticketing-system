@@ -1,22 +1,43 @@
 'use client';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import PasswordInput from '@/components/PasswordInput';
 
-export default function LoginPage() {
+const VERIFY_ERROR_MESSAGES: Record<string, string> = {
+  missing_token: 'That confirmation link looks incomplete. Try copying it again from your email.',
+  expired: 'That confirmation link has expired or was already used. Enter your email below and request a new one.',
+  not_found: 'We could not find an account for that confirmation link.',
+  suspended: 'This account has been suspended. Contact support for help.',
+};
+
+function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [pendingToken, setPendingToken] = useState('');
   const [code, setCode] = useState('');
+  const [showResend, setShowResend] = useState(false);
+  const [resendMessage, setResendMessage] = useState('');
+  const [resending, setResending] = useState(false);
+
+  useEffect(() => {
+    const verifyError = searchParams.get('verifyError');
+    if (verifyError && VERIFY_ERROR_MESSAGES[verifyError]) {
+      setError(VERIFY_ERROR_MESSAGES[verifyError]);
+      setShowResend(verifyError === 'expired');
+    }
+  }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
+    setShowResend(false);
+    setResendMessage('');
     setLoading(true);
 
     try {
@@ -30,6 +51,7 @@ export default function LoginPage() {
 
       if (!res.ok) {
         setError(data.error || 'Login failed');
+        setShowResend(Boolean(data.unverified));
         setLoading(false);
         return;
       }
@@ -73,6 +95,24 @@ export default function LoginPage() {
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');
       setLoading(false);
+    }
+  }
+
+  async function handleResendVerification() {
+    setResending(true);
+    setResendMessage('');
+    try {
+      const res = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      setResendMessage(data.message || 'If that account needs confirmation, we sent a new link.');
+    } catch {
+      setResendMessage('Something went wrong. Please try again.');
+    } finally {
+      setResending(false);
     }
   }
 
@@ -137,6 +177,22 @@ export default function LoginPage() {
         {error && (
           <div className="mb-6 p-4 bg-red-950/80 border border-red-800 text-red-300 rounded-lg text-sm font-medium">
             {error}
+            {showResend && (
+              <div className="mt-3">
+                {resendMessage ? (
+                  <p className="text-xs text-red-200">{resendMessage}</p>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleResendVerification}
+                    disabled={resending}
+                    className="text-xs font-bold uppercase tracking-wider text-indigo-300 hover:text-indigo-200 underline disabled:opacity-50"
+                  >
+                    {resending ? 'Sending...' : 'Resend confirmation email'}
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -187,5 +243,13 @@ export default function LoginPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">Loading...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }

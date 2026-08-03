@@ -2,12 +2,11 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import PasswordInput from '@/components/PasswordInput';
 
 function SignupForm() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   
   const [role, setRole] = useState<'attendee' | 'organizer'>('attendee');
   const [email, setEmail] = useState('');
@@ -15,6 +14,7 @@ function SignupForm() {
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [submittedEmail, setSubmittedEmail] = useState('');
 
   useEffect(() => {
     const roleParam = searchParams.get('role');
@@ -32,26 +32,55 @@ function SignupForm() {
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, name, role }),
+        body: JSON.stringify({ email, password, fullName: name, role }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.message || 'Signup failed');
+        throw new Error(data.error || 'Signup failed');
       }
 
-      if (role === 'organizer') {
-        router.push('/organizer/dashboard');
-      } else {
-        router.push('/attendee/dashboard');
-      }
+      // Account is created but not yet usable — the API doesn't set a session
+      // cookie until the emailed confirmation link is clicked. Show a
+      // check-your-email screen instead of sending them to the dashboard.
+      setSubmittedEmail(email);
     } catch (err: any) {
       setError(err.message || 'An error occurred during sign up.');
     } finally {
       setLoading(false);
     }
   };
+
+  if (submittedEmail) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-white flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
+          <Link href="/" className="flex items-center justify-center gap-2 text-2xl font-bold mb-6">
+            <span className="bg-emerald-600 text-white px-2.5 py-1 rounded text-base font-black">TH</span>
+            <span className="text-white font-extrabold tracking-tight">TicketHub</span>
+          </Link>
+          <div className="bg-slate-900 py-8 px-6 shadow sm:rounded-lg border border-slate-800">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-900/50 border border-emerald-700 mb-4">
+              <span className="text-2xl">✉️</span>
+            </div>
+            <h2 className="text-xl font-bold text-white mb-2">Check your email</h2>
+            <p className="text-sm text-slate-400">
+              We sent a confirmation link to <span className="text-white font-medium">{submittedEmail}</span>.
+              Click the link to activate your account and get started.
+            </p>
+            <p className="text-xs text-slate-500 mt-4">
+              Didn&apos;t get it? Check your spam folder, or{' '}
+              <Link href="/login" className="text-emerald-400 hover:text-emerald-300 font-medium">
+                go to login
+              </Link>{' '}
+              to request a new link.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-white flex flex-col justify-center py-12 sm:px-6 lg:px-8">

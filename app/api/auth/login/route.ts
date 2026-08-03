@@ -40,6 +40,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'This account has been suspended. Contact support for help.' }, { status: 403 });
     }
 
+    if (!user.email_verified) {
+      return NextResponse.json(
+        { error: 'Please confirm your email address before logging in. Check your inbox for the confirmation link.', unverified: true },
+        { status: 403 }
+      );
+    }
+
     if (user.totp_enabled) {
       const pendingToken = await signPendingTwoFactorToken(user.id);
       return NextResponse.json({ twoFactorRequired: true, pendingToken });
