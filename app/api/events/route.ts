@@ -11,10 +11,24 @@ export async function POST(req: NextRequest) {
   }
 
   if (session.role === 'organizer') {
-    const [profile] = await sql`
-      SELECT is_verified FROM organizer_profiles WHERE user_id = ${session.userId}
+    // Check live DB state, not just the session cookie — a suspension should
+    // take effect immediately, even if the organizer is already logged in
+    // with a still-valid session from before they were suspended.
+    const [account] = await sql`
+      SELECT u.status, COALESCE(op.is_verified, false) AS is_verified
+      FROM users u
+      LEFT JOIN organizer_profiles op ON op.user_id = u.id
+      WHERE u.id = ${session.userId}
     `;
-    if (!profile?.is_verified) {
+
+    if (!account || account.status === 'suspended') {
+      return NextResponse.json(
+        { error: 'Your account has been suspended. Contact support for help.' },
+        { status: 403 }
+      );
+    }
+
+    if (!account.is_verified) {
       return NextResponse.json(
         { error: 'Your organizer account is pending admin approval. You will be able to create events once approved.' },
         { status: 403 }

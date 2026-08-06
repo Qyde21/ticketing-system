@@ -16,10 +16,13 @@ export default async function Navbar() {
 
   let isVerifiedOrganizer = true;
   if (session?.role === 'organizer') {
-    const [profile] = await sql`
-      SELECT is_verified FROM organizer_profiles WHERE user_id = ${session.userId}
+    const [account] = await sql`
+      SELECT u.status, COALESCE(op.is_verified, false) AS is_verified
+      FROM users u
+      LEFT JOIN organizer_profiles op ON op.user_id = u.id
+      WHERE u.id = ${session.userId}
     `;
-    isVerifiedOrganizer = profile?.is_verified === true;
+    isVerifiedOrganizer = account?.is_verified === true && account?.status !== 'suspended';
   }
 
   return (

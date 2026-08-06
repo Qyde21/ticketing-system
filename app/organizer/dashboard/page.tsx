@@ -18,14 +18,20 @@ export default async function OrganizerDashboardPage() {
     ? await sql`SELECT * FROM events ORDER BY created_at DESC`
     : await sql`SELECT * FROM events WHERE organizer_id = ${session.userId} ORDER BY created_at DESC`;
 
-  // Organizers must be approved by an admin before they can create events.
-  // Admins are always treated as "verified" since this check doesn't apply to them.
+  // Organizers must be approved by an admin before they can create events,
+  // and a suspension should immediately block creation too — checked live
+  // from the DB rather than trusting the session cookie's role/state alone.
   let isVerifiedOrganizer = true;
+  let isSuspended = false;
   if (session.role === 'organizer') {
-    const [profile] = await sql`
-      SELECT is_verified FROM organizer_profiles WHERE user_id = ${session.userId}
+    const [account] = await sql`
+      SELECT u.status, COALESCE(op.is_verified, false) AS is_verified
+      FROM users u
+      LEFT JOIN organizer_profiles op ON op.user_id = u.id
+      WHERE u.id = ${session.userId}
     `;
-    isVerifiedOrganizer = profile?.is_verified === true;
+    isVerifiedOrganizer = account?.is_verified === true;
+    isSuspended = account?.status === 'suspended';
   }
 
   return (
@@ -35,7 +41,14 @@ export default async function OrganizerDashboardPage() {
           <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Events & Ticket Inventory Analytics</h1>
           <p className="text-gray-400 text-sm mt-1">Real-time status breakdown and ticket sales overview</p>
         </div>
-        {isVerifiedOrganizer ? (
+        {isSuspended ? (
+          <span
+            className="bg-red-950/60 border border-red-800 text-red-300 font-medium px-4 py-2 rounded-lg text-sm"
+            title="Your account has been suspended"
+          >
+            ⛔ Account suspended
+          </span>
+        ) : isVerifiedOrganizer ? (
           <Link
             href="/organizer/events/new"
             className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-4 py-2 rounded-lg transition shadow text-sm"
@@ -52,7 +65,13 @@ export default async function OrganizerDashboardPage() {
         )}
       </div>
 
-      {!isVerifiedOrganizer && (
+      {isSuspended && (
+        <div className="mb-8 p-4 bg-red-950/40 border border-red-800 rounded-lg text-red-200 text-sm">
+          Your organizer account has been suspended. You cannot create new events while suspended. Contact support if you believe this is a mistake.
+        </div>
+      )}
+
+      {!isSuspended && !isVerifiedOrganizer && (
         <div className="mb-8 p-4 bg-amber-950/40 border border-amber-800 rounded-lg text-amber-200 text-sm">
           Your organizer account is awaiting approval from a TicketHub admin. Once approved, you&apos;ll be able to create and publish events. This usually doesn&apos;t take long — check back soon.
         </div>
