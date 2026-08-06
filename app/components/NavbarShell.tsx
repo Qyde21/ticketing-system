@@ -8,9 +8,10 @@ interface NavbarShellProps {
   userEmail?: string;
   userRole?: string;
   dashboardHref?: string;
+  isVerifiedOrganizer?: boolean;
 }
 
-export default function NavbarShell({ userEmail, userRole }: NavbarShellProps) {
+export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }: NavbarShellProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
@@ -71,7 +72,9 @@ export default function NavbarShell({ userEmail, userRole }: NavbarShellProps) {
               {userRole === 'organizer' && (
                 <>
                   <Link href="/organizer/dashboard" className={getLinkClass('/organizer/dashboard')}>Dashboard</Link>
-                  <Link href="/organizer/events/new" className={getLinkClass('/organizer/events/new')}>Create Event</Link>
+                  {isVerifiedOrganizer && (
+                    <Link href="/organizer/events/new" className={getLinkClass('/organizer/events/new')}>Create Event</Link>
+                  )}
                   <Link href="/organizer/payouts" className={getLinkClass('/organizer/payouts')}>Payouts</Link>
                   <Link href="/account/security" className={getLinkClass('/account/security')}>Security</Link>
                 </>
@@ -146,7 +149,9 @@ export default function NavbarShell({ userEmail, userRole }: NavbarShellProps) {
               {userRole === 'organizer' && (
                 <>
                   <Link href="/organizer/dashboard" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/organizer/dashboard')}>Dashboard</Link>
-                  <Link href="/organizer/events/new" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/organizer/events/new')}>Create Event</Link>
+                  {isVerifiedOrganizer && (
+                    <Link href="/organizer/events/new" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/organizer/events/new')}>Create Event</Link>
+                  )}
                   <Link href="/organizer/payouts" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/organizer/payouts')}>Payouts</Link>
                   <Link href="/account/security" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/account/security')}>Security</Link>
                 </>

@@ -19,14 +19,15 @@ export default async function AdminOrganizersPage() {
       u.email,
       u.status,
       u.created_at,
+      COALESCE(op.is_verified, false) AS is_verified,
       COUNT(e.id) AS total_events,
       COUNT(e.id) FILTER (WHERE e.status = 'published') AS published_events
     FROM users u
     LEFT JOIN organizer_profiles op ON op.user_id = u.id
     LEFT JOIN events e ON e.organizer_id = u.id
     WHERE u.role = 'organizer'
-    GROUP BY u.id, op.business_name
-    ORDER BY u.created_at DESC
+    GROUP BY u.id, op.business_name, op.is_verified
+    ORDER BY op.is_verified ASC, u.created_at DESC
   `;
 
   return (
@@ -58,11 +59,18 @@ export default async function AdminOrganizersPage() {
                     <h2 className="text-xl font-bold text-white">{org.name}</h2>
                     <p className="text-indigo-300 text-sm">{org.email}</p>
                   </div>
-                  <span className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider ${
-                    org.status === 'suspended' ? 'bg-red-950 text-red-400 border border-red-800' : 'bg-green-950 text-green-400 border border-green-800'
-                  }`}>
-                    {org.status || 'active'}
-                  </span>
+                  <div className="flex flex-col items-end gap-1.5">
+                    {!org.is_verified && (
+                      <span className="px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider bg-amber-950 text-amber-400 border border-amber-800">
+                        Pending Approval
+                      </span>
+                    )}
+                    <span className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider ${
+                      org.status === 'suspended' ? 'bg-red-950 text-red-400 border border-red-800' : 'bg-green-950 text-green-400 border border-green-800'
+                    }`}>
+                      {org.status || 'active'}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-4 text-xs text-gray-400 pt-2 border-t border-gray-800/80">
@@ -80,7 +88,7 @@ export default async function AdminOrganizersPage() {
                   View Events
                 </Link>
 
-                <OrganizerActionBtn organizerId={org.id} currentStatus={org.status || 'active'} />
+                <OrganizerActionBtn organizerId={org.id} currentStatus={org.status || 'active'} isVerified={org.is_verified} />
               </div>
             </div>
           ))}

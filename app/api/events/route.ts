@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { slugify } from '@/lib/slugify';
@@ -8,6 +8,18 @@ export async function POST(req: NextRequest) {
   const session = await getSession();
   if (!session || (session.role !== 'organizer' && session.role !== 'admin')) {
     return NextResponse.json({ error: 'Not authorized' }, { status: 403 });
+  }
+
+  if (session.role === 'organizer') {
+    const [profile] = await sql`
+      SELECT is_verified FROM organizer_profiles WHERE user_id = ${session.userId}
+    `;
+    if (!profile?.is_verified) {
+      return NextResponse.json(
+        { error: 'Your organizer account is pending admin approval. You will be able to create events once approved.' },
+        { status: 403 }
+      );
+    }
   }
 
   try {
