@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { Resend } from 'resend';
@@ -44,9 +44,9 @@ export async function POST(req: NextRequest) {
 
       try {
         await resend.emails.send({
-          from: 'TicketHub <onboarding@resend.dev>',
+          from: 'TicketHub <noreply@mytickethub.co.ke>',
           to: buyer.email,
-          subject: `Message from organizer — ${event.title}`,
+          subject: `Message from organizer � ${event.title}`,
           html: `
             <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
               <h2>Message about ${event.title}</h2>
@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
 
   try {
     await resend.emails.send({
-      from: 'TicketHub <onboarding@resend.dev>',
+      from: 'TicketHub <noreply@mytickethub.co.ke>',
       to: recipient.email,
       subject: `New message about ${event.title}`,
       html: `

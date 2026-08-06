@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -12,8 +12,8 @@ export async function POST(req: NextRequest) {
     }
 
     await resend.emails.send({
-      from: 'TicketHub <onboarding@resend.dev>',
-      to: 'support@tickethub.co.ke',
+      from: 'TicketHub <noreply@mytickethub.co.ke>',
+      to: 'support@mytickethub.co.ke',
       replyTo: email,
       subject: 'Contact Form: ' + subject,
       html: `
@@ -29,9 +29,9 @@ export async function POST(req: NextRequest) {
     });
 
     await resend.emails.send({
-      from: 'TicketHub <onboarding@resend.dev>',
+      from: 'TicketHub <noreply@mytickethub.co.ke>',
       to: email,
-      subject: 'We received your message — TicketHub',
+      subject: 'We received your message � TicketHub',
       html: `
         <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
           <h2>Thanks for reaching out, ${name}!</h2>

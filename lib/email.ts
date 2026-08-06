@@ -1,4 +1,4 @@
-﻿import { Resend } from 'resend';
+import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -16,7 +16,7 @@ export async function sendTicketEmail(params: {
     .join('');
 
   await resend.emails.send({
-    from: 'TicketHub <onboarding@resend.dev>',
+    from: 'TicketHub <noreply@mytickethub.co.ke>',
     to: params.toEmail,
     subject: `Your ticket${params.ticketCodes.length > 1 ? 's' : ''} for ${params.eventTitle}`,
     html: `
@@ -41,7 +41,7 @@ export async function sendCancellationEmail(params: {
   reason: string;
 }) {
   await resend.emails.send({
-    from: 'TicketHub <onboarding@resend.dev>',
+    from: 'TicketHub <noreply@mytickethub.co.ke>',
     to: params.toEmail,
     subject: `${params.eventTitle} - Order cancelled and refunded`,
     html: `
@@ -63,7 +63,7 @@ export async function sendVerificationEmail(params: {
   verifyUrl: string;
 }) {
   await resend.emails.send({
-    from: 'TicketHub <onboarding@resend.dev>',
+    from: 'TicketHub <noreply@mytickethub.co.ke>',
     to: params.toEmail,
     subject: 'Confirm your TicketHub account',
     html: `
@@ -83,7 +83,7 @@ export async function sendPasswordResetEmail(params: {
   resetUrl: string;
 }) {
   await resend.emails.send({
-    from: 'TicketHub <onboarding@resend.dev>',
+    from: 'TicketHub <noreply@mytickethub.co.ke>',
     to: params.toEmail,
     subject: 'Reset your TicketHub password',
     html: `
@@ -109,7 +109,7 @@ export async function sendTicketTransferredToNewHolderEmail(params: {
   baseUrl: string;
 }) {
   await resend.emails.send({
-    from: 'TicketHub <onboarding@resend.dev>',
+    from: 'TicketHub <noreply@mytickethub.co.ke>',
     to: params.toEmail,
     subject: `${params.fromName} sent you a ticket for ${params.eventTitle}`,
     html: `
@@ -136,7 +136,7 @@ export async function sendTicketTransferConfirmationEmail(params: {
   ticketCode: string;
 }) {
   await resend.emails.send({
-    from: 'TicketHub <onboarding@resend.dev>',
+    from: 'TicketHub <noreply@mytickethub.co.ke>',
     to: params.toEmail,
     subject: `Ticket transferred for ${params.eventTitle}`,
     html: `
@@ -158,7 +158,7 @@ export async function sendWaitlistConfirmationEmail(params: {
   ticketTypeName: string;
 }) {
   await resend.emails.send({
-    from: 'TicketHub <onboarding@resend.dev>',
+    from: 'TicketHub <noreply@mytickethub.co.ke>',
     to: params.toEmail,
     subject: `You're on the waitlist for ${params.eventTitle}`,
     html: `
@@ -181,7 +181,7 @@ export async function sendWaitlistSpotAvailableEmail(params: {
   checkoutUrl: string;
 }) {
   await resend.emails.send({
-    from: 'TicketHub <onboarding@resend.dev>',
+    from: 'TicketHub <noreply@mytickethub.co.ke>',
     to: params.toEmail,
     subject: `A spot just opened up for ${params.eventTitle}!`,
     html: `
@@ -206,7 +206,7 @@ export async function sendEventReminderEmail(params: {
   quantity: number;
 }) {
   await resend.emails.send({
-    from: 'TicketHub <onboarding@resend.dev>',
+    from: 'TicketHub <noreply@mytickethub.co.ke>',
     to: params.toEmail,
     subject: `Reminder: ${params.eventTitle} is coming up!`,
     html: `
@@ -231,7 +231,7 @@ export async function sendEventApprovedEmail(params: {
   eventUrl: string;
 }) {
   await resend.emails.send({
-    from: 'TicketHub <onboarding@resend.dev>',
+    from: 'TicketHub <noreply@mytickethub.co.ke>',
     to: params.toEmail,
     subject: `${params.eventTitle} has been approved and is now live!`,
     html: `
@@ -253,7 +253,7 @@ export async function sendEventRejectedEmail(params: {
   reason?: string;
 }) {
   await resend.emails.send({
-    from: 'TicketHub <onboarding@resend.dev>',
+    from: 'TicketHub <noreply@mytickethub.co.ke>',
     to: params.toEmail,
     subject: `${params.eventTitle} needs some changes before it can go live`,
     html: `
@@ -268,3 +268,4 @@ export async function sendEventRejectedEmail(params: {
     `,
   });
 }
+
