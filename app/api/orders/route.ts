@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { nanoid } from 'nanoid';
 import { finalizePaidOrder } from '@/lib/tickets';
@@ -36,10 +36,16 @@ export async function POST(req: NextRequest) {
     }
 
     const [event] = await sql`
-      SELECT status, start_at, end_at FROM events WHERE id = ${ticketType.event_id}
+      SELECT e.status, e.start_at, e.end_at, e.organizer_id, u.status AS organizer_status
+      FROM events e
+      JOIN users u ON u.id = e.organizer_id
+      WHERE e.id = ${ticketType.event_id}
     `;
     if (!event) {
       return NextResponse.json({ error: 'Event not found' }, { status: 404 });
+    }
+    if (event.organizer_status === 'suspended') {
+      return NextResponse.json({ error: 'This event is not currently available for ticket sales' }, { status: 400 });
     }
     if (event.status === 'cancelled') {
       return NextResponse.json({ error: 'This event has been cancelled' }, { status: 400 });

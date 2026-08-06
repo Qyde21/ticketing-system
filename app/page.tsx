@@ -1,4 +1,4 @@
-﻿import { sql } from '@/lib/db';
+import { sql } from '@/lib/db';
 import EventList from '@/components/EventList';
 import Link from 'next/link';
 
@@ -14,7 +14,8 @@ export default async function HomePage() {
     FROM events e
     LEFT JOIN ticket_types tt ON tt.event_id = e.id
     LEFT JOIN organizer_profiles op ON op.user_id = e.organizer_id
-    WHERE e.status IN ('published', 'completed')
+    JOIN users u ON u.id = e.organizer_id
+    WHERE e.status IN ('published', 'completed') AND u.status != 'suspended'
     GROUP BY e.id, op.is_verified
     ORDER BY e.start_at ASC
   `;
