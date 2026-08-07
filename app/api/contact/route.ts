@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResend() { if (!process.env.RESEND_API_KEY) throw new Error("RESEND_API_KEY is not set"); return new Resend(process.env.RESEND_API_KEY); }
 
 export async function POST(req: NextRequest) {
   try {
@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    await resend.emails.send({
+    await getResend().emails.send({
       from: 'TicketHub <noreply@mytickethub.co.ke>',
       to: 'support@mytickethub.co.ke',
       replyTo: email,
@@ -28,10 +28,10 @@ export async function POST(req: NextRequest) {
       `,
     });
 
-    await resend.emails.send({
+    await getResend().emails.send({
       from: 'TicketHub <noreply@mytickethub.co.ke>',
       to: email,
-      subject: 'We received your message � TicketHub',
+      subject: 'We received your message ï¿½ TicketHub',
       html: `
         <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
           <h2>Thanks for reaching out, ${name}!</h2>

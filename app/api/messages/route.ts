@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResend() { if (!process.env.RESEND_API_KEY) throw new Error("RESEND_API_KEY is not set"); return new Resend(process.env.RESEND_API_KEY); }
 
 export async function POST(req: NextRequest) {
   const session = await getSession();
@@ -43,10 +43,10 @@ export async function POST(req: NextRequest) {
       `;
 
       try {
-        await resend.emails.send({
+        await getResend().emails.send({
           from: 'TicketHub <noreply@mytickethub.co.ke>',
           to: buyer.email,
-          subject: `Message from organizer � ${event.title}`,
+          subject: `Message from organizer ï¿½ ${event.title}`,
           html: `
             <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
               <h2>Message about ${event.title}</h2>
@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
   const [sender] = await sql`SELECT full_name FROM users WHERE id = ${session.userId}`;
 
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: 'TicketHub <noreply@mytickethub.co.ke>',
       to: recipient.email,
       subject: `New message about ${event.title}`,

@@ -1,6 +1,11 @@
-import { Resend } from 'resend';
+﻿import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResend() {
+  if (!process.env.RESEND_API_KEY) {
+    throw new Error('RESEND_API_KEY is not set');
+  }
+  return new Resend(process.env.RESEND_API_KEY);
+}
 
 export async function sendTicketEmail(params: {
   toEmail: string;
@@ -11,10 +16,10 @@ export async function sendTicketEmail(params: {
   ticketCodes: string[];
   baseUrl: string;
 }) {
+  const resend = getResend();
   const ticketLinks = params.ticketCodes
     .map((code) => `<li><a href="${params.baseUrl}/tickets/${code}">${code}</a></li>`)
     .join('');
-
   await resend.emails.send({
     from: 'TicketHub <noreply@mytickethub.co.ke>',
     to: params.toEmail,
@@ -40,6 +45,7 @@ export async function sendCancellationEmail(params: {
   eventTitle: string;
   reason: string;
 }) {
+  const resend = getResend();
   await resend.emails.send({
     from: 'TicketHub <noreply@mytickethub.co.ke>',
     to: params.toEmail,
@@ -62,6 +68,7 @@ export async function sendVerificationEmail(params: {
   fullName: string;
   verifyUrl: string;
 }) {
+  const resend = getResend();
   await resend.emails.send({
     from: 'TicketHub <noreply@mytickethub.co.ke>',
     to: params.toEmail,
@@ -82,6 +89,7 @@ export async function sendPasswordResetEmail(params: {
   toEmail: string;
   resetUrl: string;
 }) {
+  const resend = getResend();
   await resend.emails.send({
     from: 'TicketHub <noreply@mytickethub.co.ke>',
     to: params.toEmail,
@@ -108,6 +116,7 @@ export async function sendTicketTransferredToNewHolderEmail(params: {
   ticketCode: string;
   baseUrl: string;
 }) {
+  const resend = getResend();
   await resend.emails.send({
     from: 'TicketHub <noreply@mytickethub.co.ke>',
     to: params.toEmail,
@@ -135,6 +144,7 @@ export async function sendTicketTransferConfirmationEmail(params: {
   eventTitle: string;
   ticketCode: string;
 }) {
+  const resend = getResend();
   await resend.emails.send({
     from: 'TicketHub <noreply@mytickethub.co.ke>',
     to: params.toEmail,
@@ -157,6 +167,7 @@ export async function sendWaitlistConfirmationEmail(params: {
   eventTitle: string;
   ticketTypeName: string;
 }) {
+  const resend = getResend();
   await resend.emails.send({
     from: 'TicketHub <noreply@mytickethub.co.ke>',
     to: params.toEmail,
@@ -180,6 +191,7 @@ export async function sendWaitlistSpotAvailableEmail(params: {
   ticketTypeName: string;
   checkoutUrl: string;
 }) {
+  const resend = getResend();
   await resend.emails.send({
     from: 'TicketHub <noreply@mytickethub.co.ke>',
     to: params.toEmail,
@@ -205,6 +217,7 @@ export async function sendEventReminderEmail(params: {
   startAt: string;
   quantity: number;
 }) {
+  const resend = getResend();
   await resend.emails.send({
     from: 'TicketHub <noreply@mytickethub.co.ke>',
     to: params.toEmail,
@@ -230,6 +243,7 @@ export async function sendEventApprovedEmail(params: {
   eventTitle: string;
   eventUrl: string;
 }) {
+  const resend = getResend();
   await resend.emails.send({
     from: 'TicketHub <noreply@mytickethub.co.ke>',
     to: params.toEmail,
@@ -252,6 +266,7 @@ export async function sendEventRejectedEmail(params: {
   eventTitle: string;
   reason?: string;
 }) {
+  const resend = getResend();
   await resend.emails.send({
     from: 'TicketHub <noreply@mytickethub.co.ke>',
     to: params.toEmail,
@@ -268,4 +283,3 @@ export async function sendEventRejectedEmail(params: {
     `,
   });
 }
-
