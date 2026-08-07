@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { sendEventReminderEmail } from '@/lib/email';
+import { sendEventReminderSms } from '@/lib/sms';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -18,7 +19,7 @@ export async function GET(req: NextRequest) {
   const windowEnd = new Date(Date.now() + 30 * 60 * 60 * 1000).toISOString();
 
   const orders = await sql`
-    SELECT o.id, o.buyer_name, o.buyer_email, o.quantity,
+    SELECT o.id, o.buyer_name, o.buyer_email, o.buyer_phone, o.quantity,
            e.title AS event_title, e.venue_name, e.start_at
     FROM orders o
     JOIN events e ON e.id = o.event_id
@@ -46,6 +47,19 @@ export async function GET(req: NextRequest) {
     } catch (err) {
       console.error('Failed to send reminder for order', order.id, err);
       failed++;
+    }
+
+    if (order.buyer_phone) {
+      try {
+        await sendEventReminderSms({
+          toPhone: order.buyer_phone,
+          eventTitle: order.event_title,
+          venueName: order.venue_name,
+          startAt: order.start_at,
+        });
+      } catch (smsErr) {
+        console.error('Failed to send reminder SMS for order', order.id, smsErr);
+      }
     }
   }
 

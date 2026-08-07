@@ -1,10 +1,11 @@
-﻿import { sql } from '@/lib/db';
+import { sql } from '@/lib/db';
 import { nanoid } from 'nanoid';
 import { sendTicketEmail } from '@/lib/email';
+import { sendTicketConfirmationSms } from '@/lib/sms';
 
 /**
  * Marks an order as paid, generates real ticket rows, and emails the buyer.
- * Safe to call more than once for the same order â€” if tickets already exist,
+ * Safe to call more than once for the same order — if tickets already exist,
  * returns those codes instead of generating duplicates.
  *
  * Inventory (quantity_sold) is reserved atomically when the order is created
@@ -13,13 +14,13 @@ import { sendTicketEmail } from '@/lib/email';
  */
 export async function finalizePaidOrder(orderId: string, baseUrl: string): Promise<string[]> {
   const [order] = await sql`
-    SELECT id, payment_status, ticket_type_id, quantity, buyer_name, buyer_email, event_id, promo_code_id
+    SELECT id, payment_status, ticket_type_id, quantity, buyer_name, buyer_email, buyer_phone, event_id, promo_code_id
     FROM orders WHERE id = ${orderId}
   `;
 
   if (!order) return [];
 
-  // Already finalized with tickets â€” return existing codes (idempotent).
+  // Already finalized with tickets — return existing codes (idempotent).
   const existing = await sql`SELECT ticket_code FROM tickets WHERE order_id = ${order.id}`;
   if (existing.length > 0) {
     if (order.payment_status !== 'paid') {
@@ -47,7 +48,7 @@ export async function finalizePaidOrder(orderId: string, baseUrl: string): Promi
     generatedCodes.push(ticketCode);
   }
 
-  // quantity_sold is reserved atomically at order creation â€” do not increment here.
+  // quantity_sold is reserved atomically at order creation — do not increment here.
 
   const [eventDetails] = await sql`
     SELECT title, venue_name, start_at FROM events WHERE id = ${order.event_id}
@@ -66,6 +67,19 @@ export async function finalizePaidOrder(orderId: string, baseUrl: string): Promi
       });
     } catch (emailErr) {
       console.error('Failed to send ticket email:', emailErr);
+    }
+
+    if (order.buyer_phone) {
+      try {
+        await sendTicketConfirmationSms({
+          toPhone: order.buyer_phone,
+          eventTitle: eventDetails.title,
+          quantity: order.quantity,
+          ticketCodes: generatedCodes,
+        });
+      } catch (smsErr) {
+        console.error('Failed to send ticket confirmation SMS:', smsErr);
+      }
     }
   }
 
