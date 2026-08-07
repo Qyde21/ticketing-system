@@ -1,4 +1,5 @@
 import { sql } from '@/lib/db';
+import { getSession } from '@/lib/auth';
 import Link from 'next/link';
 import ApproveButton from './ApproveButton';
 import AdminEventActions from '../events/AdminEventActions';
@@ -7,6 +8,12 @@ import EventApprovalActions from './EventApprovalActions';
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboard() {
+  const session = await getSession();
+
+  if (!session || session.role !== 'admin') {
+    return <div className="max-w-6xl mx-auto px-4 py-8 text-white">Unauthorized access.</div>;
+  }
+
   const [stats] = await sql`
     SELECT
       (SELECT COUNT(*) FROM users) AS total_users,

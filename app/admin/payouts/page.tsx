@@ -1,8 +1,15 @@
-﻿import { sql } from '@/lib/db';
+import { sql } from '@/lib/db';
+import { getSession } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminPayoutsPage() {
+  const session = await getSession();
+
+  if (!session || session.role !== 'admin') {
+    return <div className="max-w-6xl mx-auto px-4 py-8 text-white">Unauthorized access.</div>;
+  }
+
   const events = await sql`
     SELECT
       e.id, e.title, e.status, e.start_at,
@@ -73,7 +80,7 @@ export default async function AdminPayoutsPage() {
               <div>
                 <strong style={{ color: '#fff' }}>{org.business_name}</strong>
                 {org.role === 'admin' && <span style={{ marginLeft: 8, fontSize: 11, background: '#fbbf24', color: '#000', padding: '2px 6px', borderRadius: 99, fontWeight: 700 }}>ADMIN</span>}
-                <div style={{ fontSize: 13, color: '#9ca3af', marginTop: 2 }}>{org.full_name} — {org.email}</div>
+                <div style={{ fontSize: 13, color: '#9ca3af', marginTop: 2 }}>{org.full_name} � {org.email}</div>
               </div>
               <div style={{ textAlign: 'right' }}>
                 <div style={{ fontSize: 16, fontWeight: 700, color: '#4ade80' }}>KES {orgNet.toLocaleString(undefined, { maximumFractionDigits: 0 })} net</div>
@@ -92,7 +99,7 @@ export default async function AdminPayoutsPage() {
                   <div>
                     <div style={{ fontSize: 14, fontWeight: 600, color: '#fff' }}>{e.title}</div>
                     <div style={{ fontSize: 12, color: '#9ca3af' }}>
-                      {new Date(e.start_at).toLocaleDateString()} · {e.status} · {e.paid_orders} paid · {e.refunded_orders} refunded
+                      {new Date(e.start_at).toLocaleDateString()} � {e.status} � {e.paid_orders} paid � {e.refunded_orders} refunded
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
