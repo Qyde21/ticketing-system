@@ -1,4 +1,4 @@
-﻿import type { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import Navbar from './components/Navbar';
@@ -15,8 +15,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://www.mytickethub.co.ke'),
   title: 'TicketHub — Events & Tickets in Kenya',
   description: 'Buy tickets for concerts, festivals and live events in Kenya. Pay via M-Pesa or card.',
+  openGraph: {
+    title: 'TicketHub — Events & Tickets in Kenya',
+    description: 'Buy tickets for concerts, festivals and live events in Kenya. Pay via M-Pesa or card.',
+    siteName: 'TicketHub',
+    locale: 'en_KE',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'TicketHub — Events & Tickets in Kenya',
+    description: 'Buy tickets for concerts, festivals and live events in Kenya. Pay via M-Pesa or card.',
+  },
 };
 
 const WA_HREF = 'https://wa.me/254114525941?text=Hi%20TicketHub%2C%20I%20need%20help%20with%20my%20ticket.';

@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 import { sql } from '@/lib/db';
 
-const BASE_URL = 'https://ticketing-system-phi-eight.vercel.app';
+const BASE_URL = 'https://www.mytickethub.co.ke';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [

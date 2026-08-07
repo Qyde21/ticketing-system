@@ -1,4 +1,4 @@
-﻿import { MetadataRoute } from 'next';
+import { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/admin/', '/organizer/', '/scan/', '/api/'],
     },
-    sitemap: 'https://ticketing-system-phi-eight.vercel.app/sitemap.xml',
+    sitemap: 'https://www.mytickethub.co.ke/sitemap.xml',
   };
 }
