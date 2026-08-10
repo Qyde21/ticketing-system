@@ -67,7 +67,7 @@ export default async function AdminDashboard() {
   `;
 
   const events = await sql`
-    SELECT e.id, e.title, e.slug, e.status, e.created_at, e.start_at, e.end_at
+    SELECT e.id, e.title, e.slug, e.status, e.created_at, e.start_at, e.end_at, e.start_at, e.end_at
     FROM events e
     ORDER BY e.created_at DESC
   `;
@@ -276,7 +276,7 @@ export default async function AdminDashboard() {
                         : 'bg-gray-800 text-gray-400 border border-gray-700'
                       }`}>
                         {ev.status === 'pending_review' ? 'Pending Review' : (ev.status || 'Draft')}
-                        {ev.status !== 'cancelled' && (ev.end_at ? new Date(ev.end_at) : new Date(ev.start_at)) < new Date() ? ' · Ended' : (ev.status === 'published' ? ' · Active' : '')}
+                        {ev.status !== 'cancelled' && (ev.end_at ? new Date(ev.end_at) : new Date(ev.start_at)) < new Date() ? '' : (ev.status === 'published' ? '' : '')}
                       </span>
                     </div>
                     <p className="text-xs text-gray-400 mt-1">Created: {ev.created_at ? new Date(ev.created_at).toLocaleDateString() : 'N/A'}</p>
