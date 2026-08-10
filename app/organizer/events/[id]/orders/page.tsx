@@ -55,12 +55,20 @@ export default async function EventOrdersPage({ params }: { params: Promise<{ id
           <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Orders for {event.title}</h1>
           <p className="text-gray-400 text-sm mt-1">Review ticket purchases, customer details, and process refunds</p>
         </div>
-        <Link
-          href="/organizer/dashboard"
-          className="bg-gray-800 hover:bg-gray-700 text-indigo-300 font-semibold px-4 py-2 rounded-lg border border-gray-700 transition shadow"
-        >
-          &larr; Back
-        </Link>
+        <div className="flex gap-3">
+          <a
+            href={`/api/events/${event.id}/orders/export`}
+            className="bg-emerald-700 hover:bg-emerald-600 text-white font-semibold px-4 py-2 rounded-lg transition shadow text-sm flex items-center"
+          >
+            ⬇ Export CSV
+          </a>
+          <Link
+            href="/organizer/dashboard"
+            className="bg-gray-800 hover:bg-gray-700 text-indigo-300 font-semibold px-4 py-2 rounded-lg border border-gray-700 transition shadow"
+          >
+            &larr; Back
+          </Link>
+        </div>
       </div>
 
       {orders.length === 0 ? (

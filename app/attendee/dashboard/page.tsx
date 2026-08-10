@@ -93,7 +93,9 @@ export default async function AttendeeDashboard() {
                         <Link href={'/tickets/' + t.code} className="text-indigo-400 hover:text-cyan-400 font-semibold text-sm flex-1">
                           View Ticket
                         </Link>
-                        <ShareTicket code={t.code} eventTitle={o.title} />
+                        {t.status === 'valid' && !eventEnded && (
+                          <ShareTicket code={t.code} eventTitle={o.title} />
+                        )}
                         {t.status === 'valid' && !eventEnded && (
                           <TransferTicketButton code={t.code} />
                         )}
