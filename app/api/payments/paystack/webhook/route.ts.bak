@@ -21,22 +21,21 @@ export async function POST(req: NextRequest) {
   if (event.event === 'charge.success') {
     const reference = event.data.reference;
 
-    const orders = await sql`
+    const [order] = await sql`
       SELECT id, payment_status, total_amount_kes
       FROM orders WHERE paystack_reference = ${reference}
     `;
 
-    if (orders.length > 0) {
+    if (order) {
       const paidAmountKes = event.data.amount / 100;
-      const expectedTotal = orders.reduce((s: number, o: any) => s + Number(o.total_amount_kes), 0);
-      if (Math.abs(paidAmountKes - expectedTotal) > 0.01) {
-        console.error('Amount mismatch for reference', reference, { paidAmountKes, expectedTotal });
+      if (Math.abs(paidAmountKes - Number(order.total_amount_kes)) > 0.01) {
+        console.error('Amount mismatch for order', order.id);
         return NextResponse.json({ received: true });
       }
 
-      for (const order of orders) {
-        await finalizePaidOrder(order.id, req.nextUrl.origin);
-      }
+      // Idempotent: creates tickets if missing, even when status was already 'paid'
+      // (e.g. legacy verify path that only flipped the flag).
+      await finalizePaidOrder(order.id, req.nextUrl.origin);
     }
   }
 
