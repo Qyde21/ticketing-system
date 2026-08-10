@@ -1,4 +1,4 @@
-﻿import { sql } from '@/lib/db';
+import { sql } from '@/lib/db';
 import QRCode from 'qrcode';
 import TicketQRReveal from '@/components/TicketQRReveal';
 import AddToCalendarButton from '@/components/AddToCalendarButton';
@@ -23,6 +23,9 @@ export default async function TicketPage({ params }: { params: Promise<{ code: s
 
   const qrDataUrl = await QRCode.toDataURL(String(ticket.ticket_code));
   const isUsed = ticket.status === 'used';
+  const eventEnd = ticket.end_at ? new Date(ticket.end_at) : new Date(ticket.start_at);
+  const eventEnded = eventEnd < new Date();
+  const isExpired = !isUsed && ticket.status === 'valid' && eventEnded;
 
   return (
     <div style={{ maxWidth: 400, margin: '2rem auto', textAlign: 'center', color: '#fff', padding: '0 16px' }}>
@@ -42,6 +45,13 @@ export default async function TicketPage({ params }: { params: Promise<{ code: s
             </div>
           )}
         </div>
+      ) : isExpired ? (
+        <div style={{ margin: '24px auto', padding: 16, borderRadius: 12, background: '#374151', border: '1px solid #4b5563', color: '#d1d5db', fontWeight: 700 }}>
+          Event ended — ticket no longer valid
+          <div style={{ fontWeight: 400, fontSize: 13, marginTop: 6 }}>
+            Check-in closed after the event ended.
+          </div>
+        </div>
       ) : (
         <div style={{ margin: '20px 0' }}>
           <TicketQRReveal qrDataUrl={qrDataUrl} ticketCode={String(ticket.ticket_code)} />
@@ -49,7 +59,10 @@ export default async function TicketPage({ params }: { params: Promise<{ code: s
       )}
 
       <p style={{ color: '#6b7280', fontSize: 13 }}>
-        Status: <strong style={{ color: isUsed ? '#f87171' : '#34d399' }}>{ticket.status}</strong>
+        Status:{' '}
+        <strong style={{ color: isUsed || isExpired ? '#f87171' : '#34d399' }}>
+          {isExpired ? 'expired' : ticket.status}
+        </strong>
       </p>
 
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12 }}>

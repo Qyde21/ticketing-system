@@ -113,6 +113,11 @@ export default async function OrganizerDashboardPage() {
                       }`}>
                         {event.status === 'pending_review' ? 'Pending Review' : event.status}
                       </span>
+                      {event.status !== 'cancelled' && (event.end_at ? new Date(event.end_at) : new Date(event.start_at)) < new Date() && (
+                        <span className="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider bg-gray-800 text-gray-300 border border-gray-600">
+                          Ended
+                        </span>
+                      )}
                     </div>
                     <p className="text-xs text-gray-500 mt-1">Created: {new Date(event.created_at).toLocaleDateString()}</p>
                   </div>

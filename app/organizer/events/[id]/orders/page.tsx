@@ -1,4 +1,4 @@
-﻿import { sql } from '@/lib/db';
+import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import Link from 'next/link';
 import RefundButton from './RefundButton';
@@ -17,7 +17,7 @@ export default async function EventOrdersPage({ params }: { params: Promise<{ id
   // Fetch event details (match by UUID, slug, or title for consistency with admin view)
   const decodedId = decodeURIComponent(id);
   const events = await sql`
-    SELECT id, title, organizer_id FROM events
+    SELECT id, title, organizer_id, start_at, end_at FROM events
     WHERE id::text = ${decodedId} OR slug = ${decodedId.toLowerCase()} OR title ILIKE ${decodedId}
   `;
 
@@ -34,6 +34,7 @@ export default async function EventOrdersPage({ params }: { params: Promise<{ id
   }
 
   const event = events[0];
+  const eventEnded = (event.end_at ? new Date(event.end_at) : new Date(event.start_at)) < new Date();
 
   if (event.organizer_id !== session.userId && session.role !== 'admin') {
     return <div className="max-w-6xl mx-auto px-4 py-8 text-white">Not authorized for this event.</div>;
@@ -107,7 +108,7 @@ export default async function EventOrdersPage({ params }: { params: Promise<{ id
                   <span className="text-lg font-bold text-indigo-300">KES {Number(order.total_amount_kes).toLocaleString()}</span>
                 </div>
 
-                {order.payment_status !== 'refunded' && (
+                {order.payment_status !== 'refunded' && !eventEnded && (
                   <RefundButton orderId={order.id} />
                 )}
               </div>

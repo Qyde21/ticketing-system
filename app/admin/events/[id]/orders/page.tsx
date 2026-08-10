@@ -1,4 +1,4 @@
-﻿import { sql } from '@/lib/db';
+import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import Link from 'next/link';
 import RefundButton from './RefundButton';
@@ -34,6 +34,7 @@ export default async function EventOrdersPage({ params }: { params: Promise<{ id
   }
 
   const event = events[0];
+  const eventEnded = (event.end_at ? new Date(event.end_at) : new Date(event.start_at)) < new Date();
 
   // Fetch orders using the correct event UUID
   const orders = await sql`
@@ -101,7 +102,7 @@ export default async function EventOrdersPage({ params }: { params: Promise<{ id
                   <span className="text-lg font-bold text-indigo-300">KES {Number(order.total_amount_kes).toLocaleString()}</span>
                 </div>
 
-                {order.payment_status !== 'refunded' && (
+                {order.payment_status !== 'refunded' && !eventEnded && (
                   <RefundButton orderId={order.id} />
                 )}
               </div>
