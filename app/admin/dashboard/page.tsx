@@ -67,7 +67,7 @@ export default async function AdminDashboard() {
   `;
 
   const events = await sql`
-    SELECT e.id, e.title, e.slug, e.status, e.created_at
+    SELECT e.id, e.title, e.slug, e.status, e.created_at, e.start_at, e.end_at
     FROM events e
     ORDER BY e.created_at DESC
   `;
