@@ -1,7 +1,8 @@
-﻿import { sql } from '@/lib/db';
+import { sql } from '@/lib/db';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import JoinWaitlistButton from '@/components/JoinWaitlistButton';
+import FlashSaleCountdown from '@/components/FlashSaleCountdown';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,7 +37,9 @@ export default async function EventDetailPage({
   }
 
   const ticketTypes = await sql`
-    SELECT id, name, price_kes, quantity_total, quantity_sold
+    SELECT id, name, price_kes, quantity_total, quantity_sold,
+           flash_sale_price_kes, flash_sale_starts_at, flash_sale_ends_at,
+           flash_sale_quantity_cap, flash_sale_quantity_sold
     FROM ticket_types
     WHERE event_id = ${event.id}
     ORDER BY price_kes ASC
@@ -144,12 +147,37 @@ export default async function EventDetailPage({
             const soldOut = remaining <= 0;
             const percentSold = total > 0 ? Math.floor((Number(t.quantity_sold || 0) / total) * 100) : 0;
             const almostSoldOut = total > 0 && !soldOut && percentSold >= 90;
+
+            const now = new Date();
+            const flashCapReached = t.flash_sale_quantity_cap !== null && t.flash_sale_quantity_cap !== undefined
+              && Number(t.flash_sale_quantity_sold || 0) >= Number(t.flash_sale_quantity_cap);
+            const flashActive = t.flash_sale_price_kes !== null && t.flash_sale_price_kes !== undefined
+              && t.flash_sale_starts_at && t.flash_sale_ends_at
+              && now >= new Date(t.flash_sale_starts_at) && now <= new Date(t.flash_sale_ends_at)
+              && !flashCapReached;
+
             return (
               <div key={t.id} className="flex items-center justify-between bg-gray-900 border border-gray-800 p-4 rounded-xl">
                 <div>
-                  <p className="font-bold text-white">{t.name}</p>
+                  <p className="font-bold text-white flex items-center gap-2">
+                    {t.name}
+                    {flashActive && (
+                      <span className="text-[10px] uppercase tracking-wider font-extrabold bg-amber-500 text-black px-2 py-0.5 rounded-full">
+                        Flash Sale
+                      </span>
+                    )}
+                  </p>
                   <p className="text-xs text-gray-400">
-                    KES {Number(t.price_kes).toLocaleString()}
+                    {flashActive ? (
+                      <>
+                        <span className="line-through text-gray-500 mr-1.5">KES {Number(t.price_kes).toLocaleString()}</span>
+                        <span className="text-amber-400 font-bold">KES {Number(t.flash_sale_price_kes).toLocaleString()}</span>
+                        {' '}
+                        <FlashSaleCountdown endsAt={t.flash_sale_ends_at} />
+                      </>
+                    ) : (
+                      <>KES {Number(t.price_kes).toLocaleString()}</>
+                    )}
                     {soldOut && <span> &middot; Sold out</span>}
                     {almostSoldOut && (
                       <span className="text-amber-400 font-bold"> &middot; Almost sold out!</span>

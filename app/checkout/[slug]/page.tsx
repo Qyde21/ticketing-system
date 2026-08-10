@@ -42,7 +42,16 @@ export default async function CheckoutPage({ params }: { params: Promise<{ slug:
     notFound();
   }
 
-  const priceNum = parseFloat(ticketType.price_kes || 0);
+  const now = new Date();
+  const flashCapReached = ticketType.flash_sale_quantity_cap !== null && ticketType.flash_sale_quantity_cap !== undefined
+    && Number(ticketType.flash_sale_quantity_sold || 0) >= Number(ticketType.flash_sale_quantity_cap);
+  const flashActive = ticketType.flash_sale_price_kes !== null && ticketType.flash_sale_price_kes !== undefined
+    && ticketType.flash_sale_starts_at && ticketType.flash_sale_ends_at
+    && now >= new Date(ticketType.flash_sale_starts_at) && now <= new Date(ticketType.flash_sale_ends_at)
+    && !flashCapReached;
+  const effectivePriceKes = flashActive ? ticketType.flash_sale_price_kes : ticketType.price_kes;
+
+  const priceNum = parseFloat(effectivePriceKes || 0);
   const total = ticketType.quantity_total ?? 0;
   const sold = ticketType.quantity_sold ?? 0;
   const remaining = Math.max(0, total - sold);
@@ -55,8 +64,8 @@ export default async function CheckoutPage({ params }: { params: Promise<{ slug:
   const ticketTypesForForm = [
     {
       id: ticketType.id,
-      name: ticketType.name,
-      price_kes: ticketType.price_kes,
+      name: flashActive ? `${ticketType.name} (Flash Sale)` : ticketType.name,
+      price_kes: effectivePriceKes,
     },
   ];
 
@@ -64,7 +73,7 @@ export default async function CheckoutPage({ params }: { params: Promise<{ slug:
     <main className="max-w-2xl mx-auto px-4 py-12 text-white">
       <div className="mb-6">
         <Link href={`/events`} className="text-indigo-400 hover:underline text-sm font-semibold">
-          ← Back to Events
+          â† Back to Events
         </Link>
       </div>
 

@@ -19,7 +19,7 @@ export default async function OrganizerDashboardPage() {
     : await sql`SELECT * FROM events WHERE organizer_id = ${session.userId} ORDER BY created_at DESC`;
 
   // Organizers must be approved by an admin before they can create events,
-  // and a suspension should immediately block creation too — checked live
+  // and a suspension should immediately block creation too â€” checked live
   // from the DB rather than trusting the session cookie's role/state alone.
   let isVerifiedOrganizer = true;
   let isSuspended = false;
@@ -46,7 +46,7 @@ export default async function OrganizerDashboardPage() {
             className="bg-red-950/60 border border-red-800 text-red-300 font-medium px-4 py-2 rounded-lg text-sm"
             title="Your account has been suspended"
           >
-            ⛔ Account suspended
+            â›” Account suspended
           </span>
         ) : isVerifiedOrganizer ? (
           <Link
@@ -60,7 +60,7 @@ export default async function OrganizerDashboardPage() {
             className="bg-amber-950/60 border border-amber-700 text-amber-300 font-medium px-4 py-2 rounded-lg text-sm"
             title="An admin needs to approve your organizer account before you can create events"
           >
-            ⏳ Pending admin approval
+            â³ Pending admin approval
           </span>
         )}
       </div>
@@ -73,7 +73,7 @@ export default async function OrganizerDashboardPage() {
 
       {!isSuspended && !isVerifiedOrganizer && (
         <div className="mb-8 p-4 bg-amber-950/40 border border-amber-800 rounded-lg text-amber-200 text-sm">
-          Your organizer account is awaiting approval from a TicketHub admin. Once approved, you&apos;ll be able to create and publish events. This usually doesn&apos;t take long — check back soon.
+          Your organizer account is awaiting approval from a TicketHub admin. Once approved, you&apos;ll be able to create and publish events. This usually doesn&apos;t take long â€” check back soon.
         </div>
       )}
 
@@ -124,13 +124,15 @@ export default async function OrganizerDashboardPage() {
                     </div>
                     <div>
                       <span className="text-xs text-gray-400 block">Tickets Sold</span>
-                      <span className="text-lg font-extrabold text-emerald-400">{totalTicketsSold} / {totalInventory || '�'}</span>
+                      <span className="text-lg font-extrabold text-emerald-400">{totalTicketsSold} / {totalInventory || 'ï¿½'}</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-indigo-400 pt-1">
                   <Link href={`/organizer/events/${event.id}/orders`} className="hover:underline text-cyan-300 bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Orders</Link>
+                  <Link href={`/organizer/events/${event.id}/analytics`} className="hover:underline text-cyan-300 bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Analytics</Link>
+                  <Link href={`/organizer/events/${event.id}/flash-sales`} className="hover:underline text-amber-300 bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Flash Sales</Link>
                   <Link href={`/organizer/events/${event.id}/edit`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Manage Details</Link>
                   <Link href={`/organizer/events/${event.id}/messages`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Messages</Link>
                   <Link href={`/organizer/events/${event.id}/scan-overview`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Scan Overview</Link>
