@@ -83,16 +83,33 @@ export default async function AdminEventsPage({ searchParams }: { searchParams: 
           {events.map((ev: any) => (
             <div key={ev.id} className="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-xl flex flex-col justify-between space-y-4">
               <div>
-                <div className="flex justify-between items-start mb-2">
+                                <div className="flex justify-between items-start mb-2">
                   <h3 className="text-lg font-bold text-white line-clamp-1">{ev.title}</h3>
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                    ev.status === 'published' ? 'bg-green-950 text-green-400 border border-green-800'
-                    : ev.status === 'pending_review' ? 'bg-amber-950 text-amber-400 border border-amber-800'
-                    : ev.status === 'cancelled' ? 'bg-red-950 text-red-400 border border-red-800'
-                    : 'bg-gray-800 text-gray-400 border border-gray-700'
-                  }`}>
-                    {ev.status === 'pending_review' ? 'Pending Review' : (ev.status || 'draft')}
-                  </span>
+                  {(() => {
+                    const eventEnded =
+                      ev.status !== 'cancelled' &&
+                      (ev.end_at ? new Date(ev.end_at) : new Date(ev.start_at)) < new Date();
+                    const isCompleted = ev.status === 'completed' || eventEnded;
+                    const displayStatus = isCompleted
+                      ? 'Completed'
+                      : ev.status === 'pending_review'
+                        ? 'Pending Review'
+                        : (ev.status || 'draft');
+                    const badgeClass = isCompleted
+                      ? 'bg-gray-800 text-gray-300 border border-gray-600'
+                      : ev.status === 'published'
+                        ? 'bg-green-950 text-green-400 border border-green-800'
+                        : ev.status === 'pending_review'
+                          ? 'bg-amber-950 text-amber-400 border border-amber-800'
+                          : ev.status === 'cancelled'
+                            ? 'bg-red-950 text-red-400 border border-red-800'
+                            : 'bg-gray-800 text-gray-400 border border-gray-700';
+                    return (
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${badgeClass}`}>
+                        {displayStatus}
+                      </span>
+                    );
+                  })()}
                 </div>
                 <p className="text-xs text-indigo-300 mb-2">Organizer: {ev.organizer_name || ev.organizer_email || 'Unknown'}</p>
                 <p className="text-xs text-gray-400 line-clamp-2">{ev.description}</p>

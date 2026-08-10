@@ -105,19 +105,29 @@ export default async function OrganizerDashboardPage() {
                   <div>
                     <div className="flex items-center gap-3">
                       <h2 className="text-xl font-bold text-white">{event.title}</h2>
-                      <span className={`px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider ${
-                        event.status === 'published' ? 'bg-green-950 text-green-400 border border-green-800'
-                        : event.status === 'pending_review' ? 'bg-amber-950 text-amber-400 border border-amber-800'
-                        : event.status === 'cancelled' ? 'bg-red-950 text-red-400 border border-red-800'
-                        : 'bg-gray-800 text-gray-400'
-                      }`}>
-                        {event.status === 'pending_review' ? 'Pending Review' : event.status}
-                      </span>
-                      {event.status !== 'cancelled' && (event.end_at ? new Date(event.end_at) : new Date(event.start_at)) < new Date() && (
-                        <span className="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider bg-gray-800 text-gray-300 border border-gray-600">
-                          Ended
-                        </span>
-                      )}
+                      {(() => {
+                        const eventEnded =
+                          event.status !== 'cancelled' &&
+                          (event.end_at ? new Date(event.end_at) : new Date(event.start_at)) < new Date();
+                        const isCompleted = event.status === 'completed' || eventEnded;
+                        if (isCompleted) {
+                          return (
+                            <span className="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider bg-gray-800 text-gray-300 border border-gray-600">
+                              Completed
+                            </span>
+                          );
+                        }
+                        return (
+                          <span className={`px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider ${
+                            event.status === 'published' ? 'bg-green-950 text-green-400 border border-green-800'
+                            : event.status === 'pending_review' ? 'bg-amber-950 text-amber-400 border border-amber-800'
+                            : event.status === 'cancelled' ? 'bg-red-950 text-red-400 border border-red-800'
+                            : 'bg-gray-800 text-gray-400'
+                          }`}>
+                            {event.status === 'pending_review' ? 'Pending Review' : event.status}
+                          </span>
+                        );
+                      })()}
                     </div>
                     <p className="text-xs text-gray-500 mt-1">Created: {new Date(event.created_at).toLocaleDateString()}</p>
                   </div>

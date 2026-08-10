@@ -267,17 +267,33 @@ export default async function AdminDashboard() {
               <div key={ev.id} className="bg-gray-950 p-5 rounded-lg border border-gray-800">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4 pb-3 border-b border-gray-800">
                   <div>
-                    <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-3">
                       <h3 className="text-lg font-bold text-white">{ev.title}</h3>
-                      <span className={`text-[10px] px-2 py-0.5 rounded uppercase font-bold tracking-wider ${
-                        ev.status === 'published' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
-                        : ev.status === 'pending_review' ? 'bg-amber-950 text-amber-400 border border-amber-800'
-                        : ev.status === 'cancelled' ? 'bg-red-950 text-red-400 border border-red-800'
-                        : 'bg-gray-800 text-gray-400 border border-gray-700'
-                      }`}>
-                        {ev.status === 'pending_review' ? 'Pending Review' : (ev.status || 'Draft')}
-                        {ev.status !== 'cancelled' && (ev.end_at ? new Date(ev.end_at) : new Date(ev.start_at)) < new Date() ? '' : (ev.status === 'published' ? '' : '')}
-                      </span>
+                      {(() => {
+                        const eventEnded =
+                          ev.status !== 'cancelled' &&
+                          (ev.end_at ? new Date(ev.end_at) : new Date(ev.start_at)) < new Date();
+                        const isCompleted = ev.status === 'completed' || eventEnded;
+                        const displayStatus = isCompleted
+                          ? 'Completed'
+                          : ev.status === 'pending_review'
+                            ? 'Pending Review'
+                            : (ev.status || 'Draft');
+                        const badgeClass = isCompleted
+                          ? 'bg-gray-800 text-gray-300 border border-gray-600'
+                          : ev.status === 'published'
+                            ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
+                            : ev.status === 'pending_review'
+                              ? 'bg-amber-950 text-amber-400 border border-amber-800'
+                              : ev.status === 'cancelled'
+                                ? 'bg-red-950 text-red-400 border border-red-800'
+                                : 'bg-gray-800 text-gray-400 border border-gray-700';
+                        return (
+                          <span className={`text-[10px] px-2 py-0.5 rounded uppercase font-bold tracking-wider ${badgeClass}`}>
+                            {displayStatus}
+                          </span>
+                        );
+                      })()}
                     </div>
                     <p className="text-xs text-gray-400 mt-1">Created: {ev.created_at ? new Date(ev.created_at).toLocaleDateString() : 'N/A'}</p>
                   </div>
