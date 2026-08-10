@@ -78,34 +78,36 @@ export default async function EventDetailPage({
       </h1>
       <p className="text-gray-300 text-lg mb-6 leading-relaxed">{event.description}</p>
 
-      <div className="flex gap-2 mb-8 flex-wrap">
-        <a
-          href={whatsappShareUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 text-white text-xs font-semibold px-3 py-2 rounded-lg transition"
-          style={{ background: '#25D366' }}
-        >
-          Share on WhatsApp
-        </a>
-        <a
-          href={twitterShareUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 bg-gray-800 hover:bg-gray-700 text-white text-xs font-semibold px-3 py-2 rounded-lg transition"
-        >
-          Share on X
-        </a>
-        <a
-          href={facebookShareUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 text-white text-xs font-semibold px-3 py-2 rounded-lg transition"
-          style={{ background: '#1877F2' }}
-        >
-          Share on Facebook
-        </a>
-      </div>
+      {!isCancelled && !isEnded && (
+        <div className="flex gap-2 mb-8 flex-wrap">
+          <a
+            href={whatsappShareUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-white text-xs font-semibold px-3 py-2 rounded-lg transition"
+            style={{ background: '#25D366' }}
+          >
+            Share on WhatsApp
+          </a>
+          <a
+            href={twitterShareUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 bg-gray-800 hover:bg-gray-700 text-white text-xs font-semibold px-3 py-2 rounded-lg transition"
+          >
+            Share on X
+          </a>
+          <a
+            href={facebookShareUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-white text-xs font-semibold px-3 py-2 rounded-lg transition"
+            style={{ background: '#1877F2' }}
+          >
+            Share on Facebook
+          </a>
+        </div>
+      )}
 
       {isCancelled && (
         <div className="bg-red-950/40 border border-red-800/60 text-red-300 font-semibold px-4 py-3 rounded-xl mb-6">
