@@ -65,14 +65,16 @@ export default async function TicketPage({ params }: { params: Promise<{ code: s
         </strong>
       </p>
 
-      <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12 }}>
-        <AddToCalendarButton
-          title={ticket.event_title}
-          location={ticket.venue_name}
-          startAt={ticket.start_at}
-          endAt={ticket.end_at}
-        />
-      </div>
+      {!eventEnded && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12 }}>
+          <AddToCalendarButton
+            title={ticket.event_title}
+            location={ticket.venue_name}
+            startAt={ticket.start_at}
+            endAt={ticket.end_at}
+          />
+        </div>
+      )}
     </div>
   );
 }
