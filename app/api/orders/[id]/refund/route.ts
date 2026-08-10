@@ -16,7 +16,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const [order] = await sql`
     SELECT o.id, o.payment_status, o.paystack_reference, o.buyer_name, o.buyer_email,
            o.ticket_type_id, o.quantity,
-           e.title AS event_title, e.organizer_id
+           e.title AS event_title, e.organizer_id, e.start_at, e.end_at
     FROM orders o
     JOIN events e ON e.id = o.event_id
     WHERE o.id = ${id}
