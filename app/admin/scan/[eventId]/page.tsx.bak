@@ -15,17 +15,12 @@ export default async function AdminScanPage({ params }: { params: Promise<{ even
   const { eventId } = await params;
 
   const [event] = await sql`
-    SELECT id, title, venue_name, start_at, end_at, status FROM events WHERE id = ${eventId}
+    SELECT id, title, venue_name, start_at FROM events WHERE id = ${eventId}
   `;
 
   if (!event) {
     return <div className="max-w-2xl mx-auto py-12 px-4 text-white">Event not found.</div>;
   }
-
-  const eventEnded =
-    event.status === 'completed' ||
-    (event.status !== 'cancelled' &&
-      (event.end_at ? new Date(event.end_at) : new Date(event.start_at)) < new Date());
 
   const tickets = await sql`
     SELECT t.ticket_code, t.status, t.holder_name, t.checked_in_at,
@@ -46,16 +41,7 @@ export default async function AdminScanPage({ params }: { params: Promise<{ even
     <div className="max-w-2xl mx-auto py-10 px-4 text-white">
       <Link href="/admin/events" className="text-sm text-indigo-400 hover:underline">Back to events</Link>
       <h1 className="text-2xl font-extrabold mt-2">{event.title}</h1>
-      <p className="text-gray-400 text-sm">
-        {event.venue_name} &middot; {new Date(event.start_at).toLocaleString()}
-        {eventEnded && <span className="ml-2 text-gray-500 font-semibold uppercase text-xs tracking-wider">· Completed</span>}
-      </p>
-
-      {eventEnded && (
-        <div className="mt-4 rounded-xl border border-gray-700 bg-gray-900/80 px-4 py-3 text-sm text-gray-300">
-          This event has ended. Ticket scanning is closed.
-        </div>
-      )}
+      <p className="text-gray-400 text-sm">{event.venue_name} &middot; {new Date(event.start_at).toLocaleString()}</p>
 
       <div className="flex gap-3 mt-4 flex-wrap">
         {[
@@ -78,15 +64,12 @@ export default async function AdminScanPage({ params }: { params: Promise<{ even
         {total > 0 ? Math.round((checkedIn / total) * 100) : 0}% checked in
       </p>
 
-      {eventEnded ? (
-        <span className="inline-block mt-3 bg-gray-800 text-gray-500 px-5 py-2 rounded-lg font-semibold text-sm border border-gray-700 cursor-not-allowed" title="Scanning is closed — this event has ended">
-          Open Scanner (closed)
-        </span>
-      ) : (
-        <Link href={`/scan/${eventId}`} className="inline-block mt-3 bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-lg font-semibold text-sm transition">
-          Open Scanner
-        </Link>
-      )}
+      <Link
+        href={`/scan/${eventId}`}
+        className="inline-block mt-3 bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-lg font-semibold text-sm transition"
+      >
+        Open Scanner
+      </Link>
 
       <h2 className="text-xl font-bold mt-6 mb-3">Tickets</h2>
       <ul className="list-none p-0">

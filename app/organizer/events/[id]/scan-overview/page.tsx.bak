@@ -1,4 +1,4 @@
-import { sql } from '@/lib/db';
+﻿import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -15,16 +15,10 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
   let event = null;
   try {
     if (session.role === 'admin') {
-      const results = await sql`
-        SELECT id, title, venue_name, start_at, end_at, status, organizer_id
-        FROM events WHERE id = ${eventId}
-      `;
+      const results = await sql`SELECT id, title, venue_name, start_at, organizer_id FROM events WHERE id = ${eventId}`;
       event = results[0] || null;
     } else {
-      const results = await sql`
-        SELECT id, title, venue_name, start_at, end_at, status, organizer_id
-        FROM events WHERE id = ${eventId} AND organizer_id = ${session.userId}
-      `;
+      const results = await sql`SELECT id, title, venue_name, start_at, organizer_id FROM events WHERE id = ${eventId} AND organizer_id = ${session.userId}`;
       event = results[0] || null;
     }
   } catch (e) { console.error(e); }
@@ -37,11 +31,6 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
       </div>
     );
   }
-
-  const eventEnded =
-    event.status === 'completed' ||
-    (event.status !== 'cancelled' &&
-      (event.end_at ? new Date(event.end_at) : new Date(event.start_at)) < new Date());
 
   const [counts] = await sql`
     SELECT COUNT(t.id)::int AS total,
@@ -75,11 +64,8 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
         &larr; Back
       </Link>
       <h1 className="text-2xl font-extrabold mt-2">{event.title}</h1>
-      <p className="text-gray-400 text-sm">
-        {event.venue_name || 'No Venue'} &middot; {event.start_at ? new Date(event.start_at).toLocaleString() : 'No Date'}
-        {eventEnded && <span className="ml-2 text-gray-500 font-semibold uppercase text-xs tracking-wider">· Completed</span>}
-      </p>
-      <LiveOverview eventId={eventId} initial={initial} eventEnded={eventEnded} />
+      <p className="text-gray-400 text-sm">{event.venue_name || 'No Venue'} &middot; {event.start_at ? new Date(event.start_at).toLocaleString() : 'No Date'}</p>
+      <LiveOverview eventId={eventId} initial={initial} />
     </div>
   );
 }

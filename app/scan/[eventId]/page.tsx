@@ -1,12 +1,38 @@
-﻿import { sql } from '@/lib/db';
+import { sql } from '@/lib/db';
+import Link from 'next/link';
 import Scanner from './Scanner';
 
 export const dynamic = 'force-dynamic';
 
 export default async function ScanPage({ params }: { params: Promise<{ eventId: string }> }) {
   const { eventId } = await params;
-  const [event] = await sql`SELECT id, title, venue_name, start_at FROM events WHERE id = ${eventId}`;
+  const [event] = await sql`
+    SELECT id, title, venue_name, start_at, end_at, status FROM events WHERE id = ${eventId}
+  `;
   if (!event) return <div className="max-w-md mx-auto py-12 px-4 text-white">Event not found.</div>;
+
+  const eventEnded =
+    event.status === 'completed' ||
+    (event.status !== 'cancelled' &&
+      (event.end_at ? new Date(event.end_at) : new Date(event.start_at)) < new Date());
+
+  if (eventEnded) {
+    return (
+      <div className="max-w-md mx-auto py-12 px-4 text-white">
+        <h1 className="text-xl font-extrabold mb-1">Check-in closed</h1>
+        <p className="text-gray-400 text-sm mb-4">
+          {event.title}{event.venue_name ? ` · ${event.venue_name}` : ''}
+        </p>
+        <div className="rounded-xl border border-gray-700 bg-gray-900 px-4 py-4 text-sm text-gray-300">
+          This event has ended. Ticket scanning is no longer available.
+        </div>
+        <Link href={`/organizer/events/${eventId}/scan-overview`} className="inline-block mt-4 text-indigo-400 hover:underline text-sm">
+          &larr; Back to scan overview
+        </Link>
+      </div>
+    );
+  }
+
   const [counts] = await sql`
     SELECT COUNT(t.id)::int AS total, COUNT(t.id) FILTER (WHERE t.status = 'used')::int AS checked_in
     FROM tickets t JOIN ticket_types tt ON tt.id = t.ticket_type_id WHERE tt.event_id = ${eventId}
