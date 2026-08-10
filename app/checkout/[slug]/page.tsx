@@ -72,8 +72,8 @@ export default async function CheckoutPage({ params }: { params: Promise<{ slug:
   return (
     <main className="max-w-2xl mx-auto px-4 py-12 text-white">
       <div className="mb-6">
-        <Link href={`/events`} className="text-indigo-400 hover:underline text-sm font-semibold">
-          â† Back to Events
+        <Link href={`/events/${ticketType.event_id}`} className="text-indigo-400 hover:underline text-sm font-semibold">
+          â† Back to Event
         </Link>
       </div>
 
