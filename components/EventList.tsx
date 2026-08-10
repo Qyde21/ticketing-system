@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 
@@ -58,15 +58,20 @@ export default function EventList({ events, showFilters = true }: { events: any[
             <div key={e.id} style={{ position: 'relative', background: '#121212', borderRadius: 12, overflow: 'hidden', border: '1px solid #1f1f1f', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.5)' }}>
               <div style={{ position: 'relative', height: 180, background: '#1a1a1a' }}>
                 {e.cover_image_url && <img src={e.cover_image_url} alt={e.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
-                {isCancelled ? (
-                  <div style={{ position: 'absolute', top: 10, right: 10, background: '#7f1d1d', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>CANCELLED</div>
-                ) : isPastEvent ? (
-                  <div style={{ position: 'absolute', top: 10, right: 10, background: '#4b5563', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>ENDED</div>
-                ) : isSoldOut ? (
-                  <div style={{ position: 'absolute', top: 10, right: 10, background: '#dc2626', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>SOLD OUT</div>
-                ) : isAlmostSoldOut ? (
-                  <div style={{ position: 'absolute', top: 10, right: 10, background: '#d97706', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>ALMOST SOLD OUT</div>
-                ) : null}
+                <div style={{ position: 'absolute', top: 10, right: 10, display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-end' }}>
+                  {e.has_flash_sale && !isPastEvent && !isCancelled && (
+                    <div style={{ background: 'linear-gradient(to right, #f59e0b, #ef4444)', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 800, letterSpacing: '0.03em' }}>FLASH SALE</div>
+                  )}
+                  {isCancelled ? (
+                    <div style={{ background: '#7f1d1d', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>CANCELLED</div>
+                  ) : isPastEvent ? (
+                    <div style={{ background: '#4b5563', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>ENDED</div>
+                  ) : isSoldOut ? (
+                    <div style={{ background: '#dc2626', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>SOLD OUT</div>
+                  ) : isAlmostSoldOut ? (
+                    <div style={{ background: '#d97706', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>ALMOST SOLD OUT</div>
+                  ) : null}
+                </div>
               </div>
               <div style={{ padding: 16 }}>
                 <h3 className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400 flex items-center gap-1.5" style={{ fontSize: 17, marginBottom: 8 }}>

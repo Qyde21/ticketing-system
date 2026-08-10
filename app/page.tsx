@@ -10,7 +10,18 @@ export default async function HomePage() {
       e.id, e.title, e.slug, e.venue_name, e.start_at, e.end_at, e.status, e.cover_image_url, e.category,
       COALESCE(op.is_verified, false) AS organizer_verified,
       COALESCE(SUM(tt.quantity_total), 0) as total_capacity,
-      COALESCE(SUM(tt.quantity_sold), 0) as total_sold
+      COALESCE(SUM(tt.quantity_sold), 0) as total_sold,
+      COALESCE(BOOL_OR(
+        tt.flash_sale_price_kes IS NOT NULL
+        AND tt.flash_sale_starts_at IS NOT NULL
+        AND tt.flash_sale_ends_at IS NOT NULL
+        AND now() >= tt.flash_sale_starts_at
+        AND now() <= tt.flash_sale_ends_at
+        AND (
+          tt.flash_sale_quantity_cap IS NULL
+          OR COALESCE(tt.flash_sale_quantity_sold, 0) < tt.flash_sale_quantity_cap
+        )
+      ), false) AS has_flash_sale
     FROM events e
     LEFT JOIN ticket_types tt ON tt.event_id = e.id
     LEFT JOIN organizer_profiles op ON op.user_id = e.organizer_id
@@ -22,7 +33,6 @@ export default async function HomePage() {
 
   const now = new Date();
 
-  // Classify events based on end date, start date, or completion status
   const upcomingEvents = events.filter(e => {
     if (e.status === 'completed') return false;
     const endDate = e.end_at ? new Date(e.end_at) : new Date(e.start_at);
@@ -40,12 +50,18 @@ export default async function HomePage() {
 
   return (
     <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh', color: '#fff', paddingBottom: '2rem' }}>
-      {/* Featured Banner */}
       {featuredEvent && (
         <div style={{ position: 'relative', width: '100%', height: 420, marginBottom: 32, borderBottom: '1px solid #1f1f1f' }}>
           <img src={featuredEvent.cover_image_url} alt={featuredEvent.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           <div style={{ position: 'absolute', bottom: 0, padding: '24px 32px', background: 'linear-gradient(transparent, rgba(0,0,0,0.95))', width: '100%' }}>
-            <h1 className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400" style={{ margin: 0, fontSize: 32, marginBottom: 4 }}>{featuredEvent.title}</h1>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4, flexWrap: 'wrap' }}>
+              <h1 className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400" style={{ margin: 0, fontSize: 32 }}>{featuredEvent.title}</h1>
+              {featuredEvent.has_flash_sale && (
+                <span style={{ background: 'linear-gradient(to right, #f59e0b, #ef4444)', color: '#fff', padding: '4px 10px', borderRadius: 999, fontSize: 11, fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                  Flash Sale
+                </span>
+              )}
+            </div>
             <p style={{ margin: '4px 0 12px 0', color: '#d1d5db', fontSize: 15, fontWeight: 500 }}>{featuredEvent.venue_name || 'Venue TBD'}</p>
             <Link href={`/events/${featuredEvent.slug}`} className="text-indigo-400 hover:text-cyan-400 font-bold" style={{ textDecoration: 'none', fontSize: 14 }}>
               View Event &rarr;
