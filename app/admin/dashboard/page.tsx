@@ -4,6 +4,7 @@ import Link from 'next/link';
 import ApproveButton from './ApproveButton';
 import AdminEventActions from '../events/AdminEventActions';
 import EventApprovalActions from './EventApprovalActions';
+import SalesTrendChart from '@/components/SalesTrendChart';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,6 +23,30 @@ export default async function AdminDashboard() {
       (SELECT COUNT(*) FROM events WHERE status = 'published') AS published_events,
       (SELECT COUNT(*) FROM orders WHERE payment_status = 'paid') AS paid_orders,
       (SELECT COALESCE(SUM(total_amount_kes), 0) FROM orders WHERE payment_status = 'paid') AS total_revenue_kes
+  `;
+
+  const topOrganizers = await sql`
+    SELECT
+      u.id,
+      u.full_name,
+      op.business_name,
+      COUNT(DISTINCT e.id)::int AS event_count,
+      COALESCE(SUM(o.total_amount_kes) FILTER (WHERE o.payment_status = 'paid'), 0) AS revenue_kes,
+      COALESCE(SUM(o.quantity) FILTER (WHERE o.payment_status = 'paid'), 0)::int AS tickets_sold
+    FROM users u
+    LEFT JOIN organizer_profiles op ON op.user_id = u.id
+    LEFT JOIN events e ON e.organizer_id = u.id
+    LEFT JOIN orders o ON o.event_id = e.id
+    WHERE u.role = 'organizer'
+    GROUP BY u.id, u.full_name, op.business_name
+    ORDER BY revenue_kes DESC
+    LIMIT 5
+  `;
+
+  const platformOrders = await sql`
+    SELECT created_at, total_amount_kes, payment_status, quantity
+    FROM orders
+    ORDER BY created_at ASC
   `;
 
   const pendingOrganizers = await sql`
@@ -129,6 +154,57 @@ export default async function AdminDashboard() {
           <p className="text-xs text-gray-400 mt-1">Active event organizers</p>
         </div>
       </div>
+
+      <section className="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-xl mb-10">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-bold text-indigo-300">Platform Sales Trend</h2>
+          <span className="text-xs text-gray-400">All events combined</span>
+        </div>
+        {platformOrders.length > 0 ? (
+          <SalesTrendChart orders={platformOrders as any} />
+        ) : (
+          <div className="text-center py-8 text-gray-400 bg-gray-800/40 rounded-lg border border-gray-800">
+            No orders yet.
+          </div>
+        )}
+      </section>
+
+      <section className="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-xl mb-10">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-bold text-indigo-300">Top Organizers by Revenue</h2>
+        </div>
+        {topOrganizers.length > 0 && Number(topOrganizers[0].revenue_kes) > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-gray-800 text-xs text-indigo-400 uppercase tracking-wider">
+                  <th className="py-3 px-4">Organizer</th>
+                  <th className="py-3 px-4">Events</th>
+                  <th className="py-3 px-4">Tickets Sold</th>
+                  <th className="py-3 px-4 text-right">Revenue</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-800 text-sm">
+                {topOrganizers.map((o: any) => (
+                  <tr key={o.id} className="hover:bg-gray-800/50 transition">
+                    <td className="py-4 px-4 font-semibold text-white">
+                      {o.business_name || o.full_name}
+                      {o.business_name && <div className="text-xs text-gray-500">{o.full_name}</div>}
+                    </td>
+                    <td className="py-4 px-4 text-gray-300">{o.event_count}</td>
+                    <td className="py-4 px-4 text-emerald-400 font-semibold">{o.tickets_sold}</td>
+                    <td className="py-4 px-4 text-right text-cyan-400 font-bold">KES {Number(o.revenue_kes).toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="text-center py-8 text-gray-400 bg-gray-800/40 rounded-lg border border-gray-800">
+            No organizer revenue yet.
+          </div>
+        )}
+      </section>
 
       <section className="bg-gray-900 border border-amber-800/50 rounded-xl p-6 shadow-xl mb-10">
         <div className="flex justify-between items-center mb-6">

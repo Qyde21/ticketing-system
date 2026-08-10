@@ -1,25 +1,45 @@
-import { sql } from "@/lib/db";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import SalesTrendChart from "@/components/SalesTrendChart";
+import { sql } from '@/lib/db';
+import { getSession } from '@/lib/auth';
+import Link from 'next/link';
+import SalesTrendChart from '@/components/SalesTrendChart';
 
-interface PageProps {
-  params: Promise<{ id: string }>;
-}
+export const dynamic = 'force-dynamic';
 
-export default async function AdminEventAnalyticsPage({ params }: PageProps) {
+export default async function OrganizerEventAnalyticsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const session = await getSession();
 
-  const events = await sql`SELECT * FROM events WHERE id::text = ${id} OR slug = ${id}`;
+  if (!session) {
+    return <div className="max-w-6xl mx-auto px-4 py-8 text-white">Unauthorized.</div>;
+  }
+
+  const decodedId = decodeURIComponent(id);
+  const events = await sql`
+    SELECT id, title, organizer_id FROM events
+    WHERE id::text = ${decodedId} OR slug = ${decodedId.toLowerCase()} OR title ILIKE ${decodedId}
+  `;
+
+  if (events.length === 0) {
+    return (
+      <main className="max-w-5xl mx-auto px-4 py-8 text-white">
+        <h1 className="text-2xl font-bold text-red-400 mb-2">Event Not Found</h1>
+        <p className="text-gray-400">Could not find an event matching: <code className="bg-gray-800 px-2 py-1 rounded text-cyan-300">{decodedId}</code></p>
+        <div className="mt-6">
+          <Link href="/organizer/dashboard" className="text-indigo-400 hover:underline">&larr; Back to Dashboard</Link>
+        </div>
+      </main>
+    );
+  }
+
   const event = events[0];
 
-  if (!event) {
-    notFound();
+  if (event.organizer_id !== session.userId && session.role !== 'admin') {
+    return <div className="max-w-6xl mx-auto px-4 py-8 text-white">Not authorized for this event.</div>;
   }
 
   const ticketTypes = await sql`
-    SELECT id, name, price_kes, quantity_total, quantity_sold 
-    FROM ticket_types 
+    SELECT id, name, price_kes, quantity_total, quantity_sold
+    FROM ticket_types
     WHERE event_id = ${event.id}
   `;
 
@@ -38,7 +58,7 @@ export default async function AdminEventAnalyticsPage({ params }: PageProps) {
     const sold = Number(t.quantity_sold) || 0;
     const remaining = Math.max(0, total - sold);
     const tierPrice = Number(t.price_kes || 0);
-    
+
     totalCapacity += total;
     totalSold += sold;
     totalRevenue += sold * tierPrice;
@@ -51,26 +71,23 @@ export default async function AdminEventAnalyticsPage({ params }: PageProps) {
       sold,
       remaining,
       tierPrice,
-      percentageSold
+      percentageSold,
     };
   });
 
   return (
     <main className="max-w-5xl mx-auto px-4 py-8 text-white">
-      <div className="mb-6 flex justify-between items-center">
-        <Link href="/admin/dashboard" className="text-indigo-400 hover:underline">
-          &larr; Back to Admin Dashboard
+      <div className="mb-6">
+        <Link href="/organizer/dashboard" className="text-indigo-400 hover:underline">
+          &larr; Back to Dashboard
         </Link>
-        <span className="bg-purple-950 border border-purple-800 text-purple-300 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-          Admin / Organizer View
-        </span>
       </div>
 
       <div className="mb-8">
         <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">
           Analytics: {event.title}
         </h1>
-        <p className="text-gray-400 text-sm mt-1">Real-time inventory and revenue tracking (Private View)</p>
+        <p className="text-gray-400 text-sm mt-1">Real-time inventory and revenue tracking</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -92,7 +109,7 @@ export default async function AdminEventAnalyticsPage({ params }: PageProps) {
 
       <SalesTrendChart orders={orders as any} />
 
-      <div className="bg-gray-900 p-6 rounded-lg border border-gray-800 shadow-lg">
+      <div className="bg-gray-900 p-6 rounded-lg border border-gray-800 shadow-lg mt-8">
         <h2 className="text-xl font-bold mb-4 text-indigo-300">Ticket Tier Breakdown</h2>
         {processedTiers.length > 0 ? (
           <div className="overflow-x-auto">
@@ -118,8 +135,8 @@ export default async function AdminEventAnalyticsPage({ params }: PageProps) {
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
                         <div className="w-24 bg-gray-800 h-2 rounded-full overflow-hidden border border-gray-700">
-                          <div 
-                            className="bg-indigo-500 h-full" 
+                          <div
+                            className="bg-indigo-500 h-full"
                             style={{ width: `${tier.percentageSold}%` }}
                           />
                         </div>
