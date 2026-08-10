@@ -1,10 +1,17 @@
 import { sql } from '@/lib/db';
+import { getSession } from '@/lib/auth';
 import Link from 'next/link';
 import LocalTime from '@/components/LocalTime';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminScanPage({ params }: { params: Promise<{ eventId: string }> }) {
+  const session = await getSession();
+
+  if (!session || session.role !== 'admin') {
+    return <div className="max-w-2xl mx-auto py-12 px-4 text-white">Unauthorized access.</div>;
+  }
+
   const { eventId } = await params;
 
   const [event] = await sql`

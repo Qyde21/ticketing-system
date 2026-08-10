@@ -9,7 +9,7 @@ export default async function EventOrdersPage({ params }: { params: Promise<{ id
   const { id } = await params;
   const session = await getSession();
 
-  if (!session) {
+  if (!session || session.role !== 'admin') {
     return <div className="max-w-6xl mx-auto px-4 py-8 text-white">Unauthorized.</div>;
   }
 

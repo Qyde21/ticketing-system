@@ -1,4 +1,5 @@
 import { sql } from "@/lib/db";
+import { getSession } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import SalesTrendChart from "@/components/SalesTrendChart";
@@ -8,6 +9,12 @@ interface PageProps {
 }
 
 export default async function AdminEventAnalyticsPage({ params }: PageProps) {
+  const session = await getSession();
+
+  if (!session || session.role !== 'admin') {
+    return <div className="max-w-5xl mx-auto px-4 py-8 text-white">Unauthorized access.</div>;
+  }
+
   const { id } = await params;
 
   const events = await sql`SELECT * FROM events WHERE id::text = ${id} OR slug = ${id}`;

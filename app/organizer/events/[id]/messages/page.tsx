@@ -1,4 +1,5 @@
 ﻿import { sql } from '@/lib/db';
+import { getSession } from '@/lib/auth';
 import Link from 'next/link';
 import MessageComposer from './MessageComposer';
 
@@ -6,9 +7,18 @@ export const dynamic = 'force-dynamic';
 
 export default async function OrganizerMessagesPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const session = await getSession();
 
-  const [event] = await sql`SELECT id, title FROM events WHERE id = ${id}`;
+  if (!session) {
+    return <div className="max-w-2xl mx-auto py-12 px-4 text-white">Unauthorized.</div>;
+  }
+
+  const [event] = await sql`SELECT id, title, organizer_id FROM events WHERE id = ${id}`;
   if (!event) return <div className="max-w-2xl mx-auto py-12 px-4 text-white">Event not found.</div>;
+
+  if (event.organizer_id !== session.userId && session.role !== 'admin') {
+    return <div className="max-w-2xl mx-auto py-12 px-4 text-white">Not authorized for this event.</div>;
+  }
 
   const buyers = await sql`
     SELECT DISTINCT u.id, u.full_name, u.email

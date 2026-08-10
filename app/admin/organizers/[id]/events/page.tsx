@@ -1,9 +1,16 @@
 import { sql } from '@/lib/db';
+import { getSession } from '@/lib/auth';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminOrganizerEventsPage({ params }: { params: Promise<{ id: string }> }) {
+  const session = await getSession();
+
+  if (!session || session.role !== 'admin') {
+    return <div className="max-w-2xl mx-auto py-12 px-4 text-white">Unauthorized access.</div>;
+  }
+
   const { id: organizerId } = await params;
 
   // Fetch organizer details
