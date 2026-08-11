@@ -1,15 +1,13 @@
 'use client';
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import FlashSaleBadge from '@/components/FlashSaleBadge';
 
-export default function EventList({ events, showFilters = true }: { events: any[]; showFilters?: boolean }) {
+export default function EventList({ events, showFilters = true }: { events: any[], showFilters?: boolean }) {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
 
   const filteredEvents = useMemo(() => {
     return events.filter((e) => {
-      const q = search.toLowerCase();
       const q = search.toLowerCase().trim();
       const matchesSearch =
         !q ||
@@ -29,35 +27,21 @@ export default function EventList({ events, showFilters = true }: { events: any[
             placeholder="Search events, venues..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            style={{
-              width: '100%',
-              padding: 12,
-              borderRadius: 8,
-              background: '#1f1f1f',
-              border: '1px solid #333',
-              color: '#fff',
-              marginBottom: 16,
-            }}
+            style={{ width: "100%", padding: "12px", borderRadius: 8, background: "#1f1f1f", border: "1px solid #333", color: "#fff", marginBottom: 16 }}
           />
-          <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 8 }}>
-            {['All', 'Concert', 'Festival', 'Comedy', 'Autoshow', 'Sports', 'Other'].map((cat) => (
+          <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 8 }}>
+            {["All", "Concert", "Festival", "Comedy", "Autoshow", "Sports", "Other"].map(cat => (
               <button
                 key={cat}
-                type="button"
                 onClick={() => setCategory(cat)}
                 style={{
-                  padding: '8px 16px',
-                  borderRadius: 20,
-                  cursor: 'pointer',
+                  padding: "8px 16px", borderRadius: 20, cursor: 'pointer',
                   background: category === cat ? 'linear-gradient(to right, #4f46e5, #06b6d4)' : '#1f1f1f',
                   color: category === cat ? '#fff' : '#ccc',
-                  border: category === cat ? 'none' : '1px solid #333',
-                  whiteSpace: 'nowrap',
-                  fontWeight: category === cat ? 700 : 500,
+                  border: category === cat ? 'none' : '1px solid #333', whiteSpace: "nowrap",
+                  fontWeight: category === cat ? 700 : 500
                 }}
-              >
-                {cat}
-              </button>
+              >{cat}</button>
             ))}
           </div>
         </div>
@@ -73,57 +57,29 @@ export default function EventList({ events, showFilters = true }: { events: any[
           const isSoldOut = capacity > 0 && sold >= capacity;
           const percentSold = capacity > 0 ? Math.floor((sold / capacity) * 100) : 0;
           const isAlmostSoldOut = capacity > 0 && !isSoldOut && percentSold >= 90;
-          const hasFlash =
-            e.has_active_flash === true || e.has_active_flash === 't' || e.has_active_flash === 1;
+          const hasFlash = e.has_flash_sale === true || e.has_flash_sale === 1 || e.has_flash_sale === 't';
 
           return (
-            <div
-              key={e.id}
-              style={{
-                position: 'relative',
-                background: '#121212',
-                borderRadius: 12,
-                overflow: 'hidden',
-                border: '1px solid #1f1f1f',
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.5)',
-              }}
-            >
+            <div key={e.id} style={{ position: 'relative', background: '#121212', borderRadius: 12, overflow: 'hidden', border: '1px solid #1f1f1f', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.5)' }}>
               <div style={{ position: 'relative', height: 180, background: '#1a1a1a' }}>
-                {e.cover_image_url && (
-                  <img
-                    src={e.cover_image_url}
-                    alt={e.title}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
-                )}
-                {!isCancelled && !isPastEvent && hasFlash && (
-                  <div style={{ position: 'absolute', top: 10, left: 10, zIndex: 2 }}>
-                    <FlashSaleBadge />
-                  </div>
-                )}
-                {isCancelled ? (
-                  <div style={{ position: 'absolute', top: 10, right: 10, background: '#7f1d1d', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>
-                    CANCELLED
-                  </div>
-                ) : isPastEvent ? (
-                  <div style={{ position: 'absolute', top: 10, right: 10, background: '#4b5563', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>
-                    ENDED
-                  </div>
-                ) : isSoldOut ? (
-                  <div style={{ position: 'absolute', top: 10, right: 10, background: '#dc2626', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>
-                    SOLD OUT
-                  </div>
-                ) : isAlmostSoldOut ? (
-                  <div style={{ position: 'absolute', top: 10, right: 10, background: '#d97706', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>
-                    ALMOST SOLD OUT
-                  </div>
-                ) : null}
+                {e.cover_image_url && <img src={e.cover_image_url} alt={e.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+                <div style={{ position: 'absolute', top: 10, right: 10, display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-end' }}>
+                  {hasFlash && !isPastEvent && !isCancelled && (
+                    <div style={{ background: 'linear-gradient(to right, #f59e0b, #ef4444)', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 800, letterSpacing: '0.03em' }}>FLASH SALE</div>
+                  )}
+                  {isCancelled ? (
+                    <div style={{ background: '#7f1d1d', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>CANCELLED</div>
+                  ) : isPastEvent ? (
+                    <div style={{ background: '#4b5563', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>ENDED</div>
+                  ) : isSoldOut ? (
+                    <div style={{ background: '#dc2626', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>SOLD OUT</div>
+                  ) : isAlmostSoldOut ? (
+                    <div style={{ background: '#d97706', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>ALMOST SOLD OUT</div>
+                  ) : null}
+                </div>
               </div>
               <div style={{ padding: 16 }}>
-                <h3
-                  className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400 flex items-center gap-1.5"
-                  style={{ fontSize: 17, marginBottom: 8 }}
-                >
+                <h3 className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400 flex items-center gap-1.5" style={{ fontSize: 17, marginBottom: 8 }}>
                   {e.title}
                   {e.organizer_verified && (
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="text-cyan-400 shrink-0" style={{ width: 16, height: 16 }}>
@@ -133,23 +89,10 @@ export default function EventList({ events, showFilters = true }: { events: any[
                   )}
                 </h3>
                 <p className="text-gray-400 text-xs mb-1">
-                  {e.start_at
-                    ? eventDate.toLocaleDateString('en-US', {
-                        weekday: 'short',
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
-                      })
-                    : 'Date TBA'}
+                  {e.start_at ? eventDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : 'Date TBA'}
                 </p>
                 <p className="text-gray-400 text-xs mb-3">{e.venue_name || 'Venue TBD'}</p>
-                <Link
-                  href={`/events/${e.slug}`}
-                  className="text-indigo-400 hover:text-cyan-400 font-semibold"
-                  style={{ fontSize: 13, textDecoration: 'none' }}
-                >
-                  View Details &rarr;
-                </Link>
+                <Link href={`/events/${e.slug}`} className="text-indigo-400 hover:text-cyan-400 font-semibold" style={{ fontSize: 13, textDecoration: 'none' }}>View Details &rarr;</Link>
               </div>
             </div>
           );
