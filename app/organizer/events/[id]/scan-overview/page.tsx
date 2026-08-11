@@ -15,19 +15,15 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
   let event = null;
   try {
     if (session.role === 'admin') {
-      const results = await sql`
-        SELECT id, title, venue_name, start_at, end_at, status, organizer_id
-        FROM events WHERE id = ${eventId}
-      `;
+      const results = await sql`SELECT id, title, venue_name, start_at, end_at, status, organizer_id FROM events WHERE id = ${eventId}`;
       event = results[0] || null;
     } else {
-      const results = await sql`
-        SELECT id, title, venue_name, start_at, end_at, status, organizer_id
-        FROM events WHERE id = ${eventId} AND organizer_id = ${session.userId}
-      `;
+      const results = await sql`SELECT id, title, venue_name, start_at, end_at, status, organizer_id FROM events WHERE id = ${eventId} AND organizer_id = ${session.userId}`;
       event = results[0] || null;
     }
-  } catch (e) { console.error(e); }
+  } catch (e) {
+    console.error(e);
+  }
 
   if (!event) {
     return (
@@ -38,23 +34,22 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
     );
   }
 
-  const eventEnded =
-    event.status === 'completed' ||
-    (event.status !== 'cancelled' &&
-      (event.end_at ? new Date(event.end_at) : new Date(event.start_at)) < new Date());
-
   const [counts] = await sql`
     SELECT COUNT(t.id)::int AS total,
       COUNT(t.id) FILTER (WHERE t.status = 'used')::int AS checked_in,
       COUNT(t.id) FILTER (WHERE t.status = 'valid')::int AS remaining,
       COUNT(t.id) FILTER (WHERE t.status = 'cancelled')::int AS cancelled
-    FROM tickets t JOIN ticket_types tt ON tt.id = t.ticket_type_id WHERE tt.event_id = ${eventId}
+    FROM tickets t
+    JOIN ticket_types tt ON tt.id = t.ticket_type_id
+    WHERE tt.event_id = ${eventId}
   `;
   const recent = await sql`
     SELECT t.ticket_code, t.holder_name, t.checked_in_at, tt.name AS ticket_type
-    FROM tickets t JOIN ticket_types tt ON tt.id = t.ticket_type_id
+    FROM tickets t
+    JOIN ticket_types tt ON tt.id = t.ticket_type_id
     WHERE tt.event_id = ${eventId} AND t.status = 'used' AND t.checked_in_at IS NOT NULL
-    ORDER BY t.checked_in_at DESC LIMIT 20
+    ORDER BY t.checked_in_at DESC
+    LIMIT 20
   `;
   const initial = {
     total: Number(counts?.total ?? 0),
@@ -71,17 +66,28 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
 
   return (
     <div className="max-w-2xl mx-auto py-10 px-4 text-white">
-      <Link href={session.role === 'admin' ? `/admin/organizers/${event.organizer_id}/events` : `/organizer/dashboard`} className="text-sm text-indigo-400 hover:underline">
+      <Link
+        href={session.role === 'admin' ? `/admin/organizers/${event.organizer_id}/events` : `/organizer/dashboard`}
+        className="text-sm text-indigo-400 hover:underline"
+      >
         &larr; Back
       </Link>
       <div className="flex flex-wrap items-start justify-between gap-3 mt-2">
         <div>
           <h1 className="text-2xl font-extrabold">{event.title}</h1>
-      <p className="text-gray-400 text-sm">
-        {event.venue_name || 'No Venue'} &middot; {event.start_at ? new Date(event.start_at).toLocaleString() : 'No Date'}
-        {eventEnded && <span className="ml-2 text-gray-500 font-semibold uppercase text-xs tracking-wider">· Completed</span>}
-      </p>
-      <LiveOverview eventId={eventId} initial={initial} eventEnded={eventEnded} />
+          <p className="text-gray-400 text-sm">
+            {event.venue_name || 'No Venue'} &middot;{' '}
+            {event.start_at ? new Date(event.start_at).toLocaleString() : 'No Date'}
+          </p>
+        </div>
+        <a
+          href={`/api/events/${eventId}/door-list`}
+          className="inline-flex items-center gap-1.5 bg-gray-800 hover:bg-gray-700 text-white text-xs font-semibold px-3 py-2 rounded-lg border border-gray-700 transition"
+        >
+          Download door list (CSV)
+        </a>
+      </div>
+      <LiveOverview eventId={eventId} initial={initial} />
     </div>
   );
 }
