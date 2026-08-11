@@ -117,7 +117,7 @@ export default function FlashSaleManager({ ticketTypes }: { ticketTypes: TicketT
                 <p className="font-bold text-white flex items-center gap-2">
                   {t.name}
                   {active && (
-                    <span className="text-[10px] uppercase tracking-wider font-extrabold bg-amber-500 text-black px-2 py-0.5 rounded-full">
+                    <span className="flash-sale-badge animate-pulse text-[10px] uppercase tracking-wider font-extrabold bg-amber-500 text-black px-2 py-0.5 rounded-full">
                       Live Now
                     </span>
                   )}
@@ -201,7 +201,7 @@ export default function FlashSaleManager({ ticketTypes }: { ticketTypes: TicketT
                 <button
                   onClick={() => submit(t.id)}
                   disabled={loading}
-                  className="bg-amber-600 hover:bg-amber-500 text-black font-bold px-4 py-2 rounded-lg text-sm transition disabled:opacity-50"
+                  className="flash-sale-badge bg-amber-600 hover:bg-amber-500 text-black font-bold px-4 py-2 rounded-lg text-sm transition disabled:opacity-50"
                 >
                   {loading ? 'Saving...' : 'Save Flash Sale'}
                 </button>

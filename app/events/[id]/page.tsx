@@ -217,7 +217,7 @@ export default async function EventDetailPage({
                   <p className="font-bold text-white flex items-center gap-2">
                     {t.name}
                     {flashActive && (
-                      <span className="text-[10px] uppercase tracking-wider font-extrabold bg-amber-500 text-black px-2 py-0.5 rounded-full">
+                      <span className="animate-pulse text-[10px] uppercase tracking-wider font-extrabold bg-amber-500 text-black px-2 py-0.5 rounded-full">
                         Flash Sale
                       </span>
                     )}
