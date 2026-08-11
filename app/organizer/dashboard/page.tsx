@@ -57,7 +57,7 @@ export default async function OrganizerDashboardPage() {
           </Link>
         ) : (
           <span
-            className="bg-amber-950/60 border border-amber-700 text-amber-300 font-medium px-4 py-2 rounded-lg text-sm"
+            className="flash-sale-badge bg-amber-950/60 border border-amber-700 text-amber-300 font-medium px-4 py-2 rounded-lg text-sm"
             title="An admin needs to approve your organizer account before you can create events"
           >
             â³ Pending admin approval
@@ -72,7 +72,7 @@ export default async function OrganizerDashboardPage() {
       )}
 
       {!isSuspended && !isVerifiedOrganizer && (
-        <div className="mb-8 p-4 bg-amber-950/40 border border-amber-800 rounded-lg text-amber-200 text-sm">
+        <div className="flash-sale-badge mb-8 p-4 bg-amber-950/40 border border-amber-800 rounded-lg text-amber-200 text-sm">
           Your organizer account is awaiting approval from a TicketHub admin. Once approved, you&apos;ll be able to create and publish events. This usually doesn&apos;t take long â€” check back soon.
         </div>
       )}
@@ -147,17 +147,25 @@ export default async function OrganizerDashboardPage() {
                 <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-indigo-400 pt-1">
                   <Link href={`/organizer/events/${event.id}/orders`} className="hover:underline text-cyan-300 bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Orders</Link>
                   <Link href={`/organizer/events/${event.id}/analytics`} className="hover:underline text-cyan-300 bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Analytics</Link>
-                  <Link href={`/organizer/events/${event.id}/flash-sales`} className="hover:underline text-amber-300 bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Flash Sales</Link>
+                  {eventEnded ? (
+                    <span className="text-gray-600 bg-gray-900/60 px-3 py-1.5 rounded-lg border border-gray-800 cursor-not-allowed" title="Flash sales are disabled after the event has ended">Flash Sales</span>
+                  ) : (
+                    <Link href={`/organizer/events/${event.id}/flash-sales`} className="hover:underline text-amber-300 bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Flash Sales</Link>
+                  )}
                   <Link href={`/organizer/events/${event.id}/edit`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Manage Details</Link>
                   <Link href={`/organizer/events/${event.id}/messages`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Messages</Link>
                   <Link href={`/organizer/events/${event.id}/scan-overview`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Scan Overview</Link>
-                  <Link href={`/organizer/events/${event.id}/promo-codes`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Promo Codes</Link>
+                  {eventEnded ? (
+                    <span className="text-gray-600 bg-gray-900/60 px-3 py-1.5 rounded-lg border border-gray-800 cursor-not-allowed" title="Promo codes are disabled after the event has ended">Promo Codes</span>
+                  ) : (
+                    <Link href={`/organizer/events/${event.id}/promo-codes`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Promo Codes</Link>
+                  )}
                   <Link href={`/organizer/events/new?duplicateFrom=${event.id}`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Duplicate</Link>
                   {event.status === 'draft' && (
                     <PublishButton eventId={event.id} />
                   )}
                   {event.status === 'pending_review' && (
-                    <span className="bg-amber-950/50 text-amber-300 border border-amber-800/50 px-3 py-1.5 rounded-lg font-semibold">
+                    <span className="flash-sale-badge bg-amber-950/50 text-amber-300 border border-amber-800/50 px-3 py-1.5 rounded-lg font-semibold">
                       Awaiting Admin Review
                     </span>
                   )}
