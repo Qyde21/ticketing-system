@@ -1,5 +1,6 @@
 import { sql } from '@/lib/db';
 import EventList from '@/components/EventList';
+import FlashSaleBadge from '@/components/FlashSaleBadge';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
@@ -18,21 +19,7 @@ export default async function HomePage() {
         AND tt.flash_sale_starts_at <= NOW()
         AND tt.flash_sale_ends_at >= NOW()
         AND (tt.flash_sale_quantity_cap IS NULL OR tt.flash_sale_quantity_sold < tt.flash_sale_quantity_cap)
-      ) AS has_active_flash,
-      (COALESCE(MAX(
-        CASE
-          WHEN tt.flash_sale_price_kes IS NOT NULL
-            AND tt.flash_sale_starts_at IS NOT NULL
-            AND tt.flash_sale_ends_at IS NOT NULL
-            AND now() >= tt.flash_sale_starts_at
-            AND now() <= tt.flash_sale_ends_at
-            AND (
-              tt.flash_sale_quantity_cap IS NULL
-              OR COALESCE(tt.flash_sale_quantity_sold, 0) < tt.flash_sale_quantity_cap
-            )
-          THEN 1 ELSE 0
-        END
-      ), 0) = 1) AS has_flash_sale
+      ) AS has_active_flash
     FROM events e
     LEFT JOIN ticket_types tt ON tt.event_id = e.id
     LEFT JOIN organizer_profiles op ON op.user_id = e.organizer_id
@@ -44,13 +31,13 @@ export default async function HomePage() {
 
   const now = new Date();
 
-  const upcomingEvents = events.filter(e => {
+  const upcomingEvents = events.filter((e: any) => {
     if (e.status === 'completed') return false;
     const endDate = e.end_at ? new Date(e.end_at) : new Date(e.start_at);
     return endDate >= now;
   });
 
-  const pastEvents = events.filter(e => {
+  const pastEvents = events.filter((e: any) => {
     if (e.status === 'completed') return true;
     const endDate = e.end_at ? new Date(e.end_at) : new Date(e.start_at);
     return endDate < now;
@@ -58,23 +45,49 @@ export default async function HomePage() {
 
   const featuredEvent = upcomingEvents[0];
   const remainingUpcoming = upcomingEvents.slice(1);
+  const featuredHasFlash =
+    featuredEvent &&
+    (featuredEvent.has_active_flash === true ||
+      featuredEvent.has_active_flash === 't' ||
+      featuredEvent.has_active_flash === 1);
 
   return (
     <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh', color: '#fff', paddingBottom: '2rem' }}>
       {featuredEvent && (
         <div style={{ position: 'relative', width: '100%', height: 420, marginBottom: 32, borderBottom: '1px solid #1f1f1f' }}>
-          <img src={featuredEvent.cover_image_url} alt={featuredEvent.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          <div style={{ position: 'absolute', bottom: 0, padding: '24px 32px', background: 'linear-gradient(transparent, rgba(0,0,0,0.95))', width: '100%' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4, flexWrap: 'wrap' }}>
-              <h1 className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400" style={{ margin: 0, fontSize: 32 }}>{featuredEvent.title}</h1>
-              {(featuredEvent.has_flash_sale === true || featuredEvent.has_flash_sale === 1 || featuredEvent.has_flash_sale === 't') && (
-                <span style={{ background: 'linear-gradient(to right, #f59e0b, #ef4444)', color: '#fff', padding: '4px 10px', borderRadius: 999, fontSize: 11, fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-                  Flash Sale
-                </span>
-              )}
+          {featuredEvent.cover_image_url && (
+            <img
+              src={featuredEvent.cover_image_url}
+              alt={featuredEvent.title}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          )}
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              padding: '24px 32px',
+              background: 'linear-gradient(transparent, rgba(0,0,0,0.95))',
+              width: '100%',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 4 }}>
+              <h1
+                className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400"
+                style={{ margin: 0, fontSize: 32 }}
+              >
+                {featuredEvent.title}
+              </h1>
+              {featuredHasFlash && <FlashSaleBadge />}
             </div>
-            <p style={{ margin: '4px 0 12px 0', color: '#d1d5db', fontSize: 15, fontWeight: 500 }}>{featuredEvent.venue_name || 'Venue TBD'}</p>
-            <Link href={`/events/${featuredEvent.slug}`} className="text-indigo-400 hover:text-cyan-400 font-bold" style={{ textDecoration: 'none', fontSize: 14 }}>
+            <p style={{ margin: '4px 0 12px 0', color: '#d1d5db', fontSize: 15, fontWeight: 500 }}>
+              {featuredEvent.venue_name || 'Venue TBD'}
+            </p>
+            <Link
+              href={`/events/${featuredEvent.slug}`}
+              className="text-indigo-400 hover:text-cyan-400 font-bold"
+              style={{ textDecoration: 'none', fontSize: 14 }}
+            >
               View Event &rarr;
             </Link>
           </div>
@@ -82,7 +95,12 @@ export default async function HomePage() {
       )}
 
       <div style={{ maxWidth: 1000, margin: '0 auto', padding: '0 1rem' }}>
-        <h2 className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400" style={{ marginBottom: 20, fontSize: 22 }}>Events Coming Up</h2>
+        <h2
+          className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400"
+          style={{ marginBottom: 20, fontSize: 22 }}
+        >
+          Events Coming Up
+        </h2>
         {remainingUpcoming.length > 0 ? (
           <EventList events={remainingUpcoming} showFilters={true} />
         ) : (
