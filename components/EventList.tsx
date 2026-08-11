@@ -60,7 +60,7 @@ export default function EventList({ events, showFilters = true }: { events: any[
                 {e.cover_image_url && <img src={e.cover_image_url} alt={e.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
                 <div style={{ position: 'absolute', top: 10, right: 10, display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-end' }}>
                   {(e.has_flash_sale === true || e.has_flash_sale === 1 || e.has_flash_sale === 't') && !isPastEvent && !isCancelled && (
-                    <div style={{ background: 'linear-gradient(to right, #f59e0b, #ef4444)', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 800, letterSpacing: '0.03em' }}>FLASH SALE</div>
+                    <div style={{ background: 'linear-gradient(to right, #f59e0b, #ef4444)', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 800, letterSpacing: '0.03em' }} className="flash-sale-badge">FLASH SALE</div>
                   )}
                   {isCancelled ? (
                     <div style={{ background: '#7f1d1d', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700 }}>CANCELLED</div>
