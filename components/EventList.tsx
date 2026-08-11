@@ -10,7 +10,9 @@ export default function EventList({ events, showFilters = true }: { events: any[
   const filteredEvents = useMemo(() => {
     return events.filter((e) => {
       const q = search.toLowerCase();
+      const q = search.toLowerCase().trim();
       const matchesSearch =
+        !q ||
         (e.title || '').toLowerCase().includes(q) ||
         (e.venue_name || '').toLowerCase().includes(q);
       const matchesCat = category === 'All' || (e.category && e.category === category);

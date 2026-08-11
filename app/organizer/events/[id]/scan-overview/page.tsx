@@ -74,7 +74,9 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
       <Link href={session.role === 'admin' ? `/admin/organizers/${event.organizer_id}/events` : `/organizer/dashboard`} className="text-sm text-indigo-400 hover:underline">
         &larr; Back
       </Link>
-      <h1 className="text-2xl font-extrabold mt-2">{event.title}</h1>
+      <div className="flex flex-wrap items-start justify-between gap-3 mt-2">
+        <div>
+          <h1 className="text-2xl font-extrabold">{event.title}</h1>
       <p className="text-gray-400 text-sm">
         {event.venue_name || 'No Venue'} &middot; {event.start_at ? new Date(event.start_at).toLocaleString() : 'No Date'}
         {eventEnded && <span className="ml-2 text-gray-500 font-semibold uppercase text-xs tracking-wider">· Completed</span>}
