@@ -51,6 +51,11 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
     ORDER BY t.checked_in_at DESC
     LIMIT 20
   `;
+  const eventEnded =
+    event.status === 'completed' ||
+    event.status === 'cancelled' ||
+    (event.end_at ? new Date(event.end_at) : new Date(event.start_at)) < new Date();
+
   const initial = {
     total: Number(counts?.total ?? 0),
     checkedIn: Number(counts?.checked_in ?? 0),
@@ -87,7 +92,7 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
           Download door list (CSV)
         </a>
       </div>
-      <LiveOverview eventId={eventId} initial={initial} />
+      <LiveOverview eventId={eventId} initial={initial} eventEnded={eventEnded} />
     </div>
   );
 }
