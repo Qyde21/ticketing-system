@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidateTag } from 'next/cache';
 import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 
@@ -101,5 +102,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     WHERE id = ${id}
   `;
 
+  revalidateTag('events');
+  revalidateTag('events');
   return NextResponse.json({ success: true });
 }

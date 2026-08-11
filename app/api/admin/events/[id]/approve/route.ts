@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidateTag } from 'next/cache';
 import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { sendEventApprovedEmail } from '@/lib/email';
@@ -38,5 +39,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     console.error('Failed to send event approval email:', emailErr);
   }
 
+  revalidateTag('events');
+  revalidateTag('events');
   return NextResponse.json({ success: true });
 }
