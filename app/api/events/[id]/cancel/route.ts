@@ -44,6 +44,6 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   await sql`UPDATE events SET status = 'cancelled', updated_at = now() WHERE id = ${id}`;
 
-  revalidateTag('events');
+  revalidateTag('events', 'max');
   return NextResponse.json({ success: true, refundedOrders: paidOrders.length });
 }

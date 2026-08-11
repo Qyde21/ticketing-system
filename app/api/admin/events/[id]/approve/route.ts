@@ -39,7 +39,6 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     console.error('Failed to send event approval email:', emailErr);
   }
 
-  revalidateTag('events');
-  revalidateTag('events');
+  revalidateTag('events', 'max');
   return NextResponse.json({ success: true });
 }

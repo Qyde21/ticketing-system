@@ -102,7 +102,6 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     WHERE id = ${id}
   `;
 
-  revalidateTag('events');
-  revalidateTag('events');
+  revalidateTag('events', 'max');
   return NextResponse.json({ success: true });
 }

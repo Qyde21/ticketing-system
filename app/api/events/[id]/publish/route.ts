@@ -30,6 +30,6 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     RETURNING id, status
   `;
 
-  revalidateTag('events');
+  revalidateTag('events', 'max');
   return NextResponse.json({ event: updated });
 }
