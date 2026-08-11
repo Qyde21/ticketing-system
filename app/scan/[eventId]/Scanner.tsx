@@ -8,6 +8,7 @@ import {
   saveManifest,
   tryMarkUsed,
 } from './offlineStore';
+import { flushCheckinQueueNow, registerScanServiceWorker, requestCheckinBackgroundSync } from './registerScanSw';
 
 interface LiveStats {
   total: number;
@@ -170,6 +171,7 @@ export default function Scanner({
     setOnline(typeof navigator !== 'undefined' ? navigator.onLine : true);
     const on = () => {
       setOnline(true);
+      void flushCheckinQueueNow();
       void syncQueue();
       void refreshStats();
     };
@@ -194,6 +196,10 @@ export default function Scanner({
       await refreshQueueCount();
     })();
   }, [eventId, refreshQueueCount]);
+
+  useEffect(() => {
+    void registerScanServiceWorker();
+  }, []);
 
   useEffect(() => {
     if (!online) return;
