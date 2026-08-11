@@ -159,13 +159,13 @@ export default async function EventDetailPage({
               && !flashCapReached;
 
             return (
-              <div key={t.id} className="flex items-center justify-between bg-gray-900 border border-gray-800 p-4 rounded-xl">
+              <div key={t.id} className={`flex items-center justify-between bg-gray-900 border p-4 rounded-xl ${flashActive ? "border-amber-500 shadow-lg shadow-amber-500/20" : "border-gray-800"}`}>
                 <div>
                   <p className="font-bold text-white flex items-center gap-2">
                     {t.name}
                     {flashActive && (
-                      <span className="text-[10px] uppercase tracking-wider font-extrabold bg-amber-500 text-black px-2 py-0.5 rounded-full">
-                        Flash Sale
+                      <span className="flash-sale-badge text-[10px] uppercase tracking-wider font-extrabold bg-amber-500 text-black px-2 py-0.5 rounded-full">
+                        ⚡ Flash Sale
                       </span>
                     )}
                   </p>
