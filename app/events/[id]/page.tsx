@@ -3,8 +3,47 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import JoinWaitlistButton from '@/components/JoinWaitlistButton';
 import FlashSaleCountdown from '@/components/FlashSaleCountdown';
+import MessageOrganizerWidget from '@/components/MessageOrganizerWidget';
+import { getSession } from '@/lib/auth';
+import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id: identifier } = await params;
+
+  let events: any = await sql`
+    SELECT title, description, venue_name, start_at, cover_image_url
+    FROM events WHERE id::text = ${identifier} OR slug = ${identifier} LIMIT 1
+  `;
+  const rows = Array.isArray(events) ? events : (events?.rows || []);
+  const event = rows[0];
+
+  if (!event) {
+    return { title: 'Event not found — TicketHub' };
+  }
+
+  const dateStr = event.start_at
+    ? new Date(event.start_at).toLocaleDateString('en-KE', { day: 'numeric', month: 'long', year: 'numeric' })
+    : '';
+  const venue = event.venue_name || 'Venue TBA';
+  const description = event.description
+    ? event.description.slice(0, 160)
+    : `${dateStr} at ${venue}. Get your tickets on TicketHub.`;
+
+  const images = event.cover_image_url ? [{ url: event.cover_image_url }] : undefined;
+
+  return {
+    title: `${event.title} — TicketHub`,
+    description,
+    openGraph: { title: event.title, description, images, type: 'website' },
+    twitter: { card: images ? 'summary_large_image' : 'summary', title: event.title, description, images },
+  };
+}
 
 export default async function EventDetailPage({ 
   params 
@@ -57,7 +96,21 @@ export default async function EventDetailPage({
   const notYetPublished = event.status === 'draft' || event.status === 'pending_review';
   const salesClosed = isCancelled || isEnded || notYetPublished;
 
-  const eventUrl = `https://ticketing-system-phi-eight.vercel.app/events/${event.slug || event.id}`;
+  const eventUrl = `https://www.mytickethub.co.ke/events/${event.slug || event.id}`;
+
+  // Only a logged-in user who actually has a paid ticket for this event (and
+  // isn't the organizer viewing their own event) can message the organizer —
+  // matches the restriction already enforced server-side in /api/messages.
+  const session = await getSession();
+  let canMessageOrganizer = false;
+  if (session && session.userId !== event.organizer_id && !isCancelled && !isEnded) {
+    const [buyerCheck] = await sql`
+      SELECT 1 FROM orders
+      WHERE event_id = ${event.id} AND payment_status = 'paid' AND LOWER(buyer_email) = ${session.email.toLowerCase()}
+      LIMIT 1
+    `;
+    canMessageOrganizer = !!buyerCheck;
+  }
   const shareText = `Check out ${event.title} on TicketHub!`;
   const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + eventUrl)}`;
   const twitterShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(eventUrl)}`;
@@ -159,13 +212,13 @@ export default async function EventDetailPage({
               && !flashCapReached;
 
             return (
-              <div key={t.id} className={`flex items-center justify-between bg-gray-900 border p-4 rounded-xl ${flashActive ? "border-amber-500 shadow-lg shadow-amber-500/20" : "border-gray-800"}`}>
+              <div key={t.id} className="flex items-center justify-between bg-gray-900 border border-gray-800 p-4 rounded-xl">
                 <div>
                   <p className="font-bold text-white flex items-center gap-2">
                     {t.name}
                     {flashActive && (
-                      <span className="flash-sale-badge text-[10px] uppercase tracking-wider font-extrabold bg-amber-500 text-black px-2 py-0.5 rounded-full">
-                        ⚡ Flash Sale
+                      <span className="text-[10px] uppercase tracking-wider font-extrabold bg-amber-500 text-black px-2 py-0.5 rounded-full">
+                        Flash Sale
                       </span>
                     )}
                   </p>
@@ -201,6 +254,14 @@ export default async function EventDetailPage({
           })
         )}
       </div>
+
+      {canMessageOrganizer && (
+        <MessageOrganizerWidget
+          eventId={event.id}
+          organizerId={event.organizer_id}
+          eventTitle={event.title}
+        />
+      )}
     </div>
   );
 }
