@@ -11,6 +11,14 @@ export default async function HomePage() {
       COALESCE(op.is_verified, false) AS organizer_verified,
       COALESCE(SUM(tt.quantity_total), 0) as total_capacity,
       COALESCE(SUM(tt.quantity_sold), 0) as total_sold,
+      BOOL_OR(
+        tt.flash_sale_price_kes IS NOT NULL
+        AND tt.flash_sale_starts_at IS NOT NULL
+        AND tt.flash_sale_ends_at IS NOT NULL
+        AND tt.flash_sale_starts_at <= NOW()
+        AND tt.flash_sale_ends_at >= NOW()
+        AND (tt.flash_sale_quantity_cap IS NULL OR tt.flash_sale_quantity_sold < tt.flash_sale_quantity_cap)
+      ) AS has_active_flash,
       (COALESCE(MAX(
         CASE
           WHEN tt.flash_sale_price_kes IS NOT NULL
