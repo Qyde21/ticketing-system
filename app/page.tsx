@@ -11,17 +11,20 @@ export default async function HomePage() {
       COALESCE(op.is_verified, false) AS organizer_verified,
       COALESCE(SUM(tt.quantity_total), 0) as total_capacity,
       COALESCE(SUM(tt.quantity_sold), 0) as total_sold,
-      COALESCE(BOOL_OR(
-        tt.flash_sale_price_kes IS NOT NULL
-        AND tt.flash_sale_starts_at IS NOT NULL
-        AND tt.flash_sale_ends_at IS NOT NULL
-        AND now() >= tt.flash_sale_starts_at
-        AND now() <= tt.flash_sale_ends_at
-        AND (
-          tt.flash_sale_quantity_cap IS NULL
-          OR COALESCE(tt.flash_sale_quantity_sold, 0) < tt.flash_sale_quantity_cap
-        )
-      ), false) AS has_flash_sale
+      (COALESCE(MAX(
+        CASE
+          WHEN tt.flash_sale_price_kes IS NOT NULL
+            AND tt.flash_sale_starts_at IS NOT NULL
+            AND tt.flash_sale_ends_at IS NOT NULL
+            AND now() >= tt.flash_sale_starts_at
+            AND now() <= tt.flash_sale_ends_at
+            AND (
+              tt.flash_sale_quantity_cap IS NULL
+              OR COALESCE(tt.flash_sale_quantity_sold, 0) < tt.flash_sale_quantity_cap
+            )
+          THEN 1 ELSE 0
+        END
+      ), 0) = 1) AS has_flash_sale
     FROM events e
     LEFT JOIN ticket_types tt ON tt.event_id = e.id
     LEFT JOIN organizer_profiles op ON op.user_id = e.organizer_id
@@ -56,7 +59,7 @@ export default async function HomePage() {
           <div style={{ position: 'absolute', bottom: 0, padding: '24px 32px', background: 'linear-gradient(transparent, rgba(0,0,0,0.95))', width: '100%' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4, flexWrap: 'wrap' }}>
               <h1 className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400" style={{ margin: 0, fontSize: 32 }}>{featuredEvent.title}</h1>
-              {featuredEvent.has_flash_sale && (
+              {(featuredEvent.has_flash_sale === true || featuredEvent.has_flash_sale === 1 || featuredEvent.has_flash_sale === 't') && (
                 <span style={{ background: 'linear-gradient(to right, #f59e0b, #ef4444)', color: '#fff', padding: '4px 10px', borderRadius: 999, fontSize: 11, fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
                   Flash Sale
                 </span>
