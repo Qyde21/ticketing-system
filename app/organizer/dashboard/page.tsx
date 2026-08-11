@@ -99,6 +99,9 @@ export default async function OrganizerDashboardPage() {
             const totalTicketsSold = orders.reduce((acc: number, o: any) => acc + Number(o.quantity), 0);
             const totalInventory = ticketTypes.reduce((acc: number, t: any) => acc + Number(t.quantity_total), 0);
 
+            const eventEnded = (event.end_at ? new Date(event.end_at) : new Date(event.start_at)) < new Date();
+
+
             return (
               <div key={event.id} className="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl space-y-4">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-800 pb-4">
@@ -147,8 +150,7 @@ export default async function OrganizerDashboardPage() {
                 <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-indigo-400 pt-1">
                   <Link href={`/organizer/events/${event.id}/orders`} className="hover:underline text-cyan-300 bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Orders</Link>
                   <Link href={`/organizer/events/${event.id}/analytics`} className="hover:underline text-cyan-300 bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Analytics</Link>
-                  const eventEnded = (event.end_at ? new Date(event.end_at) : new Date(event.start_at)) < new Date();
-                  {eventEnded ? (
+{eventEnded ? (
                     <span className="text-gray-600 bg-gray-900/60 px-3 py-1.5 rounded-lg border border-gray-800 cursor-not-allowed" title="Flash sales are disabled after the event has ended">Flash Sales</span>
                   ) : (
                     <Link href={`/organizer/events/${event.id}/flash-sales`} className="hover:underline text-amber-300 bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Flash Sales</Link>
