@@ -1,12 +1,8 @@
-{
+﻿{
   "crons": [
     {
       "path": "/api/cron/event-reminders",
-      "schedule": "0 6 * * *"
-    },
-    {
-      "path": "/api/cron/expire-pending-orders",
-      "schedule": "*/5 * * * *"
+      "schedule": "0 3 * * *"
     }
   ]
 }
