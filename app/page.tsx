@@ -51,16 +51,16 @@ export default async function HomePage() {
     return endDate < now;
   });
 
-  // Hero is always the next upcoming event (soonest start). Flash sale only affects badges.
+  // Hero = next upcoming only (not forced by flash)
   const featuredEvent = upcomingEvents[0];
   const remainingUpcoming = upcomingEvents.slice(1);
-  const flashSaleEvents = upcomingEvents.filter((e: any) => hasFlashFlag(e.has_active_flash));
   const featuredHasFlash = featuredEvent && hasFlashFlag(featuredEvent.has_active_flash);
+  const flashSaleEvents = upcomingEvents.filter((e: any) => hasFlashFlag(e.has_active_flash));
 
   return (
     <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh', color: '#fff', paddingBottom: '2rem' }}>
       {featuredEvent && (
-        <div style={{ position: 'relative', width: '100%', height: 420, marginBottom: 32, borderBottom: '1px solid #1f1f1f' }}>
+        <div style={{ position: 'relative', width: '100%', height: 420, marginBottom: 24, borderBottom: '1px solid #1f1f1f' }}>
           {featuredEvent.cover_image_url && (
             <img
               src={featuredEvent.cover_image_url}
@@ -100,8 +100,9 @@ export default async function HomePage() {
         </div>
       )}
 
-{flashSaleEvents.length > 0 && (
-        <div style={{ maxWidth: 1000, margin: '0 auto 28px', padding: '0 1rem' }}>
+      {/* Flash sales strip — under hero, above Tonight / filters */}
+      {flashSaleEvents.length > 0 && (
+        <div style={{ maxWidth: 1000, margin: '0 auto 20px', padding: '0 1rem' }}>
           <div
             style={{
               display: 'flex',
@@ -111,7 +112,7 @@ export default async function HomePage() {
               padding: '14px 16px',
               borderRadius: 12,
               border: '1px solid rgba(245, 158, 11, 0.45)',
-              background: 'linear-gradient(90deg, rgba(245,158,11,0.12), rgba(15,23,42,0.9))',
+              background: 'linear-gradient(90deg, rgba(245,158,11,0.14), rgba(15,23,42,0.95))',
             }}
           >
             <FlashSaleBadge />
@@ -128,16 +129,17 @@ export default async function HomePage() {
                 <Link
                   key={e.id}
                   href={`/events/${e.slug}`}
-                  className="text-sm font-bold"
                   style={{
                     textDecoration: 'none',
                     color: '#000',
                     background: '#f59e0b',
                     padding: '8px 12px',
                     borderRadius: 999,
+                    fontSize: 13,
+                    fontWeight: 700,
                   }}
                 >
-                  {e.title.length > 28 ? e.title.slice(0, 28) + '…' : e.title} →
+                  {(e.title.length > 28 ? e.title.slice(0, 28) + '…' : e.title) + ' →'}
                 </Link>
               ))}
             </div>
@@ -154,6 +156,8 @@ export default async function HomePage() {
         </h2>
         {remainingUpcoming.length > 0 ? (
           <EventList events={remainingUpcoming} showFilters={true} />
+        ) : upcomingEvents.length === 1 ? (
+          <p style={{ color: '#888', marginBottom: 32 }}>More events will appear here as they are published.</p>
         ) : (
           <p style={{ color: '#888', marginBottom: 32 }}>No upcoming events right now.</p>
         )}
