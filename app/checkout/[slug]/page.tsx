@@ -89,7 +89,13 @@ export default async function CheckoutPage({ params }: { params: Promise<{ slug:
           <div className="flex justify-between items-center pb-3 border-b border-gray-800">
             <div>
               <h3 className="font-bold text-lg text-white">{ticketType.name} Ticket</h3>
-              <p className="text-xs text-gray-400">{remaining} tickets remaining</p>
+              {remaining <= 0 ? (
+                <p className="text-xs text-red-400 font-semibold">Sold out</p>
+              ) : remaining <= 10 || (total > 0 && remaining / total <= 0.1) ? (
+                <p className="text-xs text-amber-400 font-semibold">Almost sold out</p>
+              ) : (
+                <p className="text-xs text-gray-400">Tickets available</p>
+              )}
             </div>
             <span className="text-cyan-400 font-extrabold text-lg">
               KES {priceNum.toLocaleString()}

@@ -123,7 +123,7 @@ export default function EventTicketPicker({
                 )}
                 {soldOut && <span> · Sold out</span>}
                 {almostSoldOut && <span className="text-amber-400 font-bold"> · Almost sold out!</span>}
-                {!soldOut && <span className="text-gray-500"> · {remaining} left</span>}
+                Available</span>}
               </p>
             </div>
 
