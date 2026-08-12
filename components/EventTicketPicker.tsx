@@ -106,7 +106,7 @@ export default function EventTicketPicker({
               <p className="font-bold text-white flex items-center gap-2 flex-wrap">
                 {t.name}
                 {flashActive && (
-                  <span className="flash-sale-badge animate-pulse text-[10px] uppercase tracking-wider font-extrabold bg-amber-500 text-black px-2 py-0.5 rounded-full">
+                  <span className="animate-pulse text-[10px] uppercase tracking-wider font-extrabold bg-amber-500 text-black px-2 py-0.5 rounded-full">
                     Flash Sale
                   </span>
                 )}
@@ -135,7 +135,6 @@ export default function EventTicketPicker({
                   type="button"
                   onClick={() => setTierQty(t.id, current - 1, maxQty)}
                   className="w-9 h-9 rounded-lg bg-gray-800 border border-gray-700 text-white font-bold hover:bg-gray-700"
-                  aria-label="Decrease"
                 >
                   −
                 </button>
@@ -144,7 +143,6 @@ export default function EventTicketPicker({
                   type="button"
                   onClick={() => setTierQty(t.id, current + 1, maxQty)}
                   className="w-9 h-9 rounded-lg bg-gray-800 border border-gray-700 text-white font-bold hover:bg-gray-700"
-                  aria-label="Increase"
                   disabled={current >= maxQty}
                 >
                   +
@@ -156,26 +154,18 @@ export default function EventTicketPicker({
       })}
 
       {totalQty > 0 && (
-        <div className="sticky bottom-4 z-10 mt-4 rounded-2xl border border-indigo-800/60 bg-gray-950/95 backdrop-blur p-4 shadow-xl shadow-indigo-950/40">
+        <div className="sticky bottom-4 z-10 mt-4 rounded-2xl border border-indigo-800/60 bg-gray-950/95 backdrop-blur p-4 shadow-xl">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <p className="text-sm text-gray-300">
                 <span className="font-bold text-white">{totalQty}</span> ticket{totalQty === 1 ? '' : 's'} selected
               </p>
               <p className="text-lg font-extrabold text-cyan-400">KES {totalKes.toLocaleString()}</p>
-              <ul className="text-xs text-gray-500 mt-1 space-y-0.5">
-                {lines.map((l) => (
-                  <li key={l.id}>
-                    {l.quantity}× {l.name}
-                    {l.flashActive ? ' (flash)' : ''} — KES {l.lineTotal.toLocaleString()}
-                  </li>
-                ))}
-              </ul>
             </div>
             <button
               type="button"
               onClick={goCheckout}
-              className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold uppercase tracking-wider transition shadow-lg shadow-indigo-950/50 text-sm"
+              className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-sm"
             >
               Checkout →
             </button>
