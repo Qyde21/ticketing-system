@@ -1,3 +1,15 @@
+# Run this from your project root: C:\Users\user\ticketing-system
+# Usage: powershell -ExecutionPolicy Bypass -File fix-promo-code-race.ps1
+#
+# Hardens promo code usage counting: makes the uses_count increment atomic
+# and guarded (only increments if still under max_uses), so the stored
+# count can never overshoot the limit under concurrent redemptions.
+
+$ErrorActionPreference = "Stop"
+$utf8NoBom = New-Object System.Text.UTF8Encoding $false
+
+Write-Host "Writing: lib\tickets.ts" -ForegroundColor Cyan
+$content = @'
 import { sql } from '@/lib/db';
 import { nanoid } from 'nanoid';
 import { sendTicketEmail } from '@/lib/email';
@@ -5,7 +17,7 @@ import { sendTicketConfirmationSms } from '@/lib/sms';
 
 /**
  * Marks an order as paid, generates real ticket rows, and emails the buyer.
- * Safe to call more than once for the same order â€” if tickets already exist,
+ * Safe to call more than once for the same order — if tickets already exist,
  * returns those codes instead of generating duplicates.
  *
  * Inventory (quantity_sold) is reserved atomically when the order is created
@@ -20,7 +32,7 @@ export async function finalizePaidOrder(orderId: string, baseUrl: string): Promi
 
   if (!order) return [];
 
-  // Already finalized with tickets â€” return existing codes (idempotent).
+  // Already finalized with tickets — return existing codes (idempotent).
   const existing = await sql`SELECT ticket_code FROM tickets WHERE order_id = ${order.id}`;
   if (existing.length > 0) {
     if (order.payment_status !== 'paid') {
@@ -38,7 +50,7 @@ export async function finalizePaidOrder(orderId: string, baseUrl: string): Promi
       // stored count can never overshoot max_uses even under concurrent
       // near-simultaneous redemptions. (Payment has already succeeded via
       // Paystack by this point, so a losing concurrent order still keeps
-      // its discount â€” this guard protects future validation, not this
+      // its discount — this guard protects future validation, not this
       // specific edge case, which is an acceptable tradeoff.)
       await sql`
         UPDATE promo_codes
@@ -59,7 +71,7 @@ export async function finalizePaidOrder(orderId: string, baseUrl: string): Promi
     generatedCodes.push(ticketCode);
   }
 
-  // quantity_sold is reserved atomically at order creation â€” do not increment here.
+  // quantity_sold is reserved atomically at order creation — do not increment here.
 
   const [eventDetails] = await sql`
     SELECT title, venue_name, start_at FROM events WHERE id = ${order.event_id}
@@ -97,3 +109,17 @@ export async function finalizePaidOrder(orderId: string, baseUrl: string): Promi
   return generatedCodes;
 }
 
+
+'@
+[System.IO.File]::WriteAllText("lib\tickets.ts", $content, $utf8NoBom)
+
+if (-not (Test-Path -LiteralPath "lib\tickets.ts")) {
+    Write-Host "ERROR: file was not created!" -ForegroundColor Red
+} else {
+    Write-Host "Confirmed on disk." -ForegroundColor Green
+    Write-Host ""
+    Write-Host "Next steps:" -ForegroundColor Green
+    Write-Host "  git add ."
+    Write-Host "  git commit -m ""Fix: guard promo code usage count against race condition"""
+    Write-Host "  git push origin main"
+}
