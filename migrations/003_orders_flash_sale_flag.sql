@@ -1,0 +1,2 @@
+ALTER TABLE orders
+  ADD COLUMN IF NOT EXISTS is_flash_sale BOOLEAN NOT NULL DEFAULT false;

@@ -1,3 +1,44 @@
+# Run this from your project root: C:\Users\user\ticketing-system
+# Usage: powershell -ExecutionPolicy Bypass -File post-launch-fixes.ps1
+#
+# This full-system check found and fixes two things:
+# 1. vercel.json had been renamed to vercel.json.bak, silently disabling
+#    the daily event-reminder cron job. Restored.
+# 2. Refunding a ticket that was bought at a flash-sale price did not
+#    release its slot from the flash sale's quantity cap. Fixed by
+#    recording whether each order used flash pricing (new orders.is_flash_sale
+#    column) and having the refund route account for it.
+# Also removes the old vercel.json.bak now that it's restored.
+
+$ErrorActionPreference = "Stop"
+$script:anyFailed = $false
+$utf8NoBom = New-Object System.Text.UTF8Encoding $false
+
+function Write-ClaudeFile($path, $content) {
+    $dir = Split-Path $path -Parent
+    if ($dir -and -not (Test-Path -LiteralPath $dir)) {
+        New-Item -ItemType Directory -Force -Path $dir | Out-Null
+    }
+    [System.IO.File]::WriteAllText($path, $content, $utf8NoBom)
+}
+
+
+Write-Host "Writing: migrations\003_orders_flash_sale_flag.sql" -ForegroundColor Cyan
+$content = @'
+ALTER TABLE orders
+  ADD COLUMN IF NOT EXISTS is_flash_sale BOOLEAN NOT NULL DEFAULT false;
+
+'@
+Write-ClaudeFile "migrations\003_orders_flash_sale_flag.sql" $content
+if (-not (Test-Path -LiteralPath "migrations\003_orders_flash_sale_flag.sql")) {
+    Write-Host "  ERROR: file was not created!" -ForegroundColor Red
+    $script:anyFailed = $true
+} else {
+    Write-Host "  Confirmed on disk." -ForegroundColor Green
+}
+
+Write-Host "Writing: app\api\orders\route.ts" -ForegroundColor Cyan
+$content = @'
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { nanoid } from 'nanoid';
@@ -288,4 +329,136 @@ export async function POST(req: NextRequest) {
     }
     return NextResponse.json({ error: err.message || 'Something went wrong' }, { status: 500 });
   }
+}
+'@
+Write-ClaudeFile "app\api\orders\route.ts" $content
+if (-not (Test-Path -LiteralPath "app\api\orders\route.ts")) {
+    Write-Host "  ERROR: file was not created!" -ForegroundColor Red
+    $script:anyFailed = $true
+} else {
+    Write-Host "  Confirmed on disk." -ForegroundColor Green
+}
+
+Write-Host "Writing: app\api\orders\[id]\refund\route.ts" -ForegroundColor Cyan
+$content = @'
+import { NextRequest, NextResponse } from 'next/server';
+import { sql } from '@/lib/db';
+import { getSession } from '@/lib/auth';
+import { refundTransaction } from '@/lib/paystack';
+import { sendCancellationEmail } from '@/lib/email';
+import { notifyWaitlistIfSpotsFreed } from '@/lib/waitlist';
+
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: 'Not authorized' }, { status: 403 });
+  }
+
+  const { id } = await params;
+
+  const [order] = await sql`
+    SELECT o.id, o.payment_status, o.paystack_reference, o.buyer_name, o.buyer_email,
+           o.ticket_type_id, o.quantity, o.is_flash_sale,
+           e.title AS event_title, e.organizer_id, e.start_at, e.end_at
+    FROM orders o
+    JOIN events e ON e.id = o.event_id
+    WHERE o.id = ${id}
+  `;
+
+  if (!order) {
+    return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+  }
+  if (order.organizer_id !== session.userId && session.role !== 'admin') {
+    return NextResponse.json({ error: 'Not authorized for this order' }, { status: 403 });
+  }
+  if (order.payment_status !== 'paid') {
+    return NextResponse.json({ error: 'Only paid orders can be refunded' }, { status: 400 });
+  }
+
+  try {
+    await refundTransaction(order.paystack_reference);
+  } catch (err: any) {
+    console.error('Paystack refund error:', err);
+    return NextResponse.json({ error: err.message || 'Refund failed at Paystack' }, { status: 500 });
+  }
+
+  await sql`UPDATE orders SET payment_status = 'refunded' WHERE id = ${order.id}`;
+  await sql`UPDATE tickets SET status = 'cancelled' WHERE order_id = ${order.id}`;
+  await sql`
+    UPDATE ticket_types
+    SET quantity_sold = GREATEST(0, quantity_sold - ${order.quantity}),
+        flash_sale_quantity_sold = GREATEST(0, flash_sale_quantity_sold - ${order.is_flash_sale ? order.quantity : 0})
+    WHERE id = ${order.ticket_type_id}
+  `;
+
+  try {
+    console.log('Sending cancellation email to:', order.buyer_email);
+    await sendCancellationEmail({
+      toEmail: order.buyer_email,
+      buyerName: order.buyer_name,
+      eventTitle: order.event_title,
+      reason: 'Your order has been refunded by the organizer.',
+    });
+    console.log('Cancellation email sent successfully');
+  } catch (emailErr) {
+    console.error('Failed to send cancellation email:', emailErr);
+  }
+
+  try {
+    await notifyWaitlistIfSpotsFreed(order.ticket_type_id, order.quantity, req.nextUrl.origin);
+  } catch (waitlistErr) {
+    console.error('Failed to notify waitlist:', waitlistErr);
+  }
+
+  return NextResponse.json({ success: true });
+}
+
+'@
+Write-ClaudeFile "app\api\orders\[id]\refund\route.ts" $content
+if (-not (Test-Path -LiteralPath "app\api\orders\[id]\refund\route.ts")) {
+    Write-Host "  ERROR: file was not created!" -ForegroundColor Red
+    $script:anyFailed = $true
+} else {
+    Write-Host "  Confirmed on disk." -ForegroundColor Green
+}
+
+Write-Host "Writing: vercel.json" -ForegroundColor Cyan
+$content = @'
+{
+  "crons": [
+    {
+      "path": "/api/cron/event-reminders",
+      "schedule": "0 6 * * *"
+    }
+  ]
+}
+
+'@
+Write-ClaudeFile "vercel.json" $content
+if (-not (Test-Path -LiteralPath "vercel.json")) {
+    Write-Host "  ERROR: file was not created!" -ForegroundColor Red
+    $script:anyFailed = $true
+} else {
+    Write-Host "  Confirmed on disk." -ForegroundColor Green
+}
+
+
+if (Test-Path -LiteralPath "vercel.json.bak") {
+    Remove-Item "vercel.json.bak"
+    Write-Host "Removed stale vercel.json.bak" -ForegroundColor Green
+}
+
+Write-Host ""
+if ($script:anyFailed) {
+    Write-Host "SOME FILES FAILED TO WRITE - do not push yet, share this output." -ForegroundColor Red
+} else {
+    Write-Host "All files confirmed written successfully." -ForegroundColor Green
+    Write-Host ""
+    Write-Host "IMPORTANT: run migrations/003_orders_flash_sale_flag.sql in Neon's" -ForegroundColor Yellow
+    Write-Host "SQL Editor before pushing, or refunds will error until you do." -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "Next steps:" -ForegroundColor Green
+    Write-Host "  git add ."
+    Write-Host "  git commit -m ""Fix: restore cron config, release flash-sale cap on refund"""
+    Write-Host "  git push origin main"
 }

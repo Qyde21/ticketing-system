@@ -15,7 +15,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const [order] = await sql`
     SELECT o.id, o.payment_status, o.paystack_reference, o.buyer_name, o.buyer_email,
-           o.ticket_type_id, o.quantity,
+           o.ticket_type_id, o.quantity, o.is_flash_sale,
            e.title AS event_title, e.organizer_id, e.start_at, e.end_at
     FROM orders o
     JOIN events e ON e.id = o.event_id
@@ -42,7 +42,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   await sql`UPDATE orders SET payment_status = 'refunded' WHERE id = ${order.id}`;
   await sql`UPDATE tickets SET status = 'cancelled' WHERE order_id = ${order.id}`;
   await sql`
-    UPDATE ticket_types SET quantity_sold = GREATEST(0, quantity_sold - ${order.quantity})
+    UPDATE ticket_types
+    SET quantity_sold = GREATEST(0, quantity_sold - ${order.quantity}),
+        flash_sale_quantity_sold = GREATEST(0, flash_sale_quantity_sold - ${order.is_flash_sale ? order.quantity : 0})
     WHERE id = ${order.ticket_type_id}
   `;
 
