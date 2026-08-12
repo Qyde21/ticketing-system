@@ -16,7 +16,7 @@ CREATE TABLE users (
   id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   email         TEXT UNIQUE NOT NULL,
   phone         TEXT,
-  password_hash TEXT NOT NULL,
+  password_hash TEXT, -- nullable: OAuth-only accounts (Google, later Apple) have no password
   full_name     TEXT NOT NULL,
   role          TEXT NOT NULL DEFAULT 'attendee', -- 'attendee' | 'organizer' | 'admin'
   status        TEXT NOT NULL DEFAULT 'active', -- 'active' | 'suspended'
@@ -24,6 +24,18 @@ CREATE TABLE users (
   totp_secret   TEXT, -- base32 TOTP secret, only set once 2FA setup begins
   totp_enabled  BOOLEAN NOT NULL DEFAULT false,
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Links a user to one or more OAuth identity providers. Designed to support
+-- multiple providers per user (e.g. Google now, Apple later) without further
+-- schema changes — provider + provider_user_id together are unique.
+CREATE TABLE oauth_accounts (
+  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id          UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  provider         TEXT NOT NULL, -- 'google' | 'apple'
+  provider_user_id TEXT NOT NULL,
+  created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (provider, provider_user_id)
 );
 
 -- Email verification tokens, sent on signup. Mirrors password_reset_tokens below.

@@ -31,7 +31,20 @@ export async function POST(req: NextRequest) {
     }
 
     const [user] = await sql`SELECT * FROM users WHERE email = ${normalizedEmail}`;
-    if (!user || !(await verifyPassword(password, user.password_hash))) {
+
+    if (!user) {
+      await recordAttempt('login', normalizedEmail, ip);
+      return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
+    }
+
+    if (!user.password_hash) {
+      return NextResponse.json(
+        { error: 'This account uses Google Sign-In. Please use the "Continue with Google" button instead.' },
+        { status: 401 }
+      );
+    }
+
+    if (!(await verifyPassword(password, user.password_hash))) {
       await recordAttempt('login', normalizedEmail, ip);
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
