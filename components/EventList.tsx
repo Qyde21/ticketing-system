@@ -6,8 +6,22 @@ import FlashSaleBadge from '@/components/FlashSaleBadge';
 export default function EventList({ events, showFilters = true }: { events: any[], showFilters?: boolean }) {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
+  const [whenFilter, setWhenFilter] = useState<'all' | 'tonight' | 'weekend'>('all');
 
   const filteredEvents = useMemo(() => {
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const endOfToday = new Date(startOfToday);
+    endOfToday.setDate(endOfToday.getDate() + 1);
+
+    // Weekend = upcoming Sat 00:00 through Mon 00:00 (local time)
+    const day = now.getDay(); // 0 Sun .. 6 Sat
+    const daysUntilSat = (6 - day + 7) % 7;
+    const sat = new Date(startOfToday);
+    sat.setDate(sat.getDate() + daysUntilSat);
+    const monAfter = new Date(sat);
+    monAfter.setDate(monAfter.getDate() + 2);
+
     return events.filter((e) => {
       const q = search.toLowerCase().trim();
       const matchesSearch =
@@ -15,9 +29,18 @@ export default function EventList({ events, showFilters = true }: { events: any[
         (e.title || '').toLowerCase().includes(q) ||
         (e.venue_name || '').toLowerCase().includes(q);
       const matchesCat = category === 'All' || (e.category && e.category === category);
-      return matchesSearch && matchesCat;
+
+      const start = e.start_at ? new Date(e.start_at) : null;
+      let matchesWhen = true;
+      if (whenFilter === 'tonight' && start) {
+        matchesWhen = start >= startOfToday && start < endOfToday;
+      } else if (whenFilter === 'weekend' && start) {
+        matchesWhen = start >= sat && start < monAfter;
+      }
+
+      return matchesSearch && matchesCat && matchesWhen;
     });
-  }, [search, category, events]);
+  }, [search, category, whenFilter, events]);
 
   return (
     <div>
@@ -30,6 +53,31 @@ export default function EventList({ events, showFilters = true }: { events: any[
             onChange={(e) => setSearch(e.target.value)}
             style={{ width: "100%", padding: "12px", borderRadius: 8, background: "#1f1f1f", border: "1px solid #333", color: "#fff", marginBottom: 16 }}
           />
+                    <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 10 }}>
+            {([
+              { id: 'all', label: 'All dates' },
+              { id: 'tonight', label: 'Tonight' },
+              { id: 'weekend', label: 'This weekend' },
+            ] as const).map((w) => (
+              <button
+                key={w.id}
+                type="button"
+                onClick={() => setWhenFilter(w.id)}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: 20,
+                  cursor: 'pointer',
+                  background: whenFilter === w.id ? 'linear-gradient(to right, #f59e0b, #06b6d4)' : '#1f1f1f',
+                  color: whenFilter === w.id ? '#fff' : '#ccc',
+                  border: whenFilter === w.id ? 'none' : '1px solid #333',
+                  whiteSpace: 'nowrap',
+                  fontWeight: whenFilter === w.id ? 700 : 500,
+                }}
+              >
+                {w.label}
+              </button>
+            ))}
+          </div>
           <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 8 }}>
             {["All", "Concert", "Festival", "Comedy", "Autoshow", "Sports", "Other"].map(cat => (
               <button
