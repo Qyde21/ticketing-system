@@ -1,11 +1,19 @@
-﻿'use client';
+'use client';
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 
 interface Recent { ticketCode: string; holderName: string | null; ticketType: string | null; checkedInAt: string | null }
 interface Stats { total: number; checkedIn: number; remaining: number; cancelled: number; recent: Recent[] }
 
-export default function LiveOverview({ eventId, initial }: { eventId: string; initial: Stats }) {
+export default function LiveOverview({
+  eventId,
+  initial,
+  eventEnded = false,
+}: {
+  eventId: string;
+  initial: Stats;
+  eventEnded?: boolean;
+}) {
   const [stats, setStats] = useState<Stats>(initial);
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const refresh = useCallback(async () => {
@@ -21,6 +29,11 @@ export default function LiveOverview({ eventId, initial }: { eventId: string; in
   const percent = stats.total > 0 ? Math.round((stats.checkedIn / stats.total) * 100) : 0;
   return (
     <div>
+      {eventEnded && (
+        <div className="mt-4 rounded-xl border border-gray-700 bg-gray-900/80 px-4 py-3 text-sm text-gray-300">
+          This event has ended. Ticket scanning is closed.
+        </div>
+      )}
       <div className="flex gap-3 mt-4 flex-wrap">
         {[
           { label: 'Total tickets', value: stats.total, color: 'text-indigo-400' },
@@ -41,7 +54,15 @@ export default function LiveOverview({ eventId, initial }: { eventId: string; in
         <span>{percent}% checked in · live every 3s</span>
         <button type="button" onClick={() => void refresh()} className="text-indigo-400 hover:underline">Refresh now{updatedAt && <span className="text-gray-600 ml-1">({updatedAt.toLocaleTimeString()})</span>}</button>
       </p>
-      <Link href={`/scan/${eventId}`} className="inline-block mt-3 bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-lg font-semibold text-sm transition">Open Scanner</Link>
+      {eventEnded ? (
+        <span className="inline-block mt-3 bg-gray-800 text-gray-500 px-5 py-2 rounded-lg font-semibold text-sm border border-gray-700 cursor-not-allowed" title="Scanning is closed — this event has ended">
+          Open Scanner (closed)
+        </span>
+      ) : (
+        <Link href={`/scan/${eventId}`} className="inline-block mt-3 bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-lg font-semibold text-sm transition">
+          Open Scanner
+        </Link>
+      )}
       <h2 className="text-xl font-bold mt-6 mb-3">Recent check-ins</h2>
       {stats.recent.length === 0 ? <p className="text-gray-500 text-sm">No check-ins yet.</p> : (
         <ul className="list-none p-0 space-y-2">

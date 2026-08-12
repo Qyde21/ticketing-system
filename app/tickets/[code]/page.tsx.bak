@@ -1,0 +1,78 @@
+import { sql } from '@/lib/db';
+import QRCode from 'qrcode';
+import TicketQRReveal from '@/components/TicketQRReveal';
+import AddToCalendarButton from '@/components/AddToCalendarButton';
+
+export default async function TicketPage({ params }: { params: Promise<{ code: string }> }) {
+  const { code } = await params;
+
+  const [ticket] = await sql`
+    SELECT t.ticket_code, t.holder_name, t.status, t.checked_in_at,
+           tt.name AS ticket_type_name,
+           e.title AS event_title, e.venue_name, e.start_at, e.end_at
+    FROM tickets t
+    JOIN ticket_types tt ON tt.id = t.ticket_type_id
+    JOIN orders o ON o.id = t.order_id
+    JOIN events e ON e.id = o.event_id
+    WHERE t.ticket_code = ${code}
+  `;
+
+  if (!ticket) {
+    return <div style={{ maxWidth: 500, margin: '2rem auto' }}>Ticket not found.</div>;
+  }
+
+  const qrDataUrl = await QRCode.toDataURL(String(ticket.ticket_code));
+  const isUsed = ticket.status === 'used';
+  const eventEnd = ticket.end_at ? new Date(ticket.end_at) : new Date(ticket.start_at);
+  const eventEnded = eventEnd < new Date();
+  const isExpired = !isUsed && ticket.status === 'valid' && eventEnded;
+
+  return (
+    <div style={{ maxWidth: 400, margin: '2rem auto', textAlign: 'center', color: '#fff', padding: '0 16px' }}>
+      <h1 style={{ fontSize: 22, fontWeight: 800 }}>{ticket.event_title}</h1>
+      <p style={{ color: '#9ca3af' }}>{ticket.ticket_type_name}</p>
+      <p style={{ color: '#9ca3af' }}>
+        {ticket.venue_name} — {new Date(ticket.start_at).toLocaleString()}
+      </p>
+      {ticket.holder_name && <p>Ticket holder: {ticket.holder_name}</p>}
+
+      {isUsed ? (
+        <div style={{ margin: '24px auto', padding: 16, borderRadius: 12, background: '#7f1d1d', border: '1px solid #991b1b', color: '#fecaca', fontWeight: 700 }}>
+          Already scanned
+          {ticket.checked_in_at && (
+            <div style={{ fontWeight: 400, fontSize: 13, marginTop: 6 }}>
+              {new Date(ticket.checked_in_at).toLocaleString()}
+            </div>
+          )}
+        </div>
+      ) : isExpired ? (
+        <div style={{ margin: '24px auto', padding: 16, borderRadius: 12, background: '#374151', border: '1px solid #4b5563', color: '#d1d5db', fontWeight: 700 }}>
+          Event ended — ticket no longer valid
+          <div style={{ fontWeight: 400, fontSize: 13, marginTop: 6 }}>
+            Check-in closed after the event ended.
+          </div>
+        </div>
+      ) : (
+        <div style={{ margin: '20px 0' }}>
+          <TicketQRReveal qrDataUrl={qrDataUrl} ticketCode={String(ticket.ticket_code)} />
+        </div>
+      )}
+
+      <p style={{ color: '#6b7280', fontSize: 13 }}>
+        Status:{' '}
+        <strong style={{ color: isUsed || isExpired ? '#f87171' : '#34d399' }}>
+          {isExpired ? 'expired' : ticket.status}
+        </strong>
+      </p>
+
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12 }}>
+        <AddToCalendarButton
+          title={ticket.event_title}
+          location={ticket.venue_name}
+          startAt={ticket.start_at}
+          endAt={ticket.end_at}
+        />
+      </div>
+    </div>
+  );
+}
