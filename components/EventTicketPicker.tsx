@@ -122,8 +122,9 @@ export default function EventTicketPicker({
                   <>KES {regular.toLocaleString()}</>
                 )}
                 {soldOut && <span> · Sold out</span>}
-                {almostSoldOut && <span className="text-amber-400 font-bold"> · Almost sold out!</span>}
-                Available</span>}
+                {!soldOut && almostSoldOut && (
+                  <span className="text-amber-400 font-bold"> · Almost sold out!</span>
+                )}
               </p>
             </div>
 
