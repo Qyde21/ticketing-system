@@ -1,12 +1,41 @@
 import EventList from '@/components/EventList';
 import FlashSaleBadge from '@/components/FlashSaleBadge';
-import { getPublicEvents } from '@/lib/cached-events';
+import { sql } from '@/lib/db';
 import Link from 'next/link';
 
-export const revalidate = 30;
+export const dynamic = 'force-dynamic';
+
+function hasFlashFlag(v: unknown) {
+  return v === true || v === 't' || v === 1 || v === '1' || v === 'true';
+}
 
 export default async function HomePage() {
-  const events = await getPublicEvents();
+  const events = await sql`
+    SELECT
+      e.id, e.title, e.slug, e.venue_name, e.start_at, e.end_at, e.status,
+      e.cover_image_url, e.category,
+      COALESCE(op.is_verified, false) AS organizer_verified,
+      COALESCE(SUM(tt.quantity_total), 0) AS total_capacity,
+      COALESCE(SUM(tt.quantity_sold), 0) AS total_sold,
+      BOOL_OR(
+        tt.flash_sale_price_kes IS NOT NULL
+        AND tt.flash_sale_starts_at IS NOT NULL
+        AND tt.flash_sale_ends_at IS NOT NULL
+        AND tt.flash_sale_starts_at <= NOW()
+        AND tt.flash_sale_ends_at >= NOW()
+        AND (
+          tt.flash_sale_quantity_cap IS NULL
+          OR tt.flash_sale_quantity_sold < tt.flash_sale_quantity_cap
+        )
+      ) AS has_active_flash
+    FROM events e
+    LEFT JOIN ticket_types tt ON tt.event_id = e.id
+    LEFT JOIN organizer_profiles op ON op.user_id = e.organizer_id
+    JOIN users u ON u.id = e.organizer_id
+    WHERE e.status IN ('published', 'completed') AND u.status != 'suspended'
+    GROUP BY e.id, op.is_verified
+    ORDER BY e.start_at ASC
+  `;
 
   const now = new Date();
 
@@ -22,13 +51,11 @@ export default async function HomePage() {
     return endDate < now;
   });
 
-  const featuredEvent = upcomingEvents[0];
-  const remainingUpcoming = upcomingEvents.slice(1);
-  const featuredHasFlash =
-    !!featuredEvent &&
-    (featuredEvent.has_active_flash === true ||
-      featuredEvent.has_active_flash === 't' ||
-      featuredEvent.has_active_flash === 1);
+  // Prefer an event with an active flash sale as the hero banner
+  const flashFeatured = upcomingEvents.find((e: any) => hasFlashFlag(e.has_active_flash));
+  const featuredEvent = flashFeatured || upcomingEvents[0];
+  const remainingUpcoming = upcomingEvents.filter((e: any) => e.id !== featuredEvent?.id);
+  const featuredHasFlash = featuredEvent && hasFlashFlag(featuredEvent.has_active_flash);
 
   return (
     <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh', color: '#fff', paddingBottom: '2rem' }}>

@@ -1,6 +1,7 @@
 'use client';
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import FlashSaleBadge from '@/components/FlashSaleBadge';
 
 export default function EventList({ events, showFilters = true }: { events: any[], showFilters?: boolean }) {
   const [search, setSearch] = useState('');
