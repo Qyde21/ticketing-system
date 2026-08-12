@@ -51,10 +51,9 @@ export default async function HomePage() {
     return endDate < now;
   });
 
-  // Prefer an event with an active flash sale as the hero banner
-  const flashFeatured = upcomingEvents.find((e: any) => hasFlashFlag(e.has_active_flash));
-  const featuredEvent = flashFeatured || upcomingEvents[0];
-  const remainingUpcoming = upcomingEvents.filter((e: any) => e.id !== featuredEvent?.id);
+  // Hero is always the next upcoming event (soonest start). Flash sale only affects badges.
+  const featuredEvent = upcomingEvents[0];
+  const remainingUpcoming = upcomingEvents.slice(1);
   const featuredHasFlash = featuredEvent && hasFlashFlag(featuredEvent.has_active_flash);
 
   return (
