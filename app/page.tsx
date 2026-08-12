@@ -54,6 +54,7 @@ export default async function HomePage() {
   // Hero is always the next upcoming event (soonest start). Flash sale only affects badges.
   const featuredEvent = upcomingEvents[0];
   const remainingUpcoming = upcomingEvents.slice(1);
+  const flashSaleEvents = upcomingEvents.filter((e: any) => hasFlashFlag(e.has_active_flash));
   const featuredHasFlash = featuredEvent && hasFlashFlag(featuredEvent.has_active_flash);
 
   return (
@@ -95,6 +96,51 @@ export default async function HomePage() {
             >
               View Event &rarr;
             </Link>
+          </div>
+        </div>
+      )}
+
+{flashSaleEvents.length > 0 && (
+        <div style={{ maxWidth: 1000, margin: '0 auto 28px', padding: '0 1rem' }}>
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              gap: 12,
+              padding: '14px 16px',
+              borderRadius: 12,
+              border: '1px solid rgba(245, 158, 11, 0.45)',
+              background: 'linear-gradient(90deg, rgba(245,158,11,0.12), rgba(15,23,42,0.9))',
+            }}
+          >
+            <FlashSaleBadge />
+            <div style={{ flex: 1, minWidth: 200 }}>
+              <p style={{ margin: 0, fontWeight: 800, color: '#fbbf24', fontSize: 14 }}>
+                Flash sales on now
+              </p>
+              <p style={{ margin: '4px 0 0', color: '#d1d5db', fontSize: 13 }}>
+                {flashSaleEvents.map((e: any) => e.title).join(' · ')}
+              </p>
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {flashSaleEvents.slice(0, 3).map((e: any) => (
+                <Link
+                  key={e.id}
+                  href={`/events/${e.slug}`}
+                  className="text-sm font-bold"
+                  style={{
+                    textDecoration: 'none',
+                    color: '#000',
+                    background: '#f59e0b',
+                    padding: '8px 12px',
+                    borderRadius: 999,
+                  }}
+                >
+                  {e.title.length > 28 ? e.title.slice(0, 28) + '…' : e.title} →
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       )}
