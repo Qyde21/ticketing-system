@@ -107,6 +107,9 @@ export async function DELETE(
   const { id: eventId } = await params;
   const check = await assertOrganizerOrAdmin(eventId, session.userId, session.role);
   if ('error' in check) return NextResponse.json({ error: check.error }, { status: check.status });
+  if (isEventEnded(check.event)) {
+    return NextResponse.json({ error: 'This event has ended. Door staff changes are closed.' }, { status: 400 });
+  }
 
   const userId = req.nextUrl.searchParams.get('userId');
   if (!userId) return NextResponse.json({ error: 'userId is required' }, { status: 400 });
