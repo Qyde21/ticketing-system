@@ -183,22 +183,21 @@ export default async function EventDetailPage({
         <p><strong className="text-gray-400">Location:</strong> {event.venue_name || event.location || 'Online / Venue TBA'}</p>
       </div>
 
-      {event.venue_name && (
-        <div className="mb-8 rounded-2xl overflow-hidden border border-gray-800">
-          {!isEnded && !isCancelled && (
-                    <iframe
-            title={`Map showing ${event.venue_name}`}
-            width="100%"
-            height="280"
-            style={{ border: 0, display: 'block' }}
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            src={`https://maps.google.com/maps?q=${encodeURIComponent(
-              [event.venue_name, event.venue_address].filter(Boolean).join(', ')
-            )}&output=embed`}
-          />
-        </div>
-      )}
+      {event.venue_name && !isEnded && !isCancelled && (
+            <div className="mb-8 rounded-2xl overflow-hidden border border-gray-800">
+              <iframe
+                title={`Map showing ${event.venue_name}`}
+                width="100%"
+                height="280"
+                style={{ border: 0, display: 'block' }}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                src={`https://maps.google.com/maps?q=${encodeURIComponent(
+                  [event.venue_name, event.venue_address].filter(Boolean).join(', ')
+                )}&output=embed`}
+              />
+            </div>
+            )}
 
       <div className="space-y-3">
         <h2 className="text-xl font-bold text-white mb-2">Tickets</h2>
