@@ -107,7 +107,7 @@ export default async function AttendeeDashboard() {
                   </div>
                 </div>
 
-                {o.latitude && o.longitude ? (
+                {!eventEnded && o.latitude && o.longitude ? (
                   <a href={mapsUrl(o.latitude, o.longitude)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm text-emerald-400 hover:text-emerald-300 font-semibold">
                     View on Google Maps
                   </a>
