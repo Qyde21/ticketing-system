@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
+function isEventEnded(event: { status?: string; start_at?: string | Date; end_at?: string | Date | null }) {
+  if (event.status === 'completed') return true;
+  if (event.status === 'cancelled') return false;
+  const end = event.end_at ? new Date(event.end_at) : event.start_at ? new Date(event.start_at) : null;
+  return !!end && end < new Date();
+}
+
 
 async function assertOrganizerOrAdmin(eventId: string, userId: string, role: string) {
   const [event] = await sql`
-    SELECT id, title, organizer_id FROM events WHERE id = ${eventId}
+    SELECT id, title, organizer_id, status, start_at, end_at FROM events WHERE id = ${eventId}
   `;
   if (!event) return { error: 'Event not found', status: 404 as const };
   if (event.organizer_id !== userId && role !== 'admin') {
@@ -42,6 +49,9 @@ export async function POST(
   const { id: eventId } = await params;
   const check = await assertOrganizerOrAdmin(eventId, session.userId, session.role);
   if ('error' in check) return NextResponse.json({ error: check.error }, { status: check.status });
+  if (isEventEnded(check.event)) {
+    return NextResponse.json({ error: 'This event has ended. Door staff changes are closed.' }, { status: 400 });
+  }
 
   const body = await req.json().catch(() => ({}));
   const email = String(body.email || '').trim().toLowerCase();
