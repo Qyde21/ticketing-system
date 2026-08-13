@@ -158,6 +158,7 @@ export default async function OrganizerDashboardPage() {
                   <Link href={`/organizer/events/${event.id}/edit`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Manage Details</Link>
                   <Link href={`/organizer/events/${event.id}/messages`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Messages</Link>
                   <Link href={`/organizer/events/${event.id}/scan-overview`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Scan Overview</Link>
+                  <Link href={`/organizer/events/${event.id}/staff`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Door staff</Link>
                   {eventEnded ? (
                     <span className="text-gray-600 bg-gray-900/60 px-3 py-1.5 rounded-lg border border-gray-800 cursor-not-allowed" title="Promo codes are disabled after the event has ended">Promo Codes</span>
                   ) : (

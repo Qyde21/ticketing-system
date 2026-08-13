@@ -85,12 +85,20 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
             {event.start_at ? new Date(event.start_at).toLocaleString() : 'No Date'}
           </p>
         </div>
-        <a
-          href={`/api/events/${eventId}/door-list`}
-          className="inline-flex items-center gap-1.5 bg-gray-800 hover:bg-gray-700 text-white text-xs font-semibold px-3 py-2 rounded-lg border border-gray-700 transition"
-        >
-          Download door list (CSV)
-        </a>
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            href={`/organizer/events/${eventId}/staff`}
+            className="inline-flex items-center gap-1.5 bg-gray-800 hover:bg-gray-700 text-white text-xs font-semibold px-3 py-2 rounded-lg border border-gray-700 transition"
+          >
+            Door staff
+          </Link>
+          <a
+            href={`/api/events/${eventId}/door-list`}
+            className="inline-flex items-center gap-1.5 bg-gray-800 hover:bg-gray-700 text-white text-xs font-semibold px-3 py-2 rounded-lg border border-gray-700 transition"
+          >
+            Download door list (CSV)
+          </a>
+        </div>
       </div>
       <LiveOverview eventId={eventId} initial={initial} eventEnded={eventEnded} />
     </div>

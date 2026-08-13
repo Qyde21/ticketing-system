@@ -64,10 +64,22 @@ export async function POST(
     return NextResponse.json({ error: 'The organizer already has full access to this event' }, { status: 400 });
   }
 
+  const existing = await sql`
+    SELECT event_id FROM event_staff
+    WHERE event_id = ${eventId} AND user_id = ${user.id}
+    LIMIT 1
+  `;
+  if (existing.length > 0) {
+    return NextResponse.json({
+      error: 'That person is already door staff for this event',
+      alreadyStaff: true,
+      staff: { id: user.id, full_name: user.full_name, email: user.email },
+    }, { status: 409 });
+  }
+
   await sql`
     INSERT INTO event_staff (event_id, user_id)
     VALUES (${eventId}, ${user.id})
-    ON CONFLICT (event_id, user_id) DO NOTHING
   `;
 
   return NextResponse.json({

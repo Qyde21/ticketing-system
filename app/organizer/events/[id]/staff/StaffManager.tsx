@@ -23,7 +23,17 @@ export default function StaffManager({ eventId, initialStaff }: { eventId: strin
         body: JSON.stringify({ email: email.trim() }),
       });
       const data = await res.json();
-      if (!res.ok) { setError(data.error || 'Could not add staff'); return; }
+      if (!res.ok) {
+        if (res.status === 409 && data.alreadyStaff) {
+          setError(data.error || 'That person is already door staff for this event');
+          if (data.staff && !staff.some((s) => s.id === data.staff.id)) {
+            setStaff((prev) => [...prev, data.staff].sort((a, b) => a.full_name.localeCompare(b.full_name)));
+          }
+          return;
+        }
+        setError(data.error || 'Could not add staff');
+        return;
+      }
       if (data.staff && !staff.some((s) => s.id === data.staff.id)) {
         setStaff((prev) => [...prev, data.staff].sort((a, b) => a.full_name.localeCompare(b.full_name)));
       }
