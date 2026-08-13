@@ -1,3 +1,31 @@
+# Run this from your project root: C:\Users\user\ticketing-system
+# Usage: powershell -ExecutionPolicy Bypass -File restore-door-staff-page.ps1
+#
+# 1. Restores the "Door staff" link on the organizer dashboard that my
+#    previous full-file overwrite accidentally removed.
+# 2. Recreates app/organizer/events/[id]/staff/page.tsx, which turned out
+#    to have been missing already (a pre-existing issue, not caused by me) —
+#    it only ever existed as page.tsx.bak, which a cleanup commit deleted
+#    without the real file ever being created. StaffManager.tsx (the actual
+#    UI) was already fine; this just adds back its missing page wrapper,
+#    matching the same server-component + ownership-check pattern used
+#    everywhere else in the app.
+
+$ErrorActionPreference = "Stop"
+$script:anyFailed = $false
+$utf8NoBom = New-Object System.Text.UTF8Encoding $false
+
+function Write-ClaudeFile($path, $content) {
+    $dir = Split-Path $path -Parent
+    if ($dir -and -not (Test-Path -LiteralPath $dir)) {
+        New-Item -ItemType Directory -Force -Path $dir | Out-Null
+    }
+    [System.IO.File]::WriteAllText($path, $content, $utf8NoBom)
+}
+
+
+Write-Host "Writing: app\organizer\dashboard\page.tsx" -ForegroundColor Cyan
+$content = @'
 import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import Link from 'next/link';
@@ -19,7 +47,7 @@ export default async function OrganizerDashboardPage() {
     : await sql`SELECT * FROM events WHERE organizer_id = ${session.userId} ORDER BY created_at DESC`;
 
   // Organizers must be approved by an admin before they can create events,
-  // and a suspension should immediately block creation too Ã¢â‚¬â€ checked live
+  // and a suspension should immediately block creation too â€” checked live
   // from the DB rather than trusting the session cookie's role/state alone.
   let isVerifiedOrganizer = true;
   let isSuspended = false;
@@ -46,7 +74,7 @@ export default async function OrganizerDashboardPage() {
             className="bg-red-950/60 border border-red-800 text-red-300 font-medium px-4 py-2 rounded-lg text-sm"
             title="Your account has been suspended"
           >
-            Ã¢â€ºâ€ Account suspended
+            â›” Account suspended
           </span>
         ) : isVerifiedOrganizer ? (
           <Link
@@ -60,7 +88,7 @@ export default async function OrganizerDashboardPage() {
             className="flash-sale-badge bg-amber-950/60 border border-amber-700 text-amber-300 font-medium px-4 py-2 rounded-lg text-sm"
             title="An admin needs to approve your organizer account before you can create events"
           >
-            Ã¢ÂÂ³ Pending admin approval
+            â³ Pending admin approval
           </span>
         )}
       </div>
@@ -73,7 +101,7 @@ export default async function OrganizerDashboardPage() {
 
       {!isSuspended && !isVerifiedOrganizer && (
         <div className="flash-sale-badge mb-8 p-4 bg-amber-950/40 border border-amber-800 rounded-lg text-amber-200 text-sm">
-          Your organizer account is awaiting approval from a TicketHub admin. Once approved, you&apos;ll be able to create and publish events. This usually doesn&apos;t take long Ã¢â‚¬â€ check back soon.
+          Your organizer account is awaiting approval from a TicketHub admin. Once approved, you&apos;ll be able to create and publish events. This usually doesn&apos;t take long â€” check back soon.
         </div>
       )}
 
@@ -142,7 +170,7 @@ export default async function OrganizerDashboardPage() {
                     </div>
                     <div>
                       <span className="text-xs text-gray-400 block">Tickets Sold</span>
-                      <span className="text-lg font-extrabold text-emerald-400">{totalTicketsSold} / {totalInventory || 'âˆž'}</span>
+                      <span className="text-lg font-extrabold text-emerald-400">{totalTicketsSold} / {totalInventory || '∞'}</span>
                     </div>
                   </div>
                 </div>
@@ -216,4 +244,81 @@ export default async function OrganizerDashboardPage() {
       )}
     </main>
   );
+}
+'@
+Write-ClaudeFile "app\organizer\dashboard\page.tsx" $content
+if (-not (Test-Path -LiteralPath "app\organizer\dashboard\page.tsx")) {
+    Write-Host "  ERROR: file was not created!" -ForegroundColor Red
+    $script:anyFailed = $true
+} else {
+    Write-Host "  Confirmed on disk." -ForegroundColor Green
+}
+
+Write-Host "Writing: app\organizer\events\[id]\staff\page.tsx" -ForegroundColor Cyan
+$content = @'
+import { sql } from '@/lib/db';
+import { getSession } from '@/lib/auth';
+import Link from 'next/link';
+import StaffManager from './StaffManager';
+
+export const dynamic = 'force-dynamic';
+
+export default async function StaffPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id: eventId } = await params;
+  const session = await getSession();
+
+  if (!session) {
+    return <div className="max-w-2xl mx-auto py-12 px-4 text-white">Please log in.</div>;
+  }
+
+  const [event] = await sql`SELECT id, title, organizer_id FROM events WHERE id = ${eventId}`;
+  if (!event) {
+    return <div className="max-w-2xl mx-auto py-12 px-4 text-white">Event not found.</div>;
+  }
+
+  if (event.organizer_id !== session.userId && session.role !== 'admin') {
+    return <div className="max-w-2xl mx-auto py-12 px-4 text-white">Not authorized for this event.</div>;
+  }
+
+  const staff = await sql`
+    SELECT u.id, u.full_name, u.email
+    FROM event_staff es
+    JOIN users u ON u.id = es.user_id
+    WHERE es.event_id = ${eventId}
+    ORDER BY u.full_name ASC
+  `;
+
+  return (
+    <div className="max-w-2xl mx-auto py-10 px-4 text-white">
+      <Link href="/organizer/dashboard" className="text-sm text-indigo-400 hover:underline">
+        &larr; Back to dashboard
+      </Link>
+      <h1 className="text-2xl font-extrabold mt-2 mb-1">Door Staff</h1>
+      <p className="text-gray-400 text-sm mb-6">{event.title} &middot; People you add here can scan tickets for this event only.</p>
+
+      <StaffManager eventId={eventId} initialStaff={staff as any} />
+    </div>
+  );
+}
+
+'@
+Write-ClaudeFile "app\organizer\events\[id]\staff\page.tsx" $content
+if (-not (Test-Path -LiteralPath "app\organizer\events\[id]\staff\page.tsx")) {
+    Write-Host "  ERROR: file was not created!" -ForegroundColor Red
+    $script:anyFailed = $true
+} else {
+    Write-Host "  Confirmed on disk." -ForegroundColor Green
+}
+
+
+Write-Host ""
+if ($script:anyFailed) {
+    Write-Host "SOME FILES FAILED TO WRITE - do not push yet, share this output." -ForegroundColor Red
+} else {
+    Write-Host "All files confirmed written successfully." -ForegroundColor Green
+    Write-Host ""
+    Write-Host "Next steps:" -ForegroundColor Green
+    Write-Host "  git add ."
+    Write-Host "  git commit -m ""Restore Door staff link and its missing page"""
+    Write-Host "  git push origin main"
 }
