@@ -185,7 +185,8 @@ export default async function EventDetailPage({
 
       {event.venue_name && (
         <div className="mb-8 rounded-2xl overflow-hidden border border-gray-800">
-          <iframe
+          {!isEnded && !isCancelled && (
+                    <iframe
             title={`Map showing ${event.venue_name}`}
             width="100%"
             height="280"
