@@ -24,7 +24,7 @@ export default async function AttendeeDashboard() {
 
   const orders = await sql`
     SELECT o.id, o.total_amount_kes, o.payment_status, o.created_at, o.quantity,
-           e.title, e.venue_name, e.start_at, e.end_at, e.status, e.slug, e.cover_image_url,
+           e.title, e.venue_name, e.start_at, e.end_at, e.slug, e.cover_image_url,
            e.latitude, e.longitude,
            COALESCE(
              json_agg(json_build_object('code', t.ticket_code, 'status', t.status) ORDER BY t.ticket_code)
@@ -38,6 +38,16 @@ export default async function AttendeeDashboard() {
     AND o.payment_status = 'paid'
     GROUP BY o.id, e.id
     ORDER BY o.created_at DESC
+  `;
+
+  // Events this attendee has been added as door staff for â€” grants them
+  // access to the check-in scanner, separate from any tickets they hold.
+  const staffEvents = await sql`
+    SELECT e.id, e.title, e.venue_name, e.start_at, e.end_at, e.status
+    FROM event_staff es
+    JOIN events e ON e.id = es.event_id
+    WHERE es.user_id = ${session.userId}
+    ORDER BY e.start_at DESC
   `;
 
   return (
@@ -61,6 +71,43 @@ export default async function AttendeeDashboard() {
       </div>
       <p className="text-gray-400 text-sm mb-6">{orders.length} paid order(s)</p>
 
+      {staffEvents.length > 0 && (
+        <div className="mb-8">
+          <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Door Staff Access</p>
+          <ul className="space-y-2">
+            {staffEvents.map((e: any) => {
+              const ended =
+                e.status === 'completed' ||
+                (e.status !== 'cancelled' && (e.end_at ? new Date(e.end_at) : new Date(e.start_at)) < new Date());
+              return (
+                <li
+                  key={e.id}
+                  className="flex items-center justify-between gap-3 bg-gray-900 border border-gray-800 rounded-xl px-4 py-3"
+                >
+                  <div>
+                    <p className="font-semibold text-white text-sm">{e.title}</p>
+                    <p className="text-gray-500 text-xs">
+                      {e.venue_name}
+                      {e.start_at && ` Â· ${new Date(e.start_at).toLocaleDateString('en-KE', { dateStyle: 'medium' })}`}
+                    </p>
+                  </div>
+                  {ended ? (
+                    <span className="text-xs text-gray-500 whitespace-nowrap">Check-in closed</span>
+                  ) : (
+                    <Link
+                      href={`/scan/${e.id}`}
+                      className="bg-emerald-700 hover:bg-emerald-600 text-white text-sm font-semibold px-4 py-2 rounded-lg transition whitespace-nowrap"
+                    >
+                      Scan Tickets
+                    </Link>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+
       {orders.length === 0 && (
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center text-gray-400">
           No tickets yet. <Link href="/" className="text-indigo-400 hover:text-cyan-400">Browse events</Link>
@@ -69,11 +116,7 @@ export default async function AttendeeDashboard() {
 
       <ul className="space-y-5">
         {orders.map((o: any) => {
-          const eventEndDate = o.end_at ? new Date(o.end_at) : (o.start_at ? new Date(o.start_at) : null);
-    const eventEnded =
-      o.status === 'completed' ||
-      o.status === 'cancelled' ||
-      (eventEndDate ? eventEndDate < new Date() : false);
+          const eventEnded = (o.end_at || o.start_at) ? new Date(o.end_at || o.start_at) < new Date() : false;
           return (
             <li key={o.id} className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
               {o.cover_image_url && (
@@ -111,7 +154,7 @@ export default async function AttendeeDashboard() {
                   </div>
                 </div>
 
-                {!eventEnded && o.latitude && o.longitude ? (
+                {o.latitude && o.longitude ? (
                   <a href={mapsUrl(o.latitude, o.longitude)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm text-emerald-400 hover:text-emerald-300 font-semibold">
                     View on Google Maps
                   </a>

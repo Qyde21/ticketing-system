@@ -1,9 +1,22 @@
-﻿import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { Resend } from 'resend';
 
 function getResend() { if (!process.env.RESEND_API_KEY) throw new Error("RESEND_API_KEY is not set"); return new Resend(process.env.RESEND_API_KEY); }
+
+// Escapes text before it's interpolated into an HTML email â€” message body,
+// names, and event titles are all ultimately user-supplied, so without this
+// a message could inject markup or deceptive links into the recipient's
+// notification email.
+function escapeHtml(value: string): string {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
 
 export async function POST(req: NextRequest) {
   const session = await getSession();
@@ -46,12 +59,12 @@ export async function POST(req: NextRequest) {
         await getResend().emails.send({
           from: 'TicketHub <noreply@mytickethub.co.ke>',
           to: buyer.email,
-          subject: `Message from organizer ï¿½ ${event.title}`,
+          subject: `Message from organizer - ${event.title}`,
           html: `
             <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
-              <h2>Message about ${event.title}</h2>
-              <p>Hi ${buyer.full_name},</p>
-              <p>${body}</p>
+              <h2>Message about ${escapeHtml(event.title)}</h2>
+              <p>Hi ${escapeHtml(buyer.full_name)},</p>
+              <p>${escapeHtml(body)}</p>
               <p style="color: #888; font-size: 12px; margin-top: 24px;">
                 You can reply to this message by visiting your TicketHub inbox.
               </p>
@@ -115,10 +128,10 @@ export async function POST(req: NextRequest) {
       subject: `New message about ${event.title}`,
       html: `
         <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
-          <h2>New message about ${event.title}</h2>
-          <p>Hi ${recipient.full_name},</p>
-          <p><strong>${sender.full_name}</strong> sent you a message:</p>
-          <blockquote style="border-left: 3px solid #6366f1; padding-left: 12px; color: #374151;">${body}</blockquote>
+          <h2>New message about ${escapeHtml(event.title)}</h2>
+          <p>Hi ${escapeHtml(recipient.full_name)},</p>
+          <p><strong>${escapeHtml(sender.full_name)}</strong> sent you a message:</p>
+          <blockquote style="border-left: 3px solid #6366f1; padding-left: 12px; color: #374151;">${escapeHtml(body)}</blockquote>
           <p>Log in to TicketHub to reply.</p>
         </div>
       `,
