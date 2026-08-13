@@ -18,14 +18,10 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getSession();
-  if (!session?.userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  if (!session?.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const { id: eventId } = await params;
   const check = await assertOrganizerOrAdmin(eventId, session.userId, session.role);
-  if ('error' in check) {
-    return NextResponse.json({ error: check.error }, { status: check.status });
-  }
+  if ('error' in check) return NextResponse.json({ error: check.error }, { status: check.status });
 
   const staff = await sql`
     SELECT u.id, u.full_name, u.email
@@ -34,7 +30,6 @@ export async function GET(
     WHERE es.event_id = ${eventId}
     ORDER BY u.full_name ASC
   `;
-
   return NextResponse.json({ staff });
 }
 
@@ -43,14 +38,10 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getSession();
-  if (!session?.userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  if (!session?.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const { id: eventId } = await params;
   const check = await assertOrganizerOrAdmin(eventId, session.userId, session.role);
-  if ('error' in check) {
-    return NextResponse.json({ error: check.error }, { status: check.status });
-  }
+  if ('error' in check) return NextResponse.json({ error: check.error }, { status: check.status });
 
   const body = await req.json().catch(() => ({}));
   const email = String(body.email || '').trim().toLowerCase();
@@ -62,22 +53,15 @@ export async function POST(
     SELECT id, full_name, email, status FROM users WHERE LOWER(email) = ${email} LIMIT 1
   `;
   if (!user) {
-    return NextResponse.json(
-      {
-        error:
-          'No TicketHub account found for that email. Ask them to sign up first, then invite again.',
-      },
-      { status: 404 }
-    );
+    return NextResponse.json({
+      error: 'No TicketHub account found for that email. Ask them to sign up first, then invite again.',
+    }, { status: 404 });
   }
   if (user.status === 'suspended') {
     return NextResponse.json({ error: 'That account is suspended' }, { status: 400 });
   }
   if (user.id === check.event.organizer_id) {
-    return NextResponse.json(
-      { error: 'The organizer already has full access to this event' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'The organizer already has full access to this event' }, { status: 400 });
   }
 
   await sql`
@@ -97,24 +81,16 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getSession();
-  if (!session?.userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  if (!session?.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const { id: eventId } = await params;
   const check = await assertOrganizerOrAdmin(eventId, session.userId, session.role);
-  if ('error' in check) {
-    return NextResponse.json({ error: check.error }, { status: check.status });
-  }
+  if ('error' in check) return NextResponse.json({ error: check.error }, { status: check.status });
 
   const userId = req.nextUrl.searchParams.get('userId');
-  if (!userId) {
-    return NextResponse.json({ error: 'userId is required' }, { status: 400 });
-  }
+  if (!userId) return NextResponse.json({ error: 'userId is required' }, { status: 400 });
 
   await sql`
-    DELETE FROM event_staff
-    WHERE event_id = ${eventId} AND user_id = ${userId}
+    DELETE FROM event_staff WHERE event_id = ${eventId} AND user_id = ${userId}
   `;
-
   return NextResponse.json({ success: true });
 }
