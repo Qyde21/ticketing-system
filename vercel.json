@@ -6,7 +6,7 @@
     },
     {
       "path": "/api/cron/expire-pending-orders",
-      "schedule": "*/5 * * * *"
+      "schedule": "0 3 * * *"
     }
   ]
 }
