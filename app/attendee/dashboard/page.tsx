@@ -24,7 +24,7 @@ export default async function AttendeeDashboard() {
 
   const orders = await sql`
     SELECT o.id, o.total_amount_kes, o.payment_status, o.created_at, o.quantity,
-           e.title, e.venue_name, e.start_at, e.end_at, e.slug, e.cover_image_url,
+           e.title, e.venue_name, e.start_at, e.end_at, e.status, e.slug, e.cover_image_url,
            e.latitude, e.longitude,
            COALESCE(
              json_agg(json_build_object('code', t.ticket_code, 'status', t.status) ORDER BY t.ticket_code)
@@ -69,7 +69,11 @@ export default async function AttendeeDashboard() {
 
       <ul className="space-y-5">
         {orders.map((o: any) => {
-          const eventEnded = (o.end_at || o.start_at) ? new Date(o.end_at || o.start_at) < new Date() : false;
+          const eventEndDate = o.end_at ? new Date(o.end_at) : (o.start_at ? new Date(o.start_at) : null);
+    const eventEnded =
+      o.status === 'completed' ||
+      o.status === 'cancelled' ||
+      (eventEndDate ? eventEndDate < new Date() : false);
           return (
             <li key={o.id} className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
               {o.cover_image_url && (
