@@ -16,7 +16,7 @@ async function getOrganizer(id: string) {
       op.created_at AS profile_created_at
     FROM users u
     LEFT JOIN organizer_profiles op ON op.user_id = u.id
-    WHERE u.id::text = ${id} AND u.role = 'organizer'
+    WHERE u.id::text = ${id} AND u.role IN ('organizer', 'admin')
     LIMIT 1
   `;
   const list = Array.isArray(rows) ? rows : (rows?.rows || []);
