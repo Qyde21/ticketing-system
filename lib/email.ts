@@ -1,4 +1,4 @@
-﻿import { Resend } from 'resend';
+import { Resend } from 'resend';
 
 function getResend() {
   if (!process.env.RESEND_API_KEY) {
@@ -278,6 +278,39 @@ export async function sendEventRejectedEmail(params: {
         <p>We reviewed <strong>${params.eventTitle}</strong> and it needs some changes before it can be published. It has been moved back to draft in your dashboard.</p>
         ${params.reason ? `<p><strong>Feedback from our team:</strong><br/>${params.reason}</p>` : ''}
         <p>Please make the necessary updates and resubmit for review.</p>
+        <p style="color: #888; font-size: 12px; margin-top: 24px;">Sent by TicketHub</p>
+      </div>
+    `,
+  });
+}
+
+export async function sendDoorStaffInviteEmail(params: {
+  toEmail: string;
+  staffName: string;
+  eventTitle: string;
+  scanUrl: string;
+  loginUrl: string;
+}) {
+  const resend = getResend();
+  await resend.emails.send({
+    from: 'TicketHub <noreply@mytickethub.co.ke>',
+    to: params.toEmail,
+    subject: `You're door staff for ${params.eventTitle}`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+        <h2>You're on door staff</h2>
+        <p>Hi ${params.staffName},</p>
+        <p>You've been added as <strong>door staff</strong> for <strong>${params.eventTitle}</strong> on TicketHub.</p>
+        <p>To scan tickets at the entrance:</p>
+        <ol>
+          <li>Log in with this email address:<br/>
+            <a href="${params.loginUrl}">${params.loginUrl}</a>
+          </li>
+          <li>Open the scanner (keep this link):<br/>
+            <a href="${params.scanUrl}" style="display: inline-block; background: #4f46e5; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; margin-top: 8px;">Open scanner</a>
+          </li>
+        </ol>
+        <p style="font-size: 13px; color: #555;">You must stay logged in with <strong>${params.toEmail}</strong>. Allow camera access, or type ticket codes manually.</p>
         <p style="color: #888; font-size: 12px; margin-top: 24px;">Sent by TicketHub</p>
       </div>
     `,
