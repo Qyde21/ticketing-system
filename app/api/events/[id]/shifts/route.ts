@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
+import { sendShiftAssignedEmail } from '@/lib/email';
 
 function isEventEnded(event: {
   status?: string;
@@ -120,11 +121,39 @@ export async function POST(
       );
     }
 
+    const [shiftRow] = await sql`
+      SELECT id, name, starts_at, ends_at, gate FROM event_shifts
+      WHERE id = ${shiftId} AND event_id = ${eventId}
+    `;
+    if (!shiftRow) return NextResponse.json({ error: 'Shift not found' }, { status: 404 });
+
+    const [user] = await sql`
+      SELECT id, full_name, email FROM users WHERE id = ${userId} LIMIT 1
+    `;
+    if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+
     await sql`
       INSERT INTO event_shift_assignments (shift_id, user_id, status)
       VALUES (${shiftId}, ${userId}, 'assigned')
       ON CONFLICT (shift_id, user_id) DO NOTHING
     `;
+
+    try {
+      const origin = req.nextUrl.origin;
+      await sendShiftAssignedEmail({
+        toEmail: user.email,
+        staffName: user.full_name || 'there',
+        eventTitle: check.event.title,
+        shiftName: shiftRow.name,
+        startsAt: String(shiftRow.starts_at),
+        endsAt: String(shiftRow.ends_at),
+        gate: shiftRow.gate,
+        scanUrl: `${origin}/scan/${eventId}`,
+      });
+    } catch (err) {
+      console.error('Shift assignment email failed:', err);
+    }
+
     return NextResponse.json({ success: true });
   }
 

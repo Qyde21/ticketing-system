@@ -316,3 +316,67 @@ export async function sendDoorStaffInviteEmail(params: {
     `,
   });
 }
+
+export async function sendShiftAssignedEmail(params: {
+  toEmail: string;
+  staffName: string;
+  eventTitle: string;
+  shiftName: string;
+  startsAt: string;
+  endsAt: string;
+  gate?: string | null;
+  scanUrl: string;
+}) {
+  const resend = getResend();
+  const when = `${new Date(params.startsAt).toLocaleString()} – ${new Date(params.endsAt).toLocaleString()}`;
+  const gateLine = params.gate ? `<p><strong>Gate / location:</strong> ${params.gate}</p>` : '';
+  await resend.emails.send({
+    from: 'TicketHub <noreply@mytickethub.co.ke>',
+    to: params.toEmail,
+    subject: `Shift assigned: ${params.eventTitle} (${params.shiftName})`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+        <h2>You're on the door</h2>
+        <p>Hi ${params.staffName},</p>
+        <p>You have been assigned a shift for <strong>${params.eventTitle}</strong>.</p>
+        <p><strong>Shift:</strong> ${params.shiftName}<br/>
+        <strong>When:</strong> ${when}</p>
+        ${gateLine}
+        <p><a href="${params.scanUrl}" style="display:inline-block;background:#4f46e5;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600;">Open check-in scanner</a></p>
+        <p style="color:#888;font-size:12px;margin-top:24px;">Sent by TicketHub</p>
+      </div>
+    `,
+  });
+}
+
+export async function sendShiftReminderEmail(params: {
+  toEmail: string;
+  staffName: string;
+  eventTitle: string;
+  shiftName: string;
+  startsAt: string;
+  endsAt: string;
+  gate?: string | null;
+  scanUrl: string;
+}) {
+  const resend = getResend();
+  const when = `${new Date(params.startsAt).toLocaleString()} – ${new Date(params.endsAt).toLocaleString()}`;
+  const gateLine = params.gate ? `<p><strong>Gate / location:</strong> ${params.gate}</p>` : '';
+  await resend.emails.send({
+    from: 'TicketHub <noreply@mytickethub.co.ke>',
+    to: params.toEmail,
+    subject: `Reminder: shift soon — ${params.eventTitle}`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+        <h2>Shift starting soon</h2>
+        <p>Hi ${params.staffName},</p>
+        <p>This is a reminder for your door shift at <strong>${params.eventTitle}</strong>.</p>
+        <p><strong>Shift:</strong> ${params.shiftName}<br/>
+        <strong>When:</strong> ${when}</p>
+        ${gateLine}
+        <p><a href="${params.scanUrl}" style="display:inline-block;background:#4f46e5;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600;">Open check-in scanner</a></p>
+        <p style="color:#888;font-size:12px;margin-top:24px;">Sent by TicketHub</p>
+      </div>
+    `,
+  });
+}
