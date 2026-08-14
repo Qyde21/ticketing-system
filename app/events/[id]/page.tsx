@@ -4,6 +4,7 @@ import Link from 'next/link';
 import JoinWaitlistButton from '@/components/JoinWaitlistButton';
 import FlashSaleCountdown from '@/components/FlashSaleCountdown';
 import MessageOrganizerWidget from '@/components/MessageOrganizerWidget';
+import ReviewForm from '@/components/ReviewForm';
 import { getSession } from '@/lib/auth';
 import type { Metadata } from 'next';
 
@@ -102,19 +103,44 @@ export default async function EventDetailPage({
 
   const eventUrl = `https://www.mytickethub.co.ke/events/${event.slug || event.id}`;
 
-  // Only a logged-in user who actually has a paid ticket for this event (and
-  // isn't the organizer viewing their own event) can message the organizer —
-  // matches the restriction already enforced server-side in /api/messages.
+  // A single "does this session's account have a paid ticket for this event"
+  // check, reused for both the message-organizer gate (only while the event
+  // is still active) and the review gate (only once it's over) — avoids
+  // running the same buyer_email lookup twice.
   const session = await getSession();
-  let canMessageOrganizer = false;
-  if (session && session.userId !== event.organizer_id && !isCancelled && !isEnded) {
+  let hasPaidTicket = false;
+  if (session && session.userId !== event.organizer_id) {
     const [buyerCheck] = await sql`
       SELECT 1 FROM orders
       WHERE event_id = ${event.id} AND payment_status = 'paid' AND LOWER(buyer_email) = ${session.email.toLowerCase()}
       LIMIT 1
     `;
-    canMessageOrganizer = !!buyerCheck;
+    hasPaidTicket = !!buyerCheck;
   }
+  const canMessageOrganizer = hasPaidTicket && !isCancelled && !isEnded;
+
+  const reviews = await sql`
+    SELECT r.id, r.rating, r.comment, r.created_at, u.full_name
+    FROM event_reviews r
+    JOIN users u ON u.id = r.user_id
+    WHERE r.event_id = ${event.id}
+    ORDER BY r.created_at DESC
+  `;
+  const [reviewAgg] = await sql`
+    SELECT COUNT(*)::int AS review_count, COALESCE(AVG(rating), 0)::float AS average_rating
+    FROM event_reviews WHERE event_id = ${event.id}
+  `;
+  const reviewCount = reviewAgg?.review_count ?? 0;
+  const averageRating = Number(reviewAgg?.average_rating ?? 0);
+
+  let alreadyReviewed = false;
+  if (session && hasPaidTicket) {
+    const [existing] = await sql`
+      SELECT id FROM event_reviews WHERE event_id = ${event.id} AND user_id = ${session.userId} LIMIT 1
+    `;
+    alreadyReviewed = !!existing;
+  }
+  const canReview = hasPaidTicket && !isCancelled && isEnded && !alreadyReviewed;
   const shareText = `Check out ${event.title} on TicketHub!`;
   const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + eventUrl)}`;
   const twitterShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(eventUrl)}`;
@@ -279,6 +305,60 @@ export default async function EventDetailPage({
               </div>
             );
           })
+        )}
+      </div>
+
+      <div className="space-y-3 mt-10">
+        <div className="flex items-center gap-2 mb-2">
+          <h2 className="text-xl font-bold text-white">Reviews</h2>
+          {reviewCount > 0 && (
+            <span className="inline-flex items-center gap-1 text-amber-400 text-sm font-semibold">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style={{ width: 16, height: 16 }}>
+                <path d="M10 1.5l2.6 5.27 5.82.85-4.21 4.1.99 5.79L10 14.9l-5.2 2.73.99-5.79-4.21-4.1 5.82-.85L10 1.5z" />
+              </svg>
+              {averageRating.toFixed(1)} · {reviewCount} review{reviewCount === 1 ? '' : 's'}
+            </span>
+          )}
+        </div>
+
+        {canReview && (
+          <div className="mb-4">
+            <ReviewForm eventId={event.id} />
+          </div>
+        )}
+        {alreadyReviewed && (
+          <p className="text-gray-400 text-sm mb-4">You've already reviewed this event — thanks!</p>
+        )}
+
+        {reviews.length === 0 ? (
+          <p className="text-gray-400">No reviews yet.</p>
+        ) : (
+          <div className="space-y-3">
+            {reviews.map((r: any) => (
+              <div key={r.id} className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-semibold text-white text-sm">{r.full_name}</span>
+                  <span className="flex gap-0.5">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <svg
+                        key={star}
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill={star <= r.rating ? '#fbbf24' : 'none'}
+                        stroke="#fbbf24"
+                        strokeWidth={1.5}
+                        style={{ width: 14, height: 14 }}
+                      >
+                        <path d="M10 1.5l2.6 5.27 5.82.85-4.21 4.1.99 5.79L10 14.9l-5.2 2.73.99-5.79-4.21-4.1 5.82-.85L10 1.5z" />
+                      </svg>
+                    ))}
+                  </span>
+                </div>
+                {r.comment && <p className="text-gray-300 text-sm">{r.comment}</p>}
+                <p className="text-gray-500 text-xs mt-1">{new Date(r.created_at).toLocaleDateString()}</p>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
