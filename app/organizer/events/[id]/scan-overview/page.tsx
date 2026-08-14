@@ -44,12 +44,31 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
     WHERE tt.event_id = ${eventId}
   `;
   const recent = await sql`
-    SELECT t.ticket_code, t.holder_name, t.checked_in_at, tt.name AS ticket_type
+    SELECT
+      t.ticket_code,
+      t.holder_name,
+      t.checked_in_at,
+      tt.name AS ticket_type,
+      u.full_name AS scanned_by_name,
+      u.email AS scanned_by_email
     FROM tickets t
     JOIN ticket_types tt ON tt.id = t.ticket_type_id
+    LEFT JOIN users u ON u.id = t.checked_in_by
     WHERE tt.event_id = ${eventId} AND t.status = 'used' AND t.checked_in_at IS NOT NULL
     ORDER BY t.checked_in_at DESC
-    LIMIT 20
+    LIMIT 50
+  `;
+  const byStaff = await sql`
+    SELECT
+      COALESCE(u.full_name, 'Unknown') AS name,
+      COALESCE(u.email, '') AS email,
+      COUNT(*)::int AS count
+    FROM tickets t
+    JOIN ticket_types tt ON tt.id = t.ticket_type_id
+    LEFT JOIN users u ON u.id = t.checked_in_by
+    WHERE tt.event_id = ${eventId} AND t.status = 'used' AND t.checked_in_at IS NOT NULL
+    GROUP BY u.id, u.full_name, u.email
+    ORDER BY count DESC, name ASC
   `;
   const eventEnded =
     event.status === 'completed' ||
@@ -66,6 +85,13 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
       holderName: (r.holder_name as string) || null,
       ticketType: (r.ticket_type as string) || null,
       checkedInAt: r.checked_in_at ? new Date(r.checked_in_at as string).toISOString() : null,
+      scannedBy: (r.scanned_by_name as string) || null,
+      scannedByEmail: (r.scanned_by_email as string) || null,
+    })),
+    byStaff: byStaff.map((r) => ({
+      name: r.name as string,
+      email: (r.email as string) || null,
+      count: Number(r.count) || 0,
     })),
   };
 
