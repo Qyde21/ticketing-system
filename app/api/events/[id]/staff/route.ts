@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 function isEventEnded(event: { status?: string; start_at?: string | Date; end_at?: string | Date | null }) {
-  if (event.status === 'completed') return true;
-  if (event.status === 'cancelled') return false;
+  if (event.status === 'completed' || event.status === 'cancelled') return true;
   const end = event.end_at ? new Date(event.end_at) : event.start_at ? new Date(event.start_at) : null;
   return !!end && end < new Date();
 }

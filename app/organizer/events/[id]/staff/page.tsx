@@ -24,10 +24,11 @@ export default async function EventStaffPage({ params }: { params: Promise<{ id:
 
   const eventEnded =
     event.status === 'completed' ||
-    (event.status !== 'cancelled' &&
-      (event.end_at ? new Date(event.end_at as string) : new Date(event.start_at as string)) < new Date());
+    event.status === 'cancelled' ||
+    (event.end_at ? new Date(event.end_at as string) : new Date(event.start_at as string)) < new Date();
 
   if (eventEnded) {
+    const reason = event.status === 'cancelled' ? 'This event has been cancelled.' : 'This event has ended.';
     return (
       <div className="max-w-2xl mx-auto py-10 px-4 text-white">
         <Link href="/organizer/dashboard" className="text-sm text-indigo-400 hover:underline">
@@ -36,7 +37,7 @@ export default async function EventStaffPage({ params }: { params: Promise<{ id:
         <h1 className="text-2xl font-extrabold mt-2 mb-1">Door staff</h1>
         <p className="text-gray-400 text-sm mb-4">{event.title}</p>
         <div className="rounded-xl border border-gray-700 bg-gray-900 px-4 py-4 text-sm text-gray-300">
-          This event has ended. Door staff invites and scanning are closed.
+          {reason} Door staff invites and scanning are closed.
         </div>
       </div>
     );

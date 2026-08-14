@@ -312,7 +312,8 @@ export default async function AdminDashboard() {
                 <div className="flex flex-wrap items-center gap-2 pt-2 pb-3 mb-3 border-b border-gray-800/60 text-xs">
                   {(() => {
                     const eventEnded =
-                      ev.status !== 'cancelled' &&
+                      ev.status === 'completed' ||
+                      ev.status === 'cancelled' ||
                       (ev.end_at ? new Date(ev.end_at) : new Date(ev.start_at)) < new Date();
                     return (
                       <>
