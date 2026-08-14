@@ -95,6 +95,33 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
     })),
   };
 
+  let shiftRows: any[] = [];
+  let assignmentRows: any[] = [];
+  try {
+    shiftRows = await sql`
+      SELECT id, name, starts_at, ends_at, gate, slots_needed
+      FROM event_shifts WHERE event_id = ${eventId}
+      ORDER BY starts_at ASC
+    ` as any[];
+    assignmentRows = await sql`
+      SELECT a.shift_id, a.user_id, a.status, u.full_name
+      FROM event_shift_assignments a
+      JOIN event_shifts s ON s.id = a.shift_id
+      JOIN users u ON u.id = a.user_id
+      WHERE s.event_id = ${eventId}
+    ` as any[];
+  } catch {
+    /* tables may not exist until migration runs */
+  }
+
+  const now = new Date();
+  const assignByShift: Record<string, string[]> = {};
+  for (const a of assignmentRows) {
+    const sid = String(a.shift_id);
+    if (!assignByShift[sid]) assignByShift[sid] = [];
+    assignByShift[sid].push(String(a.full_name));
+  }
+
   return (
     <div className="max-w-2xl mx-auto py-10 px-4 text-white">
       <Link
@@ -127,6 +154,59 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
         </div>
       </div>
       <LiveOverview eventId={eventId} initial={initial} eventEnded={eventEnded} />
+
+      {shiftRows.length > 0 && (
+        <div className="mt-8">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-gray-400">Shifts</h2>
+            <Link href={`/organizer/events/${eventId}/shifts`} className="text-xs text-indigo-400 hover:underline">
+              Manage shifts
+            </Link>
+          </div>
+          <ul className="space-y-2">
+            {shiftRows.map((s: any) => {
+              const start = new Date(s.starts_at);
+              const end = new Date(s.ends_at);
+              const onDuty = !eventEnded && now >= start && now <= end;
+              const names = assignByShift[String(s.id)] || [];
+              const under = names.length < Number(s.slots_needed);
+              return (
+                <li
+                  key={s.id}
+                  className={
+                    'rounded-xl border px-3 py-3 text-sm ' +
+                    (onDuty
+                      ? 'border-emerald-700 bg-emerald-950/30'
+                      : 'border-gray-800 bg-gray-900/80')
+                  }
+                >
+                  <div className="flex flex-wrap justify-between gap-2">
+                    <span className="font-semibold text-white">
+                      {s.name}
+                      {s.gate ? ` · ${s.gate}` : ''}
+                      {onDuty && (
+                        <span className="ml-2 text-[10px] uppercase tracking-wider text-emerald-300 font-bold">
+                          On duty now
+                        </span>
+                      )}
+                    </span>
+                    <span className={under ? 'text-amber-400 text-xs' : 'text-gray-400 text-xs'}>
+                      {names.length}/{s.slots_needed}
+                      {under ? ' understaffed' : ''}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1">
+                    {start.toLocaleString()} → {end.toLocaleString()}
+                  </p>
+                  <p className="text-xs text-gray-300 mt-1">
+                    {names.length ? names.join(', ') : 'No one assigned'}
+                  </p>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
