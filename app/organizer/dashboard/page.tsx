@@ -19,7 +19,7 @@ export default async function OrganizerDashboardPage() {
     : await sql`SELECT * FROM events WHERE organizer_id = ${session.userId} ORDER BY created_at DESC`;
 
   // Organizers must be approved by an admin before they can create events,
-  // and a suspension should immediately block creation too Ã¢â‚¬â€ checked live
+  // and a suspension should immediately block creation too — checked live
   // from the DB rather than trusting the session cookie's role/state alone.
   let isVerifiedOrganizer = true;
   let isSuspended = false;
@@ -46,7 +46,7 @@ export default async function OrganizerDashboardPage() {
             className="bg-red-950/60 border border-red-800 text-red-300 font-medium px-4 py-2 rounded-lg text-sm"
             title="Your account has been suspended"
           >
-            Ã¢â€ºâ€ Account suspended
+            ⛔ Account suspended
           </span>
         ) : isVerifiedOrganizer ? (
           <Link
@@ -60,7 +60,7 @@ export default async function OrganizerDashboardPage() {
             className="flash-sale-badge bg-amber-950/60 border border-amber-700 text-amber-300 font-medium px-4 py-2 rounded-lg text-sm"
             title="An admin needs to approve your organizer account before you can create events"
           >
-            Ã¢ÂÂ³ Pending admin approval
+            ⏳ Pending admin approval
           </span>
         )}
       </div>
@@ -73,7 +73,7 @@ export default async function OrganizerDashboardPage() {
 
       {!isSuspended && !isVerifiedOrganizer && (
         <div className="flash-sale-badge mb-8 p-4 bg-amber-950/40 border border-amber-800 rounded-lg text-amber-200 text-sm">
-          Your organizer account is awaiting approval from a TicketHub admin. Once approved, you&apos;ll be able to create and publish events. This usually doesn&apos;t take long Ã¢â‚¬â€ check back soon.
+          Your organizer account is awaiting approval from a TicketHub admin. Once approved, you&apos;ll be able to create and publish events. This usually doesn&apos;t take long — check back soon.
         </div>
       )}
 
