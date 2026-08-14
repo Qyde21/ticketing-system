@@ -310,42 +310,90 @@ export default async function AdminDashboard() {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2 pt-2 pb-3 mb-3 border-b border-gray-800/60 text-xs">
-                  <Link
-                    href={`/admin/scan/${ev.id}`}
-                    className="text-gray-300 hover:text-emerald-400 transition"
-                  >
-                    Scan tickets
-                  </Link>
-                  <span className="text-gray-700">|</span>
-                  <Link
-                    href={`/organizer/events/${ev.id}/scan-overview`}
-                    className="text-gray-300 hover:text-cyan-400 transition"
-                  >
-                    Scan overview
-                  </Link>
-                  <span className="text-gray-700">|</span>
-                  <Link
-                    href={`/admin/events/${ev.id}/orders`}
-                    className="text-gray-300 hover:text-indigo-400 transition"
-                >
-                    Orders
-                  </Link>
-                  <span className="text-gray-700">|</span>
-                  <Link
-                    href={`/organizer/events/${ev.id}/messages`}
-                    className="text-gray-300 hover:text-purple-400 transition"
-                  >
-                    Messages
-                  </Link>
-                  <span className="text-gray-700">|</span>
-                  <Link
-                    href={`/organizer/events/${ev.id}/edit`}
-                    className="text-gray-300 hover:text-amber-400 transition"
-                  >
-                    Edit cover
-                  </Link>
-                  <span className="text-gray-700">|</span>
-                  <AdminEventActions eventId={ev.id} status={ev.status} />
+                  {(() => {
+                    const eventEnded =
+                      ev.status !== 'cancelled' &&
+                      (ev.end_at ? new Date(ev.end_at) : new Date(ev.start_at)) < new Date();
+                    return (
+                      <>
+                        <Link
+                          href={`/admin/scan/${ev.id}`}
+                          className="text-gray-300 hover:text-emerald-400 transition"
+                        >
+                          Scan tickets
+                        </Link>
+                        <span className="text-gray-700">|</span>
+                        <Link
+                          href={`/organizer/events/${ev.id}/scan-overview`}
+                          className="text-gray-300 hover:text-cyan-400 transition"
+                        >
+                          Scan overview
+                        </Link>
+                        <span className="text-gray-700">|</span>
+                        <Link
+                          href={`/admin/events/${ev.id}/orders`}
+                          className="text-gray-300 hover:text-indigo-400 transition"
+                        >
+                          Orders
+                        </Link>
+                        <span className="text-gray-700">|</span>
+                        <Link
+                          href={`/organizer/events/${ev.id}/messages`}
+                          className="text-gray-300 hover:text-purple-400 transition"
+                        >
+                          Messages
+                        </Link>
+                        <span className="text-gray-700">|</span>
+                        <Link
+                          href={`/organizer/events/${ev.id}/edit`}
+                          className="text-gray-300 hover:text-amber-400 transition"
+                        >
+                          Edit cover
+                        </Link>
+                        <span className="text-gray-700">|</span>
+                        {eventEnded ? (
+                          <span className="text-gray-600 cursor-not-allowed" title="Promo codes are disabled after the event has ended">
+                            Promo codes
+                          </span>
+                        ) : (
+                          <Link
+                            href={`/organizer/events/${ev.id}/promo-codes`}
+                            className="text-gray-300 hover:text-fuchsia-400 transition"
+                          >
+                            Promo codes
+                          </Link>
+                        )}
+                        <span className="text-gray-700">|</span>
+                        {eventEnded ? (
+                          <span className="text-gray-600 cursor-not-allowed" title="Flash sales are disabled after the event has ended">
+                            Flash sales
+                          </span>
+                        ) : (
+                          <Link
+                            href={`/organizer/events/${ev.id}/flash-sales`}
+                            className="text-gray-300 hover:text-orange-400 transition"
+                          >
+                            Flash sales
+                          </Link>
+                        )}
+                        <span className="text-gray-700">|</span>
+                        {eventEnded ? (
+                          <span className="text-gray-600 cursor-not-allowed" title="Door staff invites and scanning are disabled after the event has ended">
+                            Door staff
+                          </span>
+                        ) : (
+                          <Link
+                            href={`/organizer/events/${ev.id}/staff`}
+                            className="text-gray-300 hover:text-teal-400 transition"
+                          >
+                            Door staff
+                          </Link>
+                        )}
+                        <span className="text-gray-700">|</span>
+                        <AdminEventActions eventId={ev.id} status={ev.status} />
+                      </>
+                    );
+                  })()}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
