@@ -13,7 +13,8 @@ export default async function HomePage() {
   const events = await sql`
     SELECT
       e.id, e.title, e.slug, e.venue_name, e.start_at, e.end_at, e.status,
-      e.cover_image_url, e.category,
+      e.cover_image_url, e.category, e.organizer_id,
+      COALESCE(op.business_name, u.full_name) AS organizer_name,
       COALESCE(op.is_verified, false) AS organizer_verified,
       COALESCE(SUM(tt.quantity_total), 0) AS total_capacity,
       COALESCE(SUM(tt.quantity_sold), 0) AS total_sold,
@@ -33,7 +34,7 @@ export default async function HomePage() {
     LEFT JOIN organizer_profiles op ON op.user_id = e.organizer_id
     JOIN users u ON u.id = e.organizer_id
     WHERE e.status IN ('published', 'completed') AND u.status != 'suspended'
-    GROUP BY e.id, op.is_verified
+    GROUP BY e.id, op.business_name, op.is_verified, u.full_name
     ORDER BY e.start_at ASC
   `;
 
