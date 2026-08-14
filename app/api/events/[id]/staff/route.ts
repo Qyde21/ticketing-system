@@ -43,7 +43,7 @@ function parseEmails(body: any): string[] {
 
 type InviteResult = {
   email: string;
-  status: 'added' | 'already_staff' | 'not_found' | 'suspended' | 'is_organizer' | 'error';
+  status: 'added' | 'already_staff' | 'resent' | 'not_found' | 'suspended' | 'is_organizer' | 'error';
   message?: string;
   staff?: { id: string; full_name: string; email: string };
   emailSent?: boolean;
@@ -53,7 +53,8 @@ async function inviteOne(
   eventId: string,
   event: { id: string; title: string; organizer_id: string },
   email: string,
-  origin: string
+  origin: string,
+  opts: { resendOnly?: boolean } = {}
 ): Promise<InviteResult> {
   const [user] = await sql`
     SELECT id, full_name, email, status FROM users WHERE LOWER(email) = ${email} LIMIT 1
@@ -81,12 +82,50 @@ async function inviteOne(
     WHERE event_id = ${eventId} AND user_id = ${user.id}
     LIMIT 1
   `;
+  const staff = { id: user.id as string, full_name: user.full_name as string, email: user.email as string };
+
+  async function sendInviteEmail(): Promise<boolean> {
+    try {
+      const scanUrl = `${origin}/scan/${eventId}`;
+      const loginUrl = `${origin}/login`;
+      await sendDoorStaffInviteEmail({
+        toEmail: staff.email,
+        staffName: staff.full_name || staff.email,
+        eventTitle: event.title as string,
+        scanUrl,
+        loginUrl,
+      });
+      return true;
+    } catch (err) {
+      console.error('Door staff invite email failed:', err);
+      return false;
+    }
+  }
+
   if (existing.length > 0) {
+    if (opts.resendOnly) {
+      const emailSent = await sendInviteEmail();
+      return {
+        email,
+        status: 'resent',
+        message: emailSent ? 'Invite email resent' : 'Resend failed — email could not be sent',
+        staff,
+        emailSent,
+      };
+    }
     return {
       email,
       status: 'already_staff',
       message: 'Already door staff for this event',
-      staff: { id: user.id, full_name: user.full_name, email: user.email },
+      staff,
+    };
+  }
+
+  if (opts.resendOnly) {
+    return {
+      email,
+      status: 'not_found',
+      message: 'That person is not on the door staff list',
     };
   }
 
@@ -95,23 +134,7 @@ async function inviteOne(
     VALUES (${eventId}, ${user.id})
   `;
 
-  const staff = { id: user.id as string, full_name: user.full_name as string, email: user.email as string };
-  let emailSent = false;
-  try {
-    const scanUrl = `${origin}/scan/${eventId}`;
-    const loginUrl = `${origin}/login`;
-    await sendDoorStaffInviteEmail({
-      toEmail: staff.email,
-      staffName: staff.full_name || staff.email,
-      eventTitle: event.title as string,
-      scanUrl,
-      loginUrl,
-    });
-    emailSent = true;
-  } catch (err) {
-    console.error('Door staff invite email failed:', err);
-  }
-
+  const emailSent = await sendInviteEmail();
   return { email, status: 'added', staff, emailSent };
 }
 
@@ -161,7 +184,8 @@ export async function POST(
   const results: InviteResult[] = [];
   for (const email of emails) {
     try {
-      results.push(await inviteOne(eventId, check.event as any, email, origin));
+      const resendOnly = body.resend === true || body.action === 'resend';
+      results.push(await inviteOne(eventId, check.event as any, email, origin, { resendOnly }));
     } catch (err) {
       console.error('Invite failed for', email, err);
       results.push({ email, status: 'error', message: 'Something went wrong for this email' });
@@ -179,11 +203,12 @@ export async function POST(
 
   if (emails.length === 1) {
     const r = results[0];
-    if (r.status === 'added') {
+    if (r.status === 'added' || r.status === 'resent') {
       return NextResponse.json({
         success: true,
         staff: r.staff,
         emailSent: r.emailSent,
+        resent: r.status === 'resent',
         results,
         summary,
       });

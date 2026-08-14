@@ -50,6 +50,24 @@ function playTone(kind: 'ok' | 'err') {
   }
 }
 
+
+/** Ticket QR encodes the ticket code; also accept full ticket URLs. */
+function normalizeTicketCode(raw: string): string {
+  let s = (raw || '').trim();
+  if (!s) return '';
+  try {
+    if (s.includes('://') || s.startsWith('/tickets/')) {
+      const pathPart = s.includes('://') ? new URL(s).pathname : s;
+      const parts = pathPart.split('/').filter(Boolean);
+      const i = parts.indexOf('tickets');
+      if (i >= 0 && parts[i + 1]) s = parts[i + 1];
+      else if (parts.length) s = parts[parts.length - 1];
+    }
+  } catch {
+    /* keep raw */
+  }
+  return s.toUpperCase().replace(/\s+/g, '');
+}
 export default function Scanner({
   eventId,
   initialCheckedIn,
@@ -210,7 +228,7 @@ export default function Scanner({
 
   const doCheckin = useCallback(
     async (rawCode: string) => {
-      const code = rawCode.trim();
+      const code = normalizeTicketCode(rawCode);
       if (!code || processingRef.current) return;
       if (code === lastCodeRef.current) return;
       processingRef.current = true;
@@ -311,7 +329,13 @@ export default function Scanner({
         if (!mounted) return;
         const scanner = new Html5QrcodeScanner(
           'reader',
-          { fps: 8, qrbox: { width: 240, height: 240 }, rememberLastUsedCamera: true },
+          {
+            fps: 10,
+            qrbox: { width: 260, height: 260 },
+            rememberLastUsedCamera: true,
+            aspectRatio: 1,
+            videoConstraints: { facingMode: { ideal: 'environment' } },
+          },
           false
         );
         scanner.render(
@@ -323,7 +347,7 @@ export default function Scanner({
         scannerRef.current = scanner;
       })
       .catch(() => {
-        if (mounted) setCameraError('Camera scanner failed to load. Use manual entry below.');
+        if (mounted) setCameraError('Camera unavailable or permission denied. Allow camera access, or type the ticket code below.');
       });
     return () => {
       mounted = false;

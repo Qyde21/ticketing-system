@@ -21,6 +21,7 @@ export default function StaffManager({
   const [staff, setStaff] = useState<StaffMember[]>(initialStaff);
   const [emailsText, setEmailsText] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resendingId, setResendingId] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [results, setResults] = useState<InviteResult[] | null>(null);
@@ -125,6 +126,32 @@ export default function StaffManager({
     }
   }
 
+
+  async function handleResend(member: StaffMember) {
+    setError('');
+    setMessage('');
+    setResults(null);
+    setResendingId(member.id);
+    try {
+      const res = await fetch(`/api/events/${eventId}/staff`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: member.email, resend: true }),
+      });
+      const data = await res.json();
+      if (res.ok && data.emailSent) {
+        setMessage(`Invite resent to ${member.email}`);
+      } else if (res.ok) {
+        setError(data.message || 'Resend failed — email could not be sent');
+      } else {
+        setError(data.error || 'Could not resend invite');
+      }
+    } catch {
+      setError('Network error — try again');
+    } finally {
+      setResendingId(null);
+    }
+  }
   return (
     <div className="space-y-6">
       <form onSubmit={handleInvite} className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-3">
@@ -193,13 +220,23 @@ export default function StaffManager({
                   <p className="font-semibold text-white text-sm">{s.full_name}</p>
                   <p className="text-xs text-gray-400">{s.email}</p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => void handleRemove(s.id)}
-                  className="text-xs font-semibold text-red-400 px-3 py-1.5 rounded-lg bg-red-950/30 border border-red-900/50"
-                >
-                  Remove
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    disabled={resendingId === s.id}
+                    onClick={() => void handleResend(s)}
+                    className="text-xs font-semibold text-indigo-300 px-3 py-1.5 rounded-lg bg-indigo-950/40 border border-indigo-800/50 disabled:opacity-50"
+                  >
+                    {resendingId === s.id ? 'Sending…' : 'Resend invite'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void handleRemove(s.id)}
+                    className="text-xs font-semibold text-red-400 px-3 py-1.5 rounded-lg bg-red-950/30 border border-red-900/50"
+                  >
+                    Remove
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
