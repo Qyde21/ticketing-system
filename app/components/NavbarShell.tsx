@@ -64,6 +64,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
                   <Link href="/admin/organizers" className={getLinkClass('/admin/organizers')}>Organizers</Link>
                   <Link href="/admin/events" className={getLinkClass('/admin/events')}>All Events</Link>
                   <Link href="/admin/payouts" className={getLinkClass('/admin/payouts')}>Payouts</Link>
+                  <Link href="/attendee/dashboard" className={getLinkClass('/attendee/dashboard')}>My Tickets</Link>
                   <Link href="/inbox" className={getLinkClass('/inbox')}>Inbox</Link>
                   <Link href="/account/security" className={getLinkClass('/account/security')}>Security</Link>
                 </>
@@ -80,7 +81,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
                 </>
               )}
 
-              {(userRole === 'attendee' || userRole === 'organizer' || userRole === 'admin') && (
+              {userRole === 'attendee' && (
                 <>
                   <Link href="/attendee/dashboard" className={getLinkClass('/attendee/dashboard')}>My Tickets</Link>
                   <Link href="/inbox" className={getLinkClass('/inbox')}>Inbox</Link>
@@ -158,7 +159,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
                 </>
               )}
 
-              {(userRole === 'attendee' || userRole === 'organizer' || userRole === 'admin') && (
+              {userRole === 'attendee' && (
                 <>
                   <Link href="/attendee/dashboard" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/attendee/dashboard')}>My Tickets</Link>
                   <Link href="/inbox" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/inbox')}>Inbox</Link>
