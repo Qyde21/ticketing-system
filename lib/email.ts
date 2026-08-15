@@ -388,7 +388,7 @@ export async function sendLoginOtpEmail(params: {
   const resend = new Resend(process.env.RESEND_API_KEY);
   const name = params.fullName || 'there';
   await resend.emails.send({
-    from: 'TicketHub <onboarding@resend.dev>',
+    from: 'TicketHub <noreply@mytickethub.co.ke>',
     to: params.toEmail,
     subject: `${params.code} is your TicketHub login code`,
     html: `
@@ -403,3 +403,4 @@ export async function sendLoginOtpEmail(params: {
     `,
   });
 }
+
