@@ -99,6 +99,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
               <Link href="/" className={getLinkClass('/')}>Events</Link>
               <Link href="/signup?role=attendee" className={getLinkClass('/signup?role=attendee')}>Get Ticket</Link>
               <Link href="/signup?role=organizer" className={getLinkClass('/signup?role=organizer')}>Sell Tickets</Link>
+              <Link href="/my-tickets" className={getLinkClass('/my-tickets')}>My tickets</Link>
               <Link href="/login" className={getLinkClass('/login')}>Sign in</Link>
               <Link href="/signup" className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-md font-medium transition shadow-sm">
                 Get Started
@@ -176,6 +177,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
               <Link href="/" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/')}>Events</Link>
               <Link href="/signup?role=attendee" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/signup?role=attendee')}>Get Ticket</Link>
               <Link href="/signup?role=organizer" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/signup?role=organizer')}>Sell Tickets</Link>
+              <Link href="/my-tickets" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/my-tickets')}>My tickets</Link>
               <Link href="/login" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/login')}>Sign in</Link>
               <Link href="/signup" onClick={() => setMobileMenuOpen(false)} className="block w-full text-center bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-md font-medium transition mt-2">
                 Get Started

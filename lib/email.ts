@@ -1,4 +1,4 @@
-﻿import { Resend } from 'resend';
+import { Resend } from 'resend';
 
 function getResend() {
   if (!process.env.RESEND_API_KEY) {
@@ -404,3 +404,28 @@ export async function sendLoginOtpEmail(params: {
   });
 }
 
+export async function sendTicketsMagicLinkEmail(params: {
+  toEmail: string;
+  magicUrl: string;
+}) {
+  const resend = getResend();
+  await resend.emails.send({
+    from: 'TicketHub <noreply@mytickethub.co.ke>',
+    to: params.toEmail,
+    subject: 'Your TicketHub tickets — secure link',
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+        <h2>View your tickets</h2>
+        <p>Use this secure link to open your TicketHub tickets. It expires in <strong>1 hour</strong>.</p>
+        <p style="margin: 24px 0;">
+          <a href="${params.magicUrl}"
+             style="background: #4f46e5; color: #fff; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: 700;">
+            Open my tickets
+          </a>
+        </p>
+        <p style="color: #6b7280; font-size: 13px;">If you did not request this, you can ignore this email.</p>
+        <p style="color: #9ca3af; font-size: 12px; word-break: break-all;">${params.magicUrl}</p>
+      </div>
+    `,
+  });
+}

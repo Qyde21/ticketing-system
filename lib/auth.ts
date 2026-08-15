@@ -1,4 +1,4 @@
-﻿import { SignJWT, jwtVerify } from 'jose';
+import { SignJWT, jwtVerify } from 'jose';
 import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
 
@@ -127,4 +127,27 @@ export async function verifyPendingTwoFactorToken(
   const pending = await verifyPendingLoginToken(token, '2fa_pending');
   if (!pending) return null;
   return { userId: pending.userId, rememberMe: pending.rememberMe };
+}
+
+/** Magic link for guest view-my-tickets (email-bound, 1 hour). */
+export async function signTicketsMagicLink(email: string) {
+  const normalized = email.trim().toLowerCase();
+  return new SignJWT({ purpose: 'tickets_magic', email: normalized })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('1h')
+    .sign(JWT_SECRET);
+}
+
+export async function verifyTicketsMagicLink(
+  token: string
+): Promise<{ email: string } | null> {
+  try {
+    const { payload } = await jwtVerify(token, JWT_SECRET);
+    if (payload.purpose !== 'tickets_magic') return null;
+    if (typeof payload.email !== 'string' || !payload.email.includes('@')) return null;
+    return { email: payload.email.toLowerCase() };
+  } catch {
+    return null;
+  }
 }
