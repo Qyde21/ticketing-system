@@ -1,3 +1,18 @@
+# Run this from your project root
+# Usage: powershell -ExecutionPolicy Bypass -File redesign-ticket-page-gold.ps1
+#
+# Recolors the ticket page into the gold/dark-brown palette (matching the
+# "Event Ticket Design" reference), replacing the earlier magenta/cream
+# version. Same torn-stub structure and perforation, new colors: dark warm
+# brown admission panel with gold title/accents, warm gold stub panel with
+# a subtle triangle texture and a small ornamental divider above the QR
+# code. TicketQRReveal/TicketBarcode remain untouched.
+
+$ErrorActionPreference = "Stop"
+$utf8NoBom = New-Object System.Text.UTF8Encoding $false
+
+Write-Host "Writing: app\tickets\[code]\page.tsx" -ForegroundColor Cyan
+$content = @'
 import { sql } from '@/lib/db';
 import QRCode from 'qrcode';
 import TicketQRReveal from '@/components/TicketQRReveal';
@@ -87,7 +102,7 @@ export default async function TicketPage({ params }: { params: Promise<{ code: s
 
             <p className="relative mt-2 text-sm font-semibold text-[#E8C888]/90">
               {ticket.ticket_type_name}
-              {ticket.holder_name ? ` Â· ${ticket.holder_name}` : ''}
+              {ticket.holder_name ? ` · ${ticket.holder_name}` : ''}
             </p>
 
             <div className="relative mt-4 flex items-center gap-4 text-xs font-medium text-[#D9BB94]">
@@ -115,7 +130,7 @@ export default async function TicketPage({ params }: { params: Promise<{ code: s
             <div className="absolute left-3 right-3 -top-[1px] border-t-2 border-dashed border-[#D98E04]/50" />
           </div>
 
-          {/* Stub panel â€” warm gold, subtle triangle texture like a printed ticket */}
+          {/* Stub panel — warm gold, subtle triangle texture like a printed ticket */}
           <div
             className="relative px-6 pt-8 pb-7 overflow-hidden"
             style={{ background: 'linear-gradient(160deg, #F2C230 0%, #E8A317 100%)' }}
@@ -185,4 +200,20 @@ export default async function TicketPage({ params }: { params: Promise<{ code: s
       </div>
     </div>
   );
+}
+
+'@
+$dir = "app\tickets\[code]"
+if (-not (Test-Path -LiteralPath $dir)) { New-Item -ItemType Directory -Force -Path $dir | Out-Null }
+[System.IO.File]::WriteAllText("$dir\page.tsx", $content, $utf8NoBom)
+
+if (-not (Test-Path -LiteralPath "$dir\page.tsx")) {
+    Write-Host "ERROR: file was not created!" -ForegroundColor Red
+} else {
+    Write-Host "Confirmed on disk." -ForegroundColor Green
+    Write-Host ""
+    Write-Host "Next steps:" -ForegroundColor Green
+    Write-Host "  git add ."
+    Write-Host "  git commit -m ""Recolor ticket page to gold/brown palette"""
+    Write-Host "  git push origin main"
 }
