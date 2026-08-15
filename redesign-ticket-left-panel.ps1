@@ -1,3 +1,21 @@
+# Run this from your project root
+# Usage: powershell -ExecutionPolicy Bypass -File redesign-ticket-left-panel.ps1
+#
+# Polishes the white left panel of the ticket (event details):
+# - Calendar/pin icons next to date and venue for visual hierarchy
+# - A violet accent line + colored eyebrow label
+# - Price shown in a highlighted pill instead of plain text
+# - A faint watermark glyph filling the middle so shorter event titles
+#   don't leave an awkward empty gap before the price
+# - A very subtle top-to-bottom violet-to-white tint, tying it to the
+#   purple right panel without losing the white "paper ticket" feel
+# Right panel (purple/QR/barcode) is unchanged.
+
+$ErrorActionPreference = "Stop"
+$utf8NoBom = New-Object System.Text.UTF8Encoding $false
+
+Write-Host "Writing: app\tickets\[code]\page.tsx" -ForegroundColor Cyan
+$content = @'
 import { sql } from '@/lib/db';
 import QRCode from 'qrcode';
 import TicketQRReveal from '@/components/TicketQRReveal';
@@ -55,12 +73,12 @@ export default async function TicketPage({ params }: { params: Promise<{ code: s
     <div className="min-h-screen bg-gray-950 flex items-center justify-center px-3 py-10">
       <div className="w-full max-w-[380px]">
         <div className="relative flex rounded-3xl overflow-hidden shadow-2xl shadow-black/60 bg-white">
-          {/* Left panel â€” event details */}
+          {/* Left panel — event details */}
           <div
             className="relative z-0 flex-[0_0_40%] px-4 py-5 flex flex-col overflow-hidden"
             style={{ background: 'linear-gradient(180deg, #FBFAFF 0%, #FFFFFF 38%, #FFFFFF 100%)' }}
           >
-            {/* Faint watermark glyph â€” fills the middle so shorter titles don't leave a dead gap */}
+            {/* Faint watermark glyph — fills the middle so shorter titles don't leave a dead gap */}
             <svg
               className="absolute -right-6 top-[38%] w-32 h-32 text-violet-100 pointer-events-none"
               viewBox="0 0 24 24"
@@ -116,7 +134,7 @@ export default async function TicketPage({ params }: { params: Promise<{ code: s
             <div className="absolute top-3 bottom-3 left-0 border-l-2 border-dashed border-white/70" />
           </div>
 
-          {/* Right panel â€” status, holder, code */}
+          {/* Right panel — status, holder, code */}
           <div
             className="relative flex-1 px-4 py-5 flex flex-col text-white"
             style={{
@@ -178,4 +196,20 @@ export default async function TicketPage({ params }: { params: Promise<{ code: s
       </div>
     </div>
   );
+}
+
+'@
+$dir = "app\tickets\[code]"
+if (-not (Test-Path -LiteralPath $dir)) { New-Item -ItemType Directory -Force -Path $dir | Out-Null }
+[System.IO.File]::WriteAllText("$dir\page.tsx", $content, $utf8NoBom)
+
+if (-not (Test-Path -LiteralPath "$dir\page.tsx")) {
+    Write-Host "ERROR: file was not created!" -ForegroundColor Red
+} else {
+    Write-Host "Confirmed on disk." -ForegroundColor Green
+    Write-Host ""
+    Write-Host "Next steps:" -ForegroundColor Green
+    Write-Host "  git add ."
+    Write-Host "  git commit -m ""Polish ticket left panel: icons, accent details, price pill"""
+    Write-Host "  git push origin main"
 }
