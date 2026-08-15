@@ -1,4 +1,4 @@
-﻿import { sql } from '@/lib/db';
+import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
@@ -47,6 +47,25 @@ export default async function AdminPayoutsPage() {
     <div className="max-w-3xl mx-auto py-10 px-4 text-white">
       <Link href="/admin/dashboard" className="text-sm text-indigo-400 hover:underline">&larr; Admin</Link>
       <h1 className="text-2xl font-extrabold mt-2 mb-6">Platform payouts</h1>
+
+      <div className="flex flex-wrap gap-2 mb-6">
+        <a
+          href="https://dashboard.paystack.com/#/transfers"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition"
+        >
+          Paystack dashboard → Transfers
+        </a>
+        <a
+          href="https://dashboard.paystack.com/#/transfers/recipients"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-200 text-sm font-semibold px-4 py-2.5 rounded-xl transition"
+        >
+          Recipients
+        </a>
+      </div>
       <div className="flex gap-3 flex-wrap mb-8">
         {[
           { label: 'Gross paid', value: totalGross, color: 'text-indigo-400' },
