@@ -1,3 +1,25 @@
+# Run this from your project root
+# Usage: powershell -ExecutionPolicy Bypass -File redesign-ticket-page-horizontal.ps1
+#
+# Full layout redesign matching the horizontal white/purple diagonal-cut
+# reference: white details panel on the left (event name, venue, date,
+# door time, and a new "Ticket Price" hero element), diagonal seam with
+# perforation notches, purple gradient panel on the right holding status,
+# holder name, and the QR/barcode (TicketQRReveal, untouched).
+#
+# Proportions are adapted for mobile — the reference is an ultra-wide
+# desktop banner; this keeps the same visual identity but sized to fit a
+# phone screen at the door without clipping or requiring zoom.
+#
+# Also adds ticket_types.price_kes to the query (new field, used for the
+# price display) and wraps the QR/barcode area in a horizontal-scroll
+# safety net so it can never get cut off on the smallest phones.
+
+$ErrorActionPreference = "Stop"
+$utf8NoBom = New-Object System.Text.UTF8Encoding $false
+
+Write-Host "Writing: app\tickets\[code]\page.tsx" -ForegroundColor Cyan
+$content = @'
 import { sql } from '@/lib/db';
 import QRCode from 'qrcode';
 import TicketQRReveal from '@/components/TicketQRReveal';
@@ -55,7 +77,7 @@ export default async function TicketPage({ params }: { params: Promise<{ code: s
     <div className="min-h-screen bg-gray-950 flex items-center justify-center px-3 py-10">
       <div className="w-full max-w-[380px]">
         <div className="relative flex rounded-3xl overflow-hidden shadow-2xl shadow-black/60 bg-white">
-          {/* Left panel â€” event details */}
+          {/* Left panel — event details */}
           <div className="relative z-0 flex-[0_0_40%] bg-white px-4 py-5 flex flex-col">
             <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gray-400">
               Admit One
@@ -85,7 +107,7 @@ export default async function TicketPage({ params }: { params: Promise<{ code: s
             <div className="absolute top-3 bottom-3 left-0 border-l-2 border-dashed border-white/70" />
           </div>
 
-          {/* Right panel â€” status, holder, code */}
+          {/* Right panel — status, holder, code */}
           <div
             className="relative flex-1 px-4 py-5 flex flex-col text-white"
             style={{
@@ -147,4 +169,20 @@ export default async function TicketPage({ params }: { params: Promise<{ code: s
       </div>
     </div>
   );
+}
+
+'@
+$dir = "app\tickets\[code]"
+if (-not (Test-Path -LiteralPath $dir)) { New-Item -ItemType Directory -Force -Path $dir | Out-Null }
+[System.IO.File]::WriteAllText("$dir\page.tsx", $content, $utf8NoBom)
+
+if (-not (Test-Path -LiteralPath "$dir\page.tsx")) {
+    Write-Host "ERROR: file was not created!" -ForegroundColor Red
+} else {
+    Write-Host "Confirmed on disk." -ForegroundColor Green
+    Write-Host ""
+    Write-Host "Next steps:" -ForegroundColor Green
+    Write-Host "  git add ."
+    Write-Host "  git commit -m ""Redesign ticket page: horizontal white/purple diagonal layout"""
+    Write-Host "  git push origin main"
 }
