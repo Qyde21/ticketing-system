@@ -1,4 +1,4 @@
-import { Resend } from 'resend';
+﻿import { Resend } from 'resend';
 
 function getResend() {
   if (!process.env.RESEND_API_KEY) {
@@ -328,7 +328,7 @@ export async function sendShiftAssignedEmail(params: {
   scanUrl: string;
 }) {
   const resend = getResend();
-  const when = `${new Date(params.startsAt).toLocaleString()} – ${new Date(params.endsAt).toLocaleString()}`;
+  const when = `${new Date(params.startsAt).toLocaleString()} â€“ ${new Date(params.endsAt).toLocaleString()}`;
   const gateLine = params.gate ? `<p><strong>Gate / location:</strong> ${params.gate}</p>` : '';
   await resend.emails.send({
     from: 'TicketHub <noreply@mytickethub.co.ke>',
@@ -360,12 +360,12 @@ export async function sendShiftReminderEmail(params: {
   scanUrl: string;
 }) {
   const resend = getResend();
-  const when = `${new Date(params.startsAt).toLocaleString()} – ${new Date(params.endsAt).toLocaleString()}`;
+  const when = `${new Date(params.startsAt).toLocaleString()} â€“ ${new Date(params.endsAt).toLocaleString()}`;
   const gateLine = params.gate ? `<p><strong>Gate / location:</strong> ${params.gate}</p>` : '';
   await resend.emails.send({
     from: 'TicketHub <noreply@mytickethub.co.ke>',
     to: params.toEmail,
-    subject: `Reminder: shift soon — ${params.eventTitle}`,
+    subject: `Reminder: shift soon â€” ${params.eventTitle}`,
     html: `
       <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
         <h2>Shift starting soon</h2>
@@ -376,6 +376,28 @@ export async function sendShiftReminderEmail(params: {
         ${gateLine}
         <p><a href="${params.scanUrl}" style="display:inline-block;background:#4f46e5;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600;">Open check-in scanner</a></p>
         <p style="color:#888;font-size:12px;margin-top:24px;">Sent by TicketHub</p>
+      </div>
+    `,
+  });
+}
+export async function sendLoginOtpEmail(params: {
+  toEmail: string;
+  fullName?: string;
+  code: string;
+}) {
+  const name = params.fullName || 'there';
+  await resend.emails.send({
+    from: 'TicketHub <onboarding@resend.dev>',
+    to: params.toEmail,
+    subject: `${params.code} is your TicketHub login code`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+        <h2>Your login code</h2>
+        <p>Hi ${name},</p>
+        <p>Use this code to finish signing in to TicketHub:</p>
+        <p style="font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #4f46e5;">${params.code}</p>
+        <p>This code expires in <strong>10 minutes</strong>. If you did not try to log in, you can ignore this email.</p>
+        <p style="color: #888; font-size: 12px; margin-top: 24px;">Sent by TicketHub</p>
       </div>
     `,
   });

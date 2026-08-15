@@ -1,10 +1,18 @@
 ﻿import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
-import { verifyPassword, setSessionCookie, signPendingTwoFactorToken } from '@/lib/auth';
+import { verifyPassword, signPendingLoginToken } from '@/lib/auth';
+import { issueLoginEmailOtp } from '@/lib/loginOtp';
 import { checkRateLimit, recordAttempt, getClientIp } from '@/lib/rateLimit';
 
 const MAX_ATTEMPTS = 10;
 const WINDOW_MINUTES = 15;
+
+function maskEmail(email: string): string {
+  const [local, domain] = email.split('@');
+  if (!domain) return '***';
+  const visible = local.slice(0, Math.min(2, local.length));
+  return `${visible}***@${domain}`;
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -35,7 +43,7 @@ export async function POST(req: NextRequest) {
     }
 
     const [user] = await sql`SELECT * FROM users WHERE email = ${normalizedEmail}`;
-    if (!user || !(await verifyPassword(password, user.password_hash))) {
+    if (!user || !user.password_hash || !(await verifyPassword(password, user.password_hash))) {
       await recordAttempt('login', normalizedEmail, ip);
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
@@ -47,18 +55,22 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (user.totp_enabled) {
-      const pendingToken = await signPendingTwoFactorToken(user.id, rememberMe);
-      return NextResponse.json({ twoFactorRequired: true, pendingToken });
+    try {
+      await issueLoginEmailOtp(user);
+    } catch (emailErr) {
+      console.error('Failed to send login OTP:', emailErr);
+      return NextResponse.json(
+        { error: 'Could not send login code. Please try again in a moment.' },
+        { status: 503 }
+      );
     }
 
-    await setSessionCookie(
-      { userId: user.id, email: user.email, role: user.role },
-      { rememberMe }
-    );
+    const pendingToken = await signPendingLoginToken(user.id, 'login_email_otp', rememberMe);
 
     return NextResponse.json({
-      user: { id: user.id, email: user.email, fullName: user.full_name, role: user.role },
+      emailOtpRequired: true,
+      pendingToken,
+      emailHint: maskEmail(user.email),
     });
   } catch (err) {
     console.error('Login error:', err);

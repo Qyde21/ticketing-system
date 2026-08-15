@@ -83,28 +83,48 @@ export async function clearSessionCookie() {
   cookieStore.delete(COOKIE_NAME);
 }
 
-export async function signPendingTwoFactorToken(
+export type PendingLoginPurpose = 'login_email_otp' | '2fa_pending';
+
+export async function signPendingLoginToken(
   userId: string,
+  purpose: PendingLoginPurpose,
   rememberMe = false
 ): Promise<string> {
-  return new SignJWT({ userId, purpose: '2fa_pending', rememberMe: Boolean(rememberMe) })
+  return new SignJWT({ userId, purpose, rememberMe: Boolean(rememberMe) })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
-    .setExpirationTime('5m')
+    .setExpirationTime(purpose === 'login_email_otp' ? '15m' : '5m')
     .sign(JWT_SECRET);
+}
+
+export async function signPendingTwoFactorToken(userId: string, rememberMe = false) {
+  return signPendingLoginToken(userId, '2fa_pending', rememberMe);
+}
+
+export async function verifyPendingLoginToken(
+  token: string,
+  expectedPurpose?: PendingLoginPurpose
+): Promise<{ userId: string; rememberMe: boolean; purpose: PendingLoginPurpose } | null> {
+  try {
+    const { payload } = await jwtVerify(token, JWT_SECRET);
+    const purpose = payload.purpose as string;
+    if (purpose !== 'login_email_otp' && purpose !== '2fa_pending') return null;
+    if (typeof payload.userId !== 'string') return null;
+    if (expectedPurpose && purpose !== expectedPurpose) return null;
+    return {
+      userId: payload.userId,
+      rememberMe: Boolean(payload.rememberMe),
+      purpose: purpose as PendingLoginPurpose,
+    };
+  } catch {
+    return null;
+  }
 }
 
 export async function verifyPendingTwoFactorToken(
   token: string
 ): Promise<{ userId: string; rememberMe: boolean } | null> {
-  try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
-    if (payload.purpose !== '2fa_pending' || typeof payload.userId !== 'string') return null;
-    return {
-      userId: payload.userId,
-      rememberMe: Boolean(payload.rememberMe),
-    };
-  } catch {
-    return null;
-  }
+  const pending = await verifyPendingLoginToken(token, '2fa_pending');
+  if (!pending) return null;
+  return { userId: pending.userId, rememberMe: pending.rememberMe };
 }
