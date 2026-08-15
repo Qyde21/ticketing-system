@@ -1,18 +1,10 @@
 ﻿import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
-import { verifyPassword, signPendingLoginToken } from '@/lib/auth';
-import { issueLoginEmailOtp } from '@/lib/loginOtp';
+import { verifyPassword, setSessionCookie, signPendingLoginToken } from '@/lib/auth';
 import { checkRateLimit, recordAttempt, getClientIp } from '@/lib/rateLimit';
 
 const MAX_ATTEMPTS = 10;
 const WINDOW_MINUTES = 15;
-
-function maskEmail(email: string): string {
-  const [local, domain] = email.split('@');
-  if (!domain) return '***';
-  const visible = local.slice(0, Math.min(2, local.length));
-  return `${visible}***@${domain}`;
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -55,22 +47,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    try {
-      await issueLoginEmailOtp(user);
-    } catch (emailErr) {
-      console.error('Failed to send login OTP:', emailErr);
-      return NextResponse.json(
-        { error: 'Could not send login code. Please try again in a moment.' },
-        { status: 503 }
-      );
+    if (user.totp_enabled) {
+      const pendingToken = await signPendingLoginToken(user.id, '2fa_pending', rememberMe);
+      return NextResponse.json({ twoFactorRequired: true, pendingToken });
     }
 
-    const pendingToken = await signPendingLoginToken(user.id, 'login_email_otp', rememberMe);
+    await setSessionCookie(
+      { userId: user.id, email: user.email, role: user.role },
+      { rememberMe }
+    );
 
     return NextResponse.json({
-      emailOtpRequired: true,
-      pendingToken,
-      emailHint: maskEmail(user.email),
+      user: { id: user.id, email: user.email, fullName: user.full_name, role: user.role },
     });
   } catch (err) {
     console.error('Login error:', err);
