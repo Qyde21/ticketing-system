@@ -42,17 +42,81 @@ function encodeCode128B(text: string): string {
   return bars;
 }
 
-export default function TicketBarcode({ value, height = 72, moduleWidth = 2 }: { value: string; height?: number; moduleWidth?: number }) {
-  const clean = String(value || '').trim().toUpperCase();
+export default function TicketBarcode({
+  value,
+  height = 110,
+  moduleWidth = 3,
+}: {
+  value: string;
+  height?: number;
+  moduleWidth?: number;
+}) {
+  const clean = String(value || '')
+    .trim()
+    .toUpperCase()
+    .replace(/[^0-9A-Z\-_]/g, '');
   if (!clean) return null;
+
   const pattern = encodeCode128B(clean);
-  const width = pattern.length * moduleWidth;
-  const barHeight = height - 18;
+  const quiet = 10;
+  const modules = quiet * 2 + pattern.length;
+  const width = modules * moduleWidth;
+  const barHeight = height - 22;
+  const offset = quiet * moduleWidth;
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, width: '100%' }}>
-      <svg xmlns="http://www.w3.org/2000/svg" width={Math.min(width, 320)} height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`Barcode ${clean}`} style={{ maxWidth: '100%', background: '#fff', borderRadius: 4 }}>
-        {Array.from(pattern).map((bit, i) => bit === '1' ? <rect key={i} x={i * moduleWidth} y={0} width={moduleWidth} height={barHeight} fill="#000" /> : null)}
-        <text x={width / 2} y={height - 3} textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize={13} fontWeight={600} fill="#111">{clean}</text>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 6,
+        width: '100%',
+        overflowX: 'auto',
+        WebkitOverflowScrolling: 'touch',
+      }}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width={width}
+        height={height}
+        viewBox={`0 0 ${width} ${height}`}
+        role="img"
+        aria-label={`Barcode ${clean}`}
+        style={{
+          display: 'block',
+          background: '#ffffff',
+          borderRadius: 6,
+          minWidth: Math.min(width, 360),
+          maxWidth: '100%',
+          height: 'auto',
+        }}
+        preserveAspectRatio="xMidYMid meet"
+      >
+        <rect x={0} y={0} width={width} height={height} fill="#ffffff" />
+        {Array.from(pattern).map((bit, i) =>
+          bit === '1' ? (
+            <rect
+              key={i}
+              x={offset + i * moduleWidth}
+              y={4}
+              width={moduleWidth}
+              height={barHeight}
+              fill="#000000"
+            />
+          ) : null
+        )}
+        <text
+          x={width / 2}
+          y={height - 4}
+          textAnchor="middle"
+          fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace"
+          fontSize={14}
+          fontWeight={700}
+          fill="#111111"
+        >
+          {clean}
+        </text>
       </svg>
     </div>
   );
