@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { verifyPassword, setSessionCookie, signPendingTwoFactorToken } from '@/lib/auth';
 import { checkRateLimit, recordAttempt, getClientIp } from '@/lib/rateLimit';
@@ -8,7 +8,11 @@ const WINDOW_MINUTES = 15;
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password } = await req.json();
+    const body = await req.json();
+    const email = body.email;
+    const password = body.password;
+    const rememberMe = Boolean(body.rememberMe);
+
     if (!email || !password) {
       return NextResponse.json({ error: 'Missing email or password' }, { status: 400 });
     }
@@ -31,41 +35,27 @@ export async function POST(req: NextRequest) {
     }
 
     const [user] = await sql`SELECT * FROM users WHERE email = ${normalizedEmail}`;
-
-    if (!user) {
-      await recordAttempt('login', normalizedEmail, ip);
-      return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
-    }
-
-    if (!user.password_hash) {
-      return NextResponse.json(
-        { error: 'This account uses Google Sign-In. Please use the "Continue with Google" button instead.' },
-        { status: 401 }
-      );
-    }
-
-    if (!(await verifyPassword(password, user.password_hash))) {
+    if (!user || !(await verifyPassword(password, user.password_hash))) {
       await recordAttempt('login', normalizedEmail, ip);
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
 
     if (user.status === 'suspended') {
-      return NextResponse.json({ error: 'This account has been suspended. Contact support for help.' }, { status: 403 });
-    }
-
-    if (!user.email_verified) {
       return NextResponse.json(
-        { error: 'Please confirm your email address before logging in. Check your inbox for the confirmation link.', unverified: true },
+        { error: 'This account has been suspended. Contact support for help.' },
         { status: 403 }
       );
     }
 
     if (user.totp_enabled) {
-      const pendingToken = await signPendingTwoFactorToken(user.id);
+      const pendingToken = await signPendingTwoFactorToken(user.id, rememberMe);
       return NextResponse.json({ twoFactorRequired: true, pendingToken });
     }
 
-    await setSessionCookie({ userId: user.id, email: user.email, role: user.role });
+    await setSessionCookie(
+      { userId: user.id, email: user.email, role: user.role },
+      { rememberMe }
+    );
 
     return NextResponse.json({
       user: { id: user.id, email: user.email, fullName: user.full_name, role: user.role },
