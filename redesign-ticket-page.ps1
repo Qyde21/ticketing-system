@@ -1,3 +1,19 @@
+# Run this from your project root
+# Usage: powershell -ExecutionPolicy Bypass -File redesign-ticket-page.ps1
+#
+# Redesigns the buyer-facing ticket page (app/tickets/[code]/page.tsx) into
+# a proper torn-stub ticket card: cover-image (or gradient) admission panel
+# with status badge, a real perforated tear line, and a cream paper stub
+# holding the existing QR/barcode. TicketQRReveal and TicketBarcode
+# components are untouched — only this page's own markup changed, so
+# nothing that reuses those components elsewhere is affected.
+# Also fixes a corrupted character that was in the old version.
+
+$ErrorActionPreference = "Stop"
+$utf8NoBom = New-Object System.Text.UTF8Encoding $false
+
+Write-Host "Writing: app\tickets\[code]\page.tsx" -ForegroundColor Cyan
+$content = @'
 import { sql } from '@/lib/db';
 import QRCode from 'qrcode';
 import TicketQRReveal from '@/components/TicketQRReveal';
@@ -87,7 +103,7 @@ export default async function TicketPage({ params }: { params: Promise<{ code: s
 
             <p className="relative mt-2 text-sm font-semibold text-white/90">
               {ticket.ticket_type_name}
-              {ticket.holder_name ? ` Â· ${ticket.holder_name}` : ''}
+              {ticket.holder_name ? ` · ${ticket.holder_name}` : ''}
             </p>
 
             <div className="relative mt-4 flex items-center gap-4 text-xs font-medium text-white/80">
@@ -158,4 +174,20 @@ export default async function TicketPage({ params }: { params: Promise<{ code: s
       </div>
     </div>
   );
+}
+
+'@
+$dir = "app\tickets\[code]"
+if (-not (Test-Path -LiteralPath $dir)) { New-Item -ItemType Directory -Force -Path $dir | Out-Null }
+[System.IO.File]::WriteAllText("$dir\page.tsx", $content, $utf8NoBom)
+
+if (-not (Test-Path -LiteralPath "$dir\page.tsx")) {
+    Write-Host "ERROR: file was not created!" -ForegroundColor Red
+} else {
+    Write-Host "Confirmed on disk." -ForegroundColor Green
+    Write-Host ""
+    Write-Host "Next steps:" -ForegroundColor Green
+    Write-Host "  git add ."
+    Write-Host "  git commit -m ""Redesign ticket page as a torn-stub ticket card"""
+    Write-Host "  git push origin main"
 }
