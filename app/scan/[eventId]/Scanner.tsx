@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   enqueueCheckin,
@@ -147,7 +147,7 @@ export default function Scanner({
         tickets: data.tickets,
       });
       setPackReady(true);
-      setPackInfo(`${data.tickets.length} tickets · ${new Date(data.downloadedAt).toLocaleTimeString()}`);
+      setPackInfo(`${data.tickets.length} tickets Â· ${new Date(data.downloadedAt).toLocaleTimeString()}`);
       setResult({
         status: 'success',
         message: `Offline pack ready (${data.tickets.length} tickets)`,
@@ -208,7 +208,7 @@ export default function Scanner({
       if (existing) {
         setPackReady(true);
         setPackInfo(
-          `${existing.tickets.length} tickets · ${new Date(existing.downloadedAt).toLocaleTimeString()}`
+          `${existing.tickets.length} tickets Â· ${new Date(existing.downloadedAt).toLocaleTimeString()}`
         );
       }
       await refreshQueueCount();
@@ -246,7 +246,7 @@ export default function Scanner({
               status: 'error',
               message: packReady
                 ? 'Invalid ticket (not in offline pack)'
-                : 'No offline pack — connect once and download tickets',
+                : 'No offline pack â€” connect once and download tickets',
             });
           } else if (local.cancelled) {
             playTone('err');
@@ -267,7 +267,7 @@ export default function Scanner({
             playTone('ok');
             setResult({
               status: 'success',
-              message: 'Checked in offline — will sync when online',
+              message: 'Checked in offline â€” will sync when online',
               holderName: local.ticket.holderName || undefined,
             });
             setStats((s) => ({
@@ -310,7 +310,7 @@ export default function Scanner({
         }
       } catch {
         playTone('err');
-        setResult({ status: 'error', message: 'Network error — try offline pack or retry' });
+        setResult({ status: 'error', message: 'Network error â€” try offline pack or retry' });
       } finally {
         setBusy(false);
         setTimeout(() => {
@@ -325,16 +325,27 @@ export default function Scanner({
   useEffect(() => {
     let mounted = true;
     import('html5-qrcode')
-      .then(({ Html5QrcodeScanner }) => {
+      .then(({ Html5QrcodeScanner, Html5QrcodeSupportedFormats }) => {
         if (!mounted) return;
+        const formatsToSupport = [
+          Html5QrcodeSupportedFormats.QR_CODE,
+          Html5QrcodeSupportedFormats.CODE_128,
+          Html5QrcodeSupportedFormats.CODE_39,
+          Html5QrcodeSupportedFormats.CODE_93,
+          Html5QrcodeSupportedFormats.CODABAR,
+          Html5QrcodeSupportedFormats.EAN_13,
+          Html5QrcodeSupportedFormats.EAN_8,
+          Html5QrcodeSupportedFormats.UPC_A,
+          Html5QrcodeSupportedFormats.UPC_E,
+          Html5QrcodeSupportedFormats.ITF,
+        ];
         const scanner = new Html5QrcodeScanner(
           'reader',
           {
             fps: 10,
-            qrbox: { width: 260, height: 260 },
+            qrbox: { width: 280, height: 140 }, formatsToSupport, showTorchButtonIfSupported: true,
             rememberLastUsedCamera: true,
-            aspectRatio: 1,
-            videoConstraints: { facingMode: { ideal: 'environment' } },
+                        videoConstraints: { facingMode: { ideal: 'environment' } },
           },
           false
         );
@@ -361,7 +372,7 @@ export default function Scanner({
     <div>
       <div className="mb-3 flex flex-wrap items-center gap-2 text-xs">
         <span className={online ? 'text-emerald-400 font-semibold' : 'text-amber-400 font-semibold'}>
-          {online ? '● Online' : '● Offline mode'}
+          {online ? 'â— Online' : 'â— Offline mode'}
         </span>
         {packReady ? (
           <span className="text-gray-400">Pack: {packInfo}</span>
@@ -377,7 +388,7 @@ export default function Scanner({
           onClick={() => void downloadPack()}
           className="text-indigo-400 hover:text-indigo-300 disabled:opacity-40 underline"
         >
-          {packBusy ? 'Downloading…' : 'Download / refresh ticket pack'}
+          {packBusy ? 'Downloadingâ€¦' : 'Download / refresh ticket pack'}
         </button>
         {online && pendingSync > 0 && (
           <button
@@ -401,7 +412,7 @@ export default function Scanner({
         </div>
         <div className="flex-1 bg-gray-900 border border-gray-800 rounded-xl px-3 py-3 text-center">
           <div className="text-2xl font-bold text-white">{stats.total}</div>
-          <div className="text-xs text-gray-400 mt-0.5">Total · {percent}%</div>
+          <div className="text-xs text-gray-400 mt-0.5">Total Â· {percent}%</div>
         </div>
       </div>
 
@@ -444,7 +455,7 @@ export default function Scanner({
           disabled={busy || !manualCode.trim()}
           className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-semibold px-4 py-2.5 rounded-lg text-sm transition"
         >
-          {busy ? '…' : 'Check in'}
+          {busy ? 'â€¦' : 'Check in'}
         </button>
       </form>
       {result && (
@@ -457,7 +468,7 @@ export default function Scanner({
           }
         >
           <strong className="text-base">
-            {result.status === 'success' ? '✓ ' + result.message : '✗ ' + result.message}
+            {result.status === 'success' ? 'âœ“ ' + result.message : 'âœ— ' + result.message}
           </strong>
           {result.holderName && <p className="mt-1 text-sm opacity-90">{result.holderName}</p>}
         </div>
@@ -488,3 +499,4 @@ export default function Scanner({
     </div>
   );
 }
+
