@@ -385,6 +385,7 @@ export async function sendLoginOtpEmail(params: {
   fullName?: string;
   code: string;
 }) {
+  const resend = new Resend(process.env.RESEND_API_KEY);
   const name = params.fullName || 'there';
   await resend.emails.send({
     from: 'TicketHub <onboarding@resend.dev>',
