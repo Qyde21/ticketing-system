@@ -7,6 +7,33 @@ import PasswordInput from '@/components/PasswordInput';
 
 type Step = 'credentials' | 'email_otp' | 'totp';
 
+function Shell({
+  title,
+  subtitle,
+  children,
+}: {
+  title: string;
+  subtitle: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <main className="min-h-[70vh] flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-md">
+        <div className="bg-gray-900/90 border border-gray-800 rounded-2xl p-6 sm:p-8 shadow-2xl shadow-indigo-950/30">
+          <div className="text-center mb-6">
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-500 text-white font-extrabold text-lg mb-4 shadow-lg shadow-indigo-900/40">
+              T
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">{title}</h1>
+            <p className="text-gray-400 text-sm mt-2">{subtitle}</p>
+          </div>
+          {children}
+        </div>
+      </div>
+    </main>
+  );
+}
+
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,7 +42,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [resendMsg, setResendMsg] = useState('');
   const router = useRouter();
-
   const [step, setStep] = useState<Step>('credentials');
   const [pendingToken, setPendingToken] = useState('');
   const [emailHint, setEmailHint] = useState('');
@@ -50,7 +76,6 @@ export default function LoginPage() {
     setError('');
     setResendMsg('');
     setLoading(true);
-
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
@@ -58,13 +83,11 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password, rememberMe }),
       });
       const data = await res.json();
-
       if (!res.ok) {
         setError(data.error || 'Login failed');
         setLoading(false);
         return;
       }
-
       if (data.emailOtpRequired) {
         setPendingToken(data.pendingToken);
         setEmailHint(data.emailHint || '');
@@ -73,7 +96,6 @@ export default function LoginPage() {
         setLoading(false);
         return;
       }
-
       if (data.twoFactorRequired) {
         setPendingToken(data.pendingToken);
         setStep('totp');
@@ -81,7 +103,6 @@ export default function LoginPage() {
         setLoading(false);
         return;
       }
-
       router.push('/');
       router.refresh();
     } catch {
@@ -95,7 +116,6 @@ export default function LoginPage() {
     setError('');
     setResendMsg('');
     setLoading(true);
-
     try {
       const res = await fetch('/api/auth/verify-email-otp', {
         method: 'POST',
@@ -103,13 +123,11 @@ export default function LoginPage() {
         body: JSON.stringify({ pendingToken, code }),
       });
       const data = await res.json();
-
       if (!res.ok) {
         setError(data.error || 'Verification failed');
         setLoading(false);
         return;
       }
-
       if (data.twoFactorRequired) {
         setPendingToken(data.pendingToken);
         setStep('totp');
@@ -117,7 +135,6 @@ export default function LoginPage() {
         setLoading(false);
         return;
       }
-
       router.push('/');
       router.refresh();
     } catch {
@@ -153,7 +170,6 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
     setLoading(true);
-
     try {
       const res = await fetch('/api/auth/2fa/verify-login', {
         method: 'POST',
@@ -161,13 +177,11 @@ export default function LoginPage() {
         body: JSON.stringify({ pendingToken, code }),
       });
       const data = await res.json();
-
       if (!res.ok) {
         setError(data.error || 'Verification failed');
         setLoading(false);
         return;
       }
-
       router.push('/');
       router.refresh();
     } catch {
@@ -176,42 +190,17 @@ export default function LoginPage() {
     }
   }
 
-  function Shell({
-    title,
-    subtitle,
-    children,
-  }: {
-    title: string;
-    subtitle: string;
-    children: React.ReactNode;
-  }) {
-    return (
-      <main className="min-h-[70vh] flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md">
-          <div className="bg-gray-900/90 border border-gray-800 rounded-2xl p-6 sm:p-8 shadow-2xl shadow-indigo-950/30">
-            <div className="text-center mb-6">
-              <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-500 text-white font-extrabold text-lg mb-4 shadow-lg shadow-indigo-900/40">
-                T
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">{title}</h1>
-              <p className="text-gray-400 text-sm mt-2">{subtitle}</p>
-            </div>
-            {error && (
-              <div className="mb-5 p-3.5 bg-red-950/80 border border-red-800/80 text-red-300 rounded-xl text-sm font-medium">
-                {error}
-              </div>
-            )}
-            {resendMsg && (
-              <div className="mb-5 p-3.5 bg-emerald-950/50 border border-emerald-800/60 text-emerald-300 rounded-xl text-sm font-medium">
-                {resendMsg}
-              </div>
-            )}
-            {children}
-          </div>
-        </div>
-      </main>
-    );
-  }
+  const errorBox = error ? (
+    <div className="mb-5 p-3.5 bg-red-950/80 border border-red-800/80 text-red-300 rounded-xl text-sm font-medium">
+      {error}
+    </div>
+  ) : null;
+
+  const resendBox = resendMsg ? (
+    <div className="mb-5 p-3.5 bg-emerald-950/50 border border-emerald-800/60 text-emerald-300 rounded-xl text-sm font-medium">
+      {resendMsg}
+    </div>
+  ) : null;
 
   if (step === 'email_otp') {
     return (
@@ -223,6 +212,8 @@ export default function LoginPage() {
             : 'We sent a 6-digit code to your email'
         }
       >
+        {errorBox}
+        {resendBox}
         <form onSubmit={handleVerifyEmailOtp} className="space-y-4">
           <input
             type="text"
@@ -271,6 +262,7 @@ export default function LoginPage() {
   if (step === 'totp') {
     return (
       <Shell title="Two-factor code" subtitle="Enter the 6-digit code from your authenticator app">
+        {errorBox}
         <form onSubmit={handleVerifyTotp} className="space-y-4">
           <input
             type="text"
@@ -312,6 +304,8 @@ export default function LoginPage() {
 
   return (
     <Shell title="Welcome back" subtitle="Sign in to manage tickets and events">
+      {errorBox}
+      {resendBox}
       <div className="flex rounded-xl bg-gray-800/80 p-1 mb-6 border border-gray-700/80">
         <span className="flex-1 text-center py-2.5 rounded-lg text-sm font-bold bg-gradient-to-r from-indigo-600 to-cyan-600 text-white shadow">
           Login
@@ -323,7 +317,6 @@ export default function LoginPage() {
           Sign up
         </Link>
       </div>
-
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-xs font-bold uppercase tracking-wider text-indigo-300/90 mb-2">
@@ -347,7 +340,6 @@ export default function LoginPage() {
             />
           </div>
         </div>
-
         <div>
           <div className="flex items-center justify-between mb-2">
             <label className="block text-xs font-bold uppercase tracking-wider text-indigo-300/90">
@@ -377,7 +369,6 @@ export default function LoginPage() {
             />
           </div>
         </div>
-
         <label className="flex items-center gap-2.5 cursor-pointer select-none py-1">
           <input
             type="checkbox"
@@ -387,13 +378,12 @@ export default function LoginPage() {
           />
           <span className="text-sm text-gray-300">Keep me signed in for 30 days</span>
         </label>
-
         <button
           type="submit"
           disabled={loading}
           className="w-full bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-bold py-3.5 px-4 rounded-xl transition shadow-lg shadow-indigo-950/40 disabled:opacity-50 flex items-center justify-center gap-2"
         >
-          {loading ? 'Sending code…' : (
+          {loading ? 'Signing in…' : (
             <>
               <span>Sign in</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden>
@@ -403,7 +393,6 @@ export default function LoginPage() {
           )}
         </button>
       </form>
-
       <div className="relative my-6">
         <div className="absolute inset-0 flex items-center" aria-hidden>
           <div className="w-full border-t border-gray-700" />
@@ -412,7 +401,6 @@ export default function LoginPage() {
           <span className="bg-gray-900 px-3 text-gray-500 font-medium">or</span>
         </div>
       </div>
-
       <a
         href={googleHref()}
         className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-100 text-gray-900 font-semibold py-3.5 px-4 rounded-xl transition border border-gray-200 shadow-sm"
@@ -425,7 +413,6 @@ export default function LoginPage() {
         </svg>
         Continue with Google
       </a>
-
       <div className="mt-6 pt-5 border-t border-gray-800 text-center text-sm text-gray-400">
         Don&apos;t have an account?{' '}
         <Link href="/signup" className="text-indigo-400 hover:text-cyan-400 font-semibold transition">
