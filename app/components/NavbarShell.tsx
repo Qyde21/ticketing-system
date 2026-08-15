@@ -81,7 +81,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
                 </>
               )}
 
-              {userRole === 'attendee' && (
+              {(userRole === 'attendee' || userRole === 'organizer' || userRole === 'admin') && (
                 <>
                   <Link href="/attendee/dashboard" className={getLinkClass('/attendee/dashboard')}>My Tickets</Link>
                   <Link href="/inbox" className={getLinkClass('/inbox')}>Inbox</Link>
@@ -159,7 +159,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
                 </>
               )}
 
-              {userRole === 'attendee' && (
+              {(userRole === 'attendee' || userRole === 'organizer' || userRole === 'admin') && (
                 <>
                   <Link href="/attendee/dashboard" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/attendee/dashboard')}>My Tickets</Link>
                   <Link href="/inbox" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/inbox')}>Inbox</Link>
