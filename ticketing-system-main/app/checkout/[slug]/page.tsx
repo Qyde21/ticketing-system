@@ -1,0 +1,115 @@
+import { sql } from '@/lib/db';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import CheckoutForm from './CheckoutForm';
+
+export const dynamic = 'force-dynamic';
+
+export default async function CheckoutPage({ params }: { params: Promise<{ slug: string }> }) {
+  const resolvedParams = await params;
+  const ticketIdOrSlug = resolvedParams?.slug;
+
+  if (!ticketIdOrSlug) {
+    notFound();
+  }
+
+  let ticketType: any = null;
+  let event: any = null;
+
+  try {
+    const ttRes = await sql`
+      SELECT tt.*, e.title as event_title, e.start_at, e.venue_name, e.cover_image_url
+      FROM ticket_types tt
+      JOIN events e ON e.id::text = tt.event_id::text
+      WHERE tt.id::text = ${ticketIdOrSlug} OR tt.name ILIKE ${ticketIdOrSlug.replace(/-/g, ' ')}
+      LIMIT 1
+    `;
+
+    if (ttRes.length === 0) {
+      notFound();
+    }
+
+    ticketType = ttRes[0];
+    event = {
+      title: ticketType.event_title,
+      start_at: ticketType.start_at,
+      venue_name: ticketType.venue_name,
+      cover_image_url: ticketType.cover_image_url
+    };
+
+  } catch (err) {
+    console.error("Error loading checkout details:", err);
+    notFound();
+  }
+
+  const now = new Date();
+  const flashCapReached = ticketType.flash_sale_quantity_cap !== null && ticketType.flash_sale_quantity_cap !== undefined
+    && Number(ticketType.flash_sale_quantity_sold || 0) >= Number(ticketType.flash_sale_quantity_cap);
+  const flashActive = ticketType.flash_sale_price_kes !== null && ticketType.flash_sale_price_kes !== undefined
+    && ticketType.flash_sale_starts_at && ticketType.flash_sale_ends_at
+    && now >= new Date(ticketType.flash_sale_starts_at) && now <= new Date(ticketType.flash_sale_ends_at)
+    && !flashCapReached;
+  const effectivePriceKes = flashActive ? ticketType.flash_sale_price_kes : ticketType.price_kes;
+
+  const priceNum = parseFloat(effectivePriceKes || 0);
+  const total = ticketType.quantity_total ?? 0;
+  const sold = ticketType.quantity_sold ?? 0;
+  const remaining = Math.max(0, total - sold);
+
+  const eventForForm = {
+    id: ticketType.event_id,
+    title: event.title,
+  };
+
+  const ticketTypesForForm = [
+    {
+      id: ticketType.id,
+      name: flashActive ? `${ticketType.name} (Flash Sale)` : ticketType.name,
+      price_kes: effectivePriceKes,
+    },
+  ];
+
+  return (
+    <main className="max-w-2xl mx-auto px-4 py-12 text-white">
+      <div className="mb-6">
+        <Link href={`/events/${ticketType.event_id}`} className="text-indigo-400 hover:underline text-sm font-semibold">
+          â† Back to Event
+        </Link>
+      </div>
+
+      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6">
+        <div>
+          <span className="text-xs uppercase tracking-wider font-bold text-indigo-400 bg-indigo-950/60 px-3 py-1 rounded-full border border-indigo-800/50">
+            Checkout
+          </span>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white mt-3">{event.title}</h1>
+        </div>
+
+        <div className="bg-gray-950 border border-gray-800 rounded-xl p-4 space-y-3">
+          <div className="flex justify-between items-center pb-3 border-b border-gray-800">
+            <div>
+              <h3 className="font-bold text-lg text-white">{ticketType.name} Ticket</h3>
+              {remaining <= 0 ? (
+                <p className="text-xs text-red-400 font-semibold">Sold out</p>
+              ) : remaining <= 10 || (total > 0 && remaining / total <= 0.1) ? (
+                <p className="text-xs text-amber-400 font-semibold">Almost sold out</p>
+              ) : (
+                <p className="text-xs text-gray-400">Tickets available</p>
+              )}
+            </div>
+            <span className="text-cyan-400 font-extrabold text-lg">
+              KES {priceNum.toLocaleString()}
+            </span>
+          </div>
+
+          <div className="text-xs text-gray-400 space-y-1">
+            <p><strong>Venue:</strong> {event.venue_name || 'TBD'}</p>
+            <p><strong>Date:</strong> {event.start_at ? new Date(event.start_at).toLocaleString() : 'TBD'}</p>
+          </div>
+        </div>
+
+        <CheckoutForm event={eventForForm} ticketTypes={ticketTypesForForm} />
+      </div>
+    </main>
+  );
+}

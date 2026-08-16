@@ -1,5 +1,6 @@
-﻿import { sql } from '@/lib/db';
+ï»¿import { sql } from '@/lib/db';
 import { verifyTicketsMagicLink } from '@/lib/auth';
+import { getTicketDisplayStatus } from '@/lib/tickets';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
@@ -43,6 +44,8 @@ export default async function MyTicketsViewPage({
       e.title AS event_title,
       e.venue_name,
       e.start_at,
+      e.end_at,
+      e.status AS event_status,
       e.slug
     FROM orders o
     JOIN events e ON e.id = o.event_id
@@ -89,7 +92,7 @@ export default async function MyTicketsViewPage({
                   <div>
                     <h2 className="font-bold text-lg">{o.event_title as string}</h2>
                     <p className="text-xs text-gray-500">
-                      {o.venue_name ? `${o.venue_name} · ` : ''}
+                      {o.venue_name ? `${o.venue_name} Â· ` : ''}
                       {o.start_at ? new Date(o.start_at as string).toLocaleString('en-KE') : ''}
                     </p>
                   </div>
@@ -103,10 +106,16 @@ export default async function MyTicketsViewPage({
                   </div>
                 </div>
                 {list.length === 0 ? (
-                  <p className="text-amber-400/90 text-sm">Tickets are still being issued…</p>
+                  <p className="text-amber-400/90 text-sm">Tickets are still being issuedâ€¦</p>
                 ) : (
                   <ul className="space-y-2">
-                    {list.map((t) => (
+                    {list.map((t) => {
+                      const displayStatus = getTicketDisplayStatus(t.status as string, {
+                        status: o.event_status as string,
+                        start_at: o.start_at as string,
+                        end_at: o.end_at as string,
+                      });
+                      return (
                       <li
                         key={t.ticket_code as string}
                         className="flex justify-between items-center bg-gray-950/80 border border-gray-800 rounded-xl px-3 py-2.5"
@@ -117,10 +126,13 @@ export default async function MyTicketsViewPage({
                           </span>
                           <span className="text-xs text-gray-500 ml-2">
                             {(t.ticket_type as string) || 'Ticket'}
-                            {t.holder_name ? ` · ${t.holder_name}` : ''}
+                            {t.holder_name ? ` Â· ${t.holder_name}` : ''}
                           </span>
-                          {t.status === 'used' && (
+                          {displayStatus === 'used' && (
                             <span className="ml-2 text-xs text-red-400">Used</span>
+                          )}
+                          {displayStatus === 'expired' && (
+                            <span className="ml-2 text-xs text-gray-500">Expired</span>
                           )}
                         </div>
                         <Link
@@ -130,7 +142,8 @@ export default async function MyTicketsViewPage({
                           Open QR
                         </Link>
                       </li>
-                    ))}
+                      );
+                    })}
                   </ul>
                 )}
               </li>

@@ -1,4 +1,4 @@
-﻿'use client';
+ï»¿'use client';
 
 import TicketBarcode from '@/components/TicketBarcode';
 
@@ -12,6 +12,7 @@ export type EventTicketProps = {
   ticketCode: string;
   qrDataUrl: string;
   status?: string;
+  isExpired?: boolean;
   checkedInAt?: string | Date | null;
   coverImageUrl?: string | null;
 };
@@ -41,11 +42,13 @@ export default function EventTicket({
   ticketCode,
   qrDataUrl,
   status,
+  isExpired = false,
   checkedInAt,
   coverImageUrl,
 }: EventTicketProps) {
   const code = String(ticketCode || '').trim();
   const isUsed = status === 'used' || status === 'checked_in';
+  const isDimmed = isUsed || isExpired;
   const poster =
     coverImageUrl && String(coverImageUrl).trim()
       ? String(coverImageUrl).trim()
@@ -59,7 +62,7 @@ export default function EventTicket({
 
       <div className="w-full max-w-[920px] mx-auto">
         <div
-          className={'relative flex w-full overflow-hidden rounded-2xl shadow-2xl ' + (isUsed ? 'opacity-90' : '')}
+          className={'relative flex w-full overflow-hidden rounded-2xl shadow-2xl ' + (isDimmed ? 'opacity-90' : '')}
           style={{
             aspectRatio: '2.35 / 1',
             minHeight: 160,
@@ -92,7 +95,7 @@ export default function EventTicket({
                 className="text-[9px] sm:text-xs font-bold uppercase tracking-[0.2em] mb-1"
                 style={{ color: '#fbbf24' }}
               >
-                TicketHub · Official ticket
+                TicketHub Â· Official ticket
               </p>
               <h2
                 className="font-black leading-tight text-white line-clamp-2"
@@ -118,11 +121,11 @@ export default function EventTicket({
 
             <div className="relative z-10 mt-2 space-y-1 min-w-0">
               <p className="text-white/95 font-medium truncate" style={{ fontSize: 'clamp(0.65rem, 1.8vw, 0.85rem)' }}>
-                <span style={{ color: '#fbbf24' }}>📅 </span>
+                <span style={{ color: '#fbbf24' }}>ðŸ“… </span>
                 {formatWhen(startAt)}
               </p>
               <p className="text-white/90 truncate" style={{ fontSize: 'clamp(0.65rem, 1.8vw, 0.85rem)' }}>
-                <span style={{ color: '#fbbf24' }}>📍 </span>
+                <span style={{ color: '#fbbf24' }}>ðŸ“ </span>
                 {venueName || 'Venue TBA'}
               </p>
               {holderName && (
@@ -170,6 +173,14 @@ export default function EventTicket({
                   {checkedInAt && (
                     <p className="text-red-100 text-[10px] sm:text-xs mt-1">{new Date(checkedInAt).toLocaleString()}</p>
                   )}
+                </div>
+              </div>
+            )}
+            {!isUsed && isExpired && (
+              <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'rgba(55,65,81,0.85)' }}>
+                <div className="text-center px-2">
+                  <p className="text-white font-extrabold text-sm sm:text-base">Expired</p>
+                  <p className="text-gray-200 text-[10px] sm:text-xs mt-1">Event has ended</p>
                 </div>
               </div>
             )}

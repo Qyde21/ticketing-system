@@ -3,9 +3,38 @@ import { nanoid } from 'nanoid';
 import { sendTicketEmail } from '@/lib/email';
 import { sendTicketConfirmationSms } from '@/lib/sms';
 
+export type TicketDisplayStatus = 'valid' | 'used' | 'cancelled' | 'expired';
+
+/**
+ * Tickets never get their DB status flipped when an event ends unscanned -
+ * the row stays 'valid' forever (this is intentional, see finalizePaidOrder).
+ * Anywhere a ticket's status is shown to a person, use this to derive what
+ * they should actually see: an unscanned 'valid' ticket on an event that has
+ * already ended should read as 'expired', not 'valid'.
+ */
+export function getTicketDisplayStatus(
+  ticketStatus: string | null | undefined,
+  event: { status?: string | null; start_at?: string | Date | null; end_at?: string | Date | null } | null | undefined
+): TicketDisplayStatus {
+  if (ticketStatus === 'used' || ticketStatus === 'cancelled') {
+    return ticketStatus;
+  }
+  if (event) {
+    const ended =
+      event.status === 'completed' ||
+      (event.status !== 'cancelled' &&
+        (() => {
+          const end = event.end_at ? new Date(event.end_at) : event.start_at ? new Date(event.start_at) : null;
+          return end ? end < new Date() : false;
+        })());
+    if (ended) return 'expired';
+  }
+  return 'valid';
+}
+
 /**
  * Marks an order as paid, generates real ticket rows, and emails the buyer.
- * Safe to call more than once for the same order â€” if tickets already exist,
+ * Safe to call more than once for the same order - if tickets already exist,
  * returns those codes instead of generating duplicates.
  *
  * Inventory (quantity_sold) is reserved atomically when the order is created
@@ -20,7 +49,7 @@ export async function finalizePaidOrder(orderId: string, baseUrl: string): Promi
 
   if (!order) return [];
 
-  // Already finalized with tickets â€” return existing codes (idempotent).
+  // Already finalized with tickets - return existing codes (idempotent).
   const existing = await sql`SELECT ticket_code FROM tickets WHERE order_id = ${order.id}`;
   if (existing.length > 0) {
     if (order.payment_status !== 'paid') {
@@ -38,7 +67,7 @@ export async function finalizePaidOrder(orderId: string, baseUrl: string): Promi
       // stored count can never overshoot max_uses even under concurrent
       // near-simultaneous redemptions. (Payment has already succeeded via
       // Paystack by this point, so a losing concurrent order still keeps
-      // its discount â€” this guard protects future validation, not this
+      // its discount - this guard protects future validation, not this
       // specific edge case, which is an acceptable tradeoff.)
       await sql`
         UPDATE promo_codes
@@ -59,7 +88,7 @@ export async function finalizePaidOrder(orderId: string, baseUrl: string): Promi
     generatedCodes.push(ticketCode);
   }
 
-  // quantity_sold is reserved atomically at order creation â€” do not increment here.
+  // quantity_sold is reserved atomically at order creation - do not increment here.
 
   const [eventDetails] = await sql`
     SELECT title, venue_name, start_at FROM events WHERE id = ${order.event_id}
@@ -96,4 +125,3 @@ export async function finalizePaidOrder(orderId: string, baseUrl: string): Promi
 
   return generatedCodes;
 }
-
