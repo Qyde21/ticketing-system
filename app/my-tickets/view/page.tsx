@@ -1,4 +1,4 @@
-ï»¿import { sql } from '@/lib/db';
+import { sql } from '@/lib/db';
 import { verifyTicketsMagicLink } from '@/lib/auth';
 import { getTicketDisplayStatus } from '@/lib/tickets';
 import Link from 'next/link';
@@ -92,7 +92,7 @@ export default async function MyTicketsViewPage({
                   <div>
                     <h2 className="font-bold text-lg">{o.event_title as string}</h2>
                     <p className="text-xs text-gray-500">
-                      {o.venue_name ? `${o.venue_name} Â· ` : ''}
+                      {o.venue_name ? `${o.venue_name} · ` : ''}
                       {o.start_at ? new Date(o.start_at as string).toLocaleString('en-KE') : ''}
                     </p>
                   </div>
@@ -106,7 +106,7 @@ export default async function MyTicketsViewPage({
                   </div>
                 </div>
                 {list.length === 0 ? (
-                  <p className="text-amber-400/90 text-sm">Tickets are still being issuedâ€¦</p>
+                  <p className="text-amber-400/90 text-sm">Tickets are still being issued…</p>
                 ) : (
                   <ul className="space-y-2">
                     {list.map((t) => {
@@ -126,7 +126,7 @@ export default async function MyTicketsViewPage({
                           </span>
                           <span className="text-xs text-gray-500 ml-2">
                             {(t.ticket_type as string) || 'Ticket'}
-                            {t.holder_name ? ` Â· ${t.holder_name}` : ''}
+                            {t.holder_name ? ` · ${t.holder_name}` : ''}
                           </span>
                           {displayStatus === 'used' && (
                             <span className="ml-2 text-xs text-red-400">Used</span>

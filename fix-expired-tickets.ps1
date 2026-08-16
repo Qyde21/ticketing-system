@@ -1,4 +1,4 @@
-# Run this from your project root: C:\Users\user\ticketing-system
+﻿# Run this from your project root: C:\Users\user\ticketing-system
 # Usage: powershell -ExecutionPolicy Bypass -File fix-expired-tickets.ps1
 #
 # Fixes: unscanned tickets on events that have already ended were still
@@ -156,7 +156,7 @@ Write-ClaudeFile "lib\tickets.ts" $content
 
 Write-Host "Writing: app\tickets\[code]\page.tsx" -ForegroundColor Cyan
 $content = @'
-﻿import { sql } from '@/lib/db';
+import { sql } from '@/lib/db';
 import QRCode from 'qrcode';
 import EventTicket from '@/components/EventTicket';
 import AddToCalendarButton from '@/components/AddToCalendarButton';
@@ -246,7 +246,7 @@ Write-ClaudeFile "app\tickets\[code]\page.tsx" $content
 
 Write-Host "Writing: components\EventTicket.tsx" -ForegroundColor Cyan
 $content = @'
-﻿'use client';
+'use client';
 
 import TicketBarcode from '@/components/TicketBarcode';
 
@@ -627,7 +627,7 @@ Write-ClaudeFile "app\attendee\dashboard\page.tsx" $content
 
 Write-Host "Writing: app\my-tickets\view\page.tsx" -ForegroundColor Cyan
 $content = @'
-﻿import { sql } from '@/lib/db';
+import { sql } from '@/lib/db';
 import { verifyTicketsMagicLink } from '@/lib/auth';
 import { getTicketDisplayStatus } from '@/lib/tickets';
 import Link from 'next/link';
@@ -804,5 +804,5 @@ Write-Host "  - app\my-tickets\view\page.tsx"
 Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Yellow
 Write-Host "  git add -A"
-Write-Host "  git commit -m \"Show expired status for unscanned tickets on ended events\""
-Write-Host "  git push"
+Write-Host "  git commit -m ""Show expired status for unscanned tickets on ended events"""
+Write-Host "  git push --force"

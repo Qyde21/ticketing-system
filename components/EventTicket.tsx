@@ -1,4 +1,4 @@
-ï»¿'use client';
+'use client';
 
 import TicketBarcode from '@/components/TicketBarcode';
 
@@ -95,7 +95,7 @@ export default function EventTicket({
                 className="text-[9px] sm:text-xs font-bold uppercase tracking-[0.2em] mb-1"
                 style={{ color: '#fbbf24' }}
               >
-                TicketHub Â· Official ticket
+                TicketHub · Official ticket
               </p>
               <h2
                 className="font-black leading-tight text-white line-clamp-2"
@@ -121,11 +121,11 @@ export default function EventTicket({
 
             <div className="relative z-10 mt-2 space-y-1 min-w-0">
               <p className="text-white/95 font-medium truncate" style={{ fontSize: 'clamp(0.65rem, 1.8vw, 0.85rem)' }}>
-                <span style={{ color: '#fbbf24' }}>ðŸ“… </span>
+                <span style={{ color: '#fbbf24' }}>📅 </span>
                 {formatWhen(startAt)}
               </p>
               <p className="text-white/90 truncate" style={{ fontSize: 'clamp(0.65rem, 1.8vw, 0.85rem)' }}>
-                <span style={{ color: '#fbbf24' }}>ðŸ“ </span>
+                <span style={{ color: '#fbbf24' }}>📍 </span>
                 {venueName || 'Venue TBA'}
               </p>
               {holderName && (
