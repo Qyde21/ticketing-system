@@ -185,6 +185,9 @@ export async function processPayout(payoutId: string) {
     } catch {
       /* retry transfer */
     }
+    // A transfer is already registered with Paystack for this payout —
+    // don't initiate a second one concurrently. The caller can poll again.
+    return { status: 'processing' as const, payout };
   }
 
   const net = Number(payout.net_kes);
@@ -193,14 +196,41 @@ export async function processPayout(payoutId: string) {
   const recipientCode = await ensureRecipient(payout.organizer_id as string);
   const reference = payout.paystack_reference || `payout_${nanoid(12)}`;
 
-  await sql`
+  // Atomically claim this payout before initiating a real-money transfer.
+  // The UPDATE only succeeds (and returns a row) if the status is still
+  // claimable at the exact moment the database applies it — Postgres
+  // serializes concurrent updates to the same row, so if two calls race
+  // here, only one of them will see status still 'pending'/'failed' and
+  // win the claim; the other gets zero rows back and backs off instead of
+  // calling Paystack a second time. This mirrors the atomic-claim pattern
+  // used to prevent ticket overselling.
+  //
+  // A payout stuck in 'processing' with no transfer code (e.g. the process
+  // crashed after this claim but before ever reaching Paystack) is also
+  // reclaimable — but only once it's been stuck for a couple of minutes,
+  // so a call that's still legitimately mid-flight inside the try block
+  // below can't be stomped by a retry or an overlapping cron run.
+  const [claimed] = await sql`
     UPDATE organizer_payouts
     SET status = 'processing',
         paystack_reference = ${reference},
         processed_at = now(),
         failure_reason = NULL
     WHERE id = ${payoutId}
+      AND (
+        status IN ('pending', 'failed')
+        OR (status = 'processing' AND paystack_transfer_code IS NULL AND processed_at < now() - interval '2 minutes')
+      )
+    RETURNING id
   `;
+
+  if (!claimed) {
+    // Another call already claimed (or is actively mid-flight on) this
+    // payout. Report the current state rather than starting a duplicate
+    // transfer.
+    const [current] = await sql`SELECT status FROM organizer_payouts WHERE id = ${payoutId}`;
+    return { status: (current?.status as 'pending' | 'processing' | 'paid' | 'failed') ?? 'processing', payout };
+  }
 
   try {
     const transfer = await initiateTransfer({
