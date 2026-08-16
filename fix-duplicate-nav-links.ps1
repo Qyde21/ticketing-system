@@ -1,3 +1,19 @@
+# Run this from your project root
+# Usage: powershell -ExecutionPolicy Bypass -File fix-duplicate-nav-links.ps1
+#
+# Fixes duplicate "My Tickets" and "Inbox" links for admin accounts. The
+# admin-specific nav block explicitly listed both, and a separate shared
+# block below it (covering attendee/organizer/admin) listed them again -
+# since admin matches both conditions, they showed up twice (desktop:
+# both links doubled; mobile: Inbox doubled). Removed the redundant
+# copies from the admin-specific block; the shared block still covers
+# admin correctly on its own.
+
+$ErrorActionPreference = "Stop"
+$utf8NoBom = New-Object System.Text.UTF8Encoding $false
+
+Write-Host "Writing: app\components\NavbarShell.tsx" -ForegroundColor Cyan
+$content = @'
 'use client';
 
 import React, { useState } from 'react';
@@ -186,4 +202,18 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
       )}
     </header>
   );
+}
+
+'@
+[System.IO.File]::WriteAllText("app\components\NavbarShell.tsx", $content, $utf8NoBom)
+
+if (-not (Test-Path -LiteralPath "app\components\NavbarShell.tsx")) {
+    Write-Host "ERROR: file was not created!" -ForegroundColor Red
+} else {
+    Write-Host "Confirmed on disk." -ForegroundColor Green
+    Write-Host ""
+    Write-Host "Next steps:" -ForegroundColor Green
+    Write-Host "  git add ."
+    Write-Host "  git commit -m ""Fix: remove duplicate My Tickets/Inbox links for admin nav"""
+    Write-Host "  git push origin main"
 }
