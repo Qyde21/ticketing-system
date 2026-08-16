@@ -4,6 +4,8 @@ import EventTicket from '@/components/EventTicket';
 import AddToCalendarButton from '@/components/AddToCalendarButton';
 import { getTicketDisplayStatus } from '@/lib/tickets';
 
+export const dynamic = 'force-dynamic';
+
 export default async function TicketPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
 
@@ -47,7 +49,7 @@ export default async function TicketPage({ params }: { params: Promise<{ code: s
         <div className="text-center sm:text-left">
           <p className="text-xs font-bold uppercase tracking-widest text-indigo-300/80 mb-1">Your ticket</p>
           <h1 className="text-xl sm:text-2xl font-extrabold text-white leading-tight">{ticket.event_title}</h1>
-          <p className="text-sm text-gray-400 mt-1">Show this at the entrance — QR or barcode both work</p>
+          <p className="text-sm text-gray-400 mt-1">Show this at the entrance â€” QR or barcode both work</p>
         </div>
 
         <EventTicket
