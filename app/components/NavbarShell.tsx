@@ -45,8 +45,11 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         
         {/* Left Side: Logo */}
-        <Link href="/" className="flex items-center hover:opacity-90 transition shrink-0">
+        <Link href="/" className="flex items-center gap-2.5 hover:opacity-90 transition shrink-0">
           <img src="/logo-badge.png" alt="TicketHub" className="h-11 w-11" />
+          <span className="font-serif text-lg sm:text-xl font-bold tracking-tight">
+            <span className="text-slate-200">Ticket</span><span className="text-amber-400">Hub</span>
+          </span>
         </Link>
 
         {/* Desktop Navigation Links */}
