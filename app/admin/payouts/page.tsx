@@ -54,12 +54,14 @@ export default async function AdminPayoutsPage() {
       <div style={{ background: '#111827', border: '1px solid #1f2937', borderRadius: 12, padding: 20, marginBottom: 28 }}>
         <h2 style={{ margin: '0 0 12px', fontSize: 16, fontWeight: 800, color: '#e5e7eb' }}>Manual payout steps</h2>
         <ol style={{ margin: 0, paddingLeft: 20, color: '#d1d5db', fontSize: 14, lineHeight: 1.7 }}>
-          <li>Wait until the <strong>event has ended</strong> and the refund window is closed (e.g. 3–7 days after).</li>
-          <li>Confirm <strong>Net to Organizers</strong> below (gross paid tickets minus TicketHub 10% fee). Refunded orders are not included in gross.</li>
-          <li>Check <strong>Paystack</strong> that settlements are available in your balance (Paystack fees may reduce what you actually received).</li>
-          <li>Transfer the net amount to the organizer via <strong>M-Pesa or bank</strong> using the details you have on file.</li>
-          <li>Save the transfer <strong>reference, date, and amount</strong> (spreadsheet or notes) next to the event name.</li>
-          <li>Optional: message the organizer that payout was sent and include the reference.</li>
+          <li>Wait until the <strong>event has ended</strong>.</li>
+          <li><strong>Refunds first:</strong> Process any approved attendee refunds from the event Orders page before paying the organizer. Refunds go through Paystack and cancel tickets; inventory is released automatically.</li>
+          <li>Close the refund window (e.g. <strong>3–7 days after</strong> the event) so late refunds do not change the payout amount after you have paid out.</li>
+          <li>Confirm figures below: <strong>Gross</strong> = currently paid orders only; <strong>Refunded</strong> is shown separately; <strong>Net</strong> = gross − TicketHub 10% fee (refunds are already excluded from gross).</li>
+          <li>If a refund happens <strong>after</strong> you already paid the organizer, record it and <strong>deduct from their next payout</strong> or agree a clawback offline—do not ignore it.</li>
+          <li>Check <strong>Paystack</strong> that settlements cover what you plan to send (Paystack fees may reduce available balance).</li>
+          <li>Transfer the net amount via <strong>M-Pesa or bank</strong>; save <strong>reference, date, amount</strong>, and note any post-payout refunds.</li>
+          <li>Optional: message the organizer with the payout reference and a short refund summary if any refunds applied.</li>
         </ol>
         <p style={{ margin: '12px 0 0', fontSize: 12, color: '#9ca3af' }}>
           TicketHub does not send bank transfers automatically yet. This page is your payout worksheet.

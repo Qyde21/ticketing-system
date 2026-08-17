@@ -37,7 +37,7 @@ export default async function PayoutsPage() {
         <strong style={{ color: '#e5e7eb' }}>How payouts work</strong>
         <p style={{ margin: '8px 0 0' }}>
           After your event ends, TicketHub reviews paid ticket revenue and pays your <strong>net payout</strong> (gross − 10% platform fee) manually via M-Pesa or bank.
-          Paystack processing fees are separate and may affect settlement timing. Contact support if a payout seems delayed.
+          Refunds issued to attendees are removed from paid revenue before net payout is calculated. Paystack processing fees are separate and may affect settlement timing. Contact support if a payout seems delayed.
         </p>
       </div>
 
