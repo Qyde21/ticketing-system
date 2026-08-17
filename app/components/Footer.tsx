@@ -8,11 +8,11 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
           {/* Brand Info */}
           <div>
-            <Link href="/" className="flex items-center gap-2 mb-3 text-lg font-bold">
-              <span className="bg-emerald-600 text-white px-2 py-0.5 rounded text-sm font-black">
-                TH
+            <Link href="/" className="flex items-center gap-2 mb-3">
+              <img src="/logo-badge.png" alt="TicketHub" className="h-10 w-10" />
+              <span className="font-serif text-xl font-bold tracking-tight">
+                <span className="text-slate-200">Ticket</span><span className="text-amber-400">Hub</span>
               </span>
-              <span className="text-white font-extrabold text-xl">TicketHub</span>
             </Link>
             <p className="text-sm text-slate-400 leading-relaxed">
               Kenya's premier event ticketing platform. Buy and sell tickets for concerts, festivals, and live events.
@@ -25,7 +25,7 @@ export default function Footer() {
             <ul className="space-y-2 text-sm text-slate-400">
               <li><Link href="/" className="hover:text-white transition">Browse Events</Link></li>
               <li><Link href="/pricing" className="hover:text-white transition">Sell Tickets</Link></li>
-              <li><Link href="/login" className="hover:text-white transition">Log In</Link></li>
+              <li><Link href="/my-tickets" className="hover:text-white transition">My Tickets</Link></li><li><Link href="/login" className="hover:text-white transition">Log In</Link></li>
               <li><Link href="/signup" className="hover:text-white transition">Sign Up</Link></li>
             </ul>
           </div>

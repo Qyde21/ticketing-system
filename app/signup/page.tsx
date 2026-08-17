@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
@@ -56,9 +56,11 @@ function SignupForm() {
     return (
       <div className="min-h-screen bg-slate-950 text-white flex flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-          <Link href="/" className="flex items-center justify-center gap-2 text-2xl font-bold mb-6">
-            <span className="bg-emerald-600 text-white px-2.5 py-1 rounded text-base font-black">TH</span>
-            <span className="text-white font-extrabold tracking-tight">TicketHub</span>
+          <Link href="/" className="flex items-center justify-center gap-2.5 mb-6">
+            <img src="/logo-badge.png" alt="TicketHub" className="h-14 w-14" />
+            <span className="font-serif text-2xl font-bold tracking-tight">
+              <span className="text-slate-200">Ticket</span><span className="text-amber-400">Hub</span>
+            </span>
           </Link>
           <div className="bg-slate-900 py-8 px-6 shadow sm:rounded-lg border border-slate-800">
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-900/50 border border-emerald-700 mb-4">
@@ -86,9 +88,11 @@ function SignupForm() {
     <div className="min-h-screen bg-slate-950 text-white flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
-          <Link href="/" className="flex items-center gap-2 text-2xl font-bold">
-            <span className="bg-emerald-600 text-white px-2.5 py-1 rounded text-base font-black">TH</span>
-            <span className="text-white font-extrabold tracking-tight">TicketHub</span>
+          <Link href="/" className="flex items-center gap-2.5">
+            <img src="/logo-badge.png" alt="TicketHub" className="h-14 w-14" />
+            <span className="font-serif text-2xl font-bold tracking-tight">
+              <span className="text-slate-200">Ticket</span><span className="text-amber-400">Hub</span>
+            </span>
           </Link>
         </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-white">

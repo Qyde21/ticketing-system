@@ -45,11 +45,11 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         
         {/* Left Side: Logo */}
-        <Link href="/" className="flex items-center gap-2 text-lg font-bold hover:opacity-90 transition shrink-0">
-          <span className="bg-emerald-600 text-white px-2 py-0.5 rounded text-sm font-black">
-            TH
+        <Link href="/" className="flex items-center gap-2.5 hover:opacity-90 transition shrink-0">
+          <img src="/logo-badge.png" alt="TicketHub" className="h-11 w-11" />
+          <span className="font-serif text-lg sm:text-xl font-bold tracking-tight">
+            <span className="text-slate-200">Ticket</span><span className="text-amber-400">Hub</span>
           </span>
-          <span className="text-white font-extrabold text-lg sm:text-xl tracking-tight">TicketHub</span>
         </Link>
 
         {/* Desktop Navigation Links */}
@@ -64,7 +64,6 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
                   <Link href="/admin/organizers" className={getLinkClass('/admin/organizers')}>Organizers</Link>
                   <Link href="/admin/events" className={getLinkClass('/admin/events')}>All Events</Link>
                   <Link href="/admin/payouts" className={getLinkClass('/admin/payouts')}>Payouts</Link>
-                  <Link href="/inbox" className={getLinkClass('/inbox')}>Inbox</Link>
                   <Link href="/account/security" className={getLinkClass('/account/security')}>Security</Link>
                 </>
               )}
@@ -80,7 +79,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
                 </>
               )}
 
-              {userRole === 'attendee' && (
+              {(userRole === 'attendee' || userRole === 'organizer' || userRole === 'admin') && (
                 <>
                   <Link href="/attendee/dashboard" className={getLinkClass('/attendee/dashboard')}>My Tickets</Link>
                   <Link href="/inbox" className={getLinkClass('/inbox')}>Inbox</Link>
@@ -99,6 +98,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
               <Link href="/" className={getLinkClass('/')}>Events</Link>
               <Link href="/signup?role=attendee" className={getLinkClass('/signup?role=attendee')}>Get Ticket</Link>
               <Link href="/signup?role=organizer" className={getLinkClass('/signup?role=organizer')}>Sell Tickets</Link>
+              <Link href="/my-tickets" className={getLinkClass('/my-tickets')}>My tickets</Link>
               <Link href="/login" className={getLinkClass('/login')}>Sign in</Link>
               <Link href="/signup" className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-md font-medium transition shadow-sm">
                 Get Started
@@ -141,7 +141,6 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
                   <Link href="/admin/organizers" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/admin/organizers')}>Organizers</Link>
                   <Link href="/admin/events" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/admin/events')}>All Events</Link>
                   <Link href="/admin/payouts" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/admin/payouts')}>Payouts</Link>
-                  <Link href="/inbox" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/inbox')}>Inbox</Link>
                   <Link href="/account/security" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/account/security')}>Security</Link>
                 </>
               )}
@@ -157,7 +156,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
                 </>
               )}
 
-              {userRole === 'attendee' && (
+              {(userRole === 'attendee' || userRole === 'organizer' || userRole === 'admin') && (
                 <>
                   <Link href="/attendee/dashboard" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/attendee/dashboard')}>My Tickets</Link>
                   <Link href="/inbox" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/inbox')}>Inbox</Link>
@@ -176,6 +175,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
               <Link href="/" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/')}>Events</Link>
               <Link href="/signup?role=attendee" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/signup?role=attendee')}>Get Ticket</Link>
               <Link href="/signup?role=organizer" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/signup?role=organizer')}>Sell Tickets</Link>
+              <Link href="/my-tickets" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/my-tickets')}>My tickets</Link>
               <Link href="/login" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/login')}>Sign in</Link>
               <Link href="/signup" onClick={() => setMobileMenuOpen(false)} className="block w-full text-center bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-md font-medium transition mt-2">
                 Get Started
