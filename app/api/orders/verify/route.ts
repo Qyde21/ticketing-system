@@ -34,21 +34,27 @@ export async function GET(req: NextRequest) {
         FROM orders WHERE paystack_reference = ${reference}
       `;
 
-      if (orders.length > 0) {
-        const paidAmountKes = verifyData.data.amount / 100;
-        const expectedTotal = orders.reduce((s: number, o: any) => s + Number(o.total_amount_kes), 0);
-        if (Math.abs(paidAmountKes - expectedTotal) > 0.01) {
-          console.error('Amount mismatch for reference', reference, 'via verify redirect');
-          return NextResponse.redirect(new URL('/?error=verification_failed', req.url));
-        }
-
-        for (const order of orders) {
-          await finalizePaidOrder(order.id, req.nextUrl.origin);
-        }
+      if (orders.length === 0) {
+        console.error('No orders for successful reference', reference);
+        return NextResponse.redirect(new URL('/?error=order_not_found', req.url));
       }
+
+      const paidAmountKes = verifyData.data.amount / 100;
+      const expectedTotal = orders.reduce((s: number, o: any) => s + Number(o.total_amount_kes), 0);
+      if (Math.abs(paidAmountKes - expectedTotal) > 0.01) {
+        console.error('Amount mismatch for reference', reference, 'via verify redirect');
+        return NextResponse.redirect(new URL('/?error=verification_failed', req.url));
+      }
+
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || req.nextUrl.origin;
+      for (const order of orders) {
+        await finalizePaidOrder(order.id, baseUrl);
+      }
+
+      return NextResponse.redirect(new URL(`/success?reference=${reference}`, req.url));
     }
 
-    return NextResponse.redirect(new URL(`/success?reference=${reference}`, req.url));
+    return NextResponse.redirect(new URL(`/?error=payment_failed&reference=${encodeURIComponent(reference)}`, req.url));
   } catch (err) {
     console.error('Verification error:', err);
     return NextResponse.redirect(new URL('/?error=verification_failed', req.url));

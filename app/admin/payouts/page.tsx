@@ -31,7 +31,8 @@ export default async function AdminPayoutsPage() {
   const totalGross = events.reduce((sum: number, e: any) => sum + Number(e.gross_revenue), 0);
   const totalRefunded = events.reduce((sum: number, e: any) => sum + Number(e.refunded_amount), 0);
   const totalFees = totalGross * 0.10;
-  const totalNet = totalGross - totalRefunded - totalFees;
+  // gross_revenue only includes payment_status = paid, so refunded rows are already excluded
+  const totalNet = totalGross - totalFees;
 
   const grouped: Record<string, any> = {};
   for (const e of events as any[]) {

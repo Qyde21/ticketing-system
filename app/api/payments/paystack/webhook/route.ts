@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
       }
 
       for (const order of orders) {
-        await finalizePaidOrder(order.id, req.nextUrl.origin);
+        await finalizePaidOrder(order.id, process.env.NEXT_PUBLIC_APP_URL || req.nextUrl.origin);
       }
     }
   }

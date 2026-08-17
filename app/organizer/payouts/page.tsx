@@ -1,4 +1,4 @@
-﻿import { sql } from '@/lib/db';
+import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import Link from 'next/link';
 
@@ -27,7 +27,8 @@ export default async function PayoutsPage() {
   const totalGross = events.reduce((sum: number, e: any) => sum + Number(e.gross_revenue), 0);
   const totalRefunded = events.reduce((sum: number, e: any) => sum + Number(e.refunded_amount), 0);
   const totalFees = totalGross * 0.10;
-  const totalNet = totalGross - totalRefunded - totalFees;
+  // gross_revenue only includes payment_status = paid, so refunded rows are already excluded
+  const totalNet = totalGross - totalFees;
 
   return (
     <div style={{ maxWidth: 700, margin: '2rem auto', padding: '0 1rem', color: '#fff' }}>
@@ -57,7 +58,8 @@ export default async function PayoutsPage() {
           const gross = Number(e.gross_revenue);
           const refunded = Number(e.refunded_amount);
           const fees = gross * 0.10;
-          const net = gross - refunded - fees;
+          // paid-only gross — do not subtract refunded again
+          const net = gross - fees;
           return (
             <li key={e.id} style={{ background: '#111827', border: '1px solid #1f2937', borderRadius: 8, padding: 16, marginBottom: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
