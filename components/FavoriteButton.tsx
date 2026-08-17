@@ -16,9 +16,10 @@ export default function FavoriteButton({
   const [busy, setBusy] = useState(false);
   const router = useRouter();
 
+  // Only reset when switching to a different event — not after every toggle
   useEffect(() => {
     setFavorited(initialFavorited);
-  }, [initialFavorited]);
+  }, [eventId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const dim = size === 'sm' ? 18 : 22;
 
@@ -28,7 +29,8 @@ export default function FavoriteButton({
     if (busy) return;
 
     const previous = favorited;
-    setFavorited(!previous);
+    const next = !previous;
+    setFavorited(next);
     setBusy(true);
 
     try {
@@ -52,7 +54,6 @@ export default function FavoriteButton({
       }
 
       setFavorited(!!data.favorited);
-      router.refresh();
     } catch {
       setFavorited(previous);
     } finally {
