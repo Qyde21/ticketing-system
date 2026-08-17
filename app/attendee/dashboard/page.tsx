@@ -28,7 +28,11 @@ export default async function AttendeeDashboard() {
            e.latitude, e.longitude,
            COALESCE(
              json_agg(json_build_object('code', t.ticket_code, 'status', t.status) ORDER BY t.ticket_code)
-             FILTER (WHERE t.id IS NOT NULL),
+             FILTER (
+               WHERE t.id IS NOT NULL
+                 AND t.shared_at IS NULL
+                 AND (t.holder_email IS NULL OR LOWER(t.holder_email) = LOWER(o.buyer_email))
+             ),
              '[]'
            ) AS tickets
     FROM orders o
@@ -40,7 +44,7 @@ export default async function AttendeeDashboard() {
     ORDER BY o.created_at DESC
   `;
 
-  // Events this attendee has been added as door staff for â€” grants them
+  // Events this attendee has been added as door staff for - grants them
   // access to the check-in scanner, separate from any tickets they hold.
   const staffEvents = await sql`
     SELECT e.id, e.title, e.venue_name, e.start_at, e.end_at, e.status
@@ -133,6 +137,11 @@ export default async function AttendeeDashboard() {
                   <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">
                     Your tickets ({o.tickets.length}):
                   </p>
+                  {o.tickets.length === 0 ? (
+                    <p className="text-gray-500 text-sm bg-gray-950 border border-gray-800 rounded-lg px-3 py-2">
+                      All tickets from this order have been shared or transferred.
+                    </p>
+                  ) : (
                   <div className="flex flex-col gap-2">
                     {o.tickets.map((t: any, index: number) => (
                       <div key={t.code} className="flex flex-wrap items-center gap-2 bg-gray-950 border border-gray-800 rounded-lg px-3 py-2">
@@ -149,9 +158,13 @@ export default async function AttendeeDashboard() {
                         {t.status === 'used' && (
                           <span className="text-xs text-gray-500 whitespace-nowrap">Checked in</span>
                         )}
+                        {t.status === 'valid' && eventEnded && (
+                          <span className="text-xs text-gray-500 whitespace-nowrap">Expired</span>
+                        )}
                       </div>
                     ))}
                   </div>
+                  )}
                 </div>
 
                 {o.latitude && o.longitude ? (

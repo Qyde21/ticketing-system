@@ -1,4 +1,4 @@
--- Ticketing System — database schema
+-- Ticketing System â€” database schema
 --
 -- NOTE: This file was reconstructed by reading every query in the codebase,
 -- since no migrations/schema file was committed to the repo and the app
@@ -28,7 +28,7 @@ CREATE TABLE users (
 
 -- Links a user to one or more OAuth identity providers. Designed to support
 -- multiple providers per user (e.g. Google now, Apple later) without further
--- schema changes — provider + provider_user_id together are unique.
+-- schema changes â€” provider + provider_user_id together are unique.
 CREATE TABLE oauth_accounts (
   id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id          UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -96,7 +96,12 @@ CREATE TABLE ticket_types (
   price_kes      NUMERIC NOT NULL,
   quantity_total INTEGER NOT NULL,
   quantity_sold  INTEGER NOT NULL DEFAULT 0,
-  max_per_order  INTEGER NOT NULL DEFAULT 10
+  max_per_order  INTEGER NOT NULL DEFAULT 10,
+  flash_sale_price_kes     NUMERIC,
+  flash_sale_starts_at     TIMESTAMPTZ,
+  flash_sale_ends_at       TIMESTAMPTZ,
+  flash_sale_quantity_cap  INTEGER,
+  flash_sale_quantity_sold INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE waitlist_entries (
@@ -136,6 +141,7 @@ CREATE TABLE orders (
   discount_amount_kes NUMERIC NOT NULL DEFAULT 0,
   payment_status      TEXT NOT NULL DEFAULT 'pending' CHECK (payment_status IN ('pending', 'paid', 'refunded', 'expired')),
   paystack_reference  TEXT UNIQUE,
+  is_flash_sale       BOOLEAN NOT NULL DEFAULT false,
   reminder_sent_at     TIMESTAMPTZ,
   created_at          TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -148,7 +154,9 @@ CREATE TABLE tickets (
   holder_name    TEXT,
   holder_email   TEXT,
   status         TEXT NOT NULL DEFAULT 'valid', -- 'valid' | 'used' | 'cancelled'
-  checked_in_at  TIMESTAMPTZ
+  checked_in_at  TIMESTAMPTZ,
+  checked_in_by  UUID REFERENCES users(id),
+  shared_at      TIMESTAMPTZ -- set when the buyer shares this ticket's link; hides it from the buyer's own "My Tickets" list, same as a transfer
 );
 
 CREATE TABLE messages (
@@ -191,4 +199,46 @@ CREATE TABLE password_reset_tokens (
   token_hash TEXT UNIQUE NOT NULL,
   expires_at TIMESTAMPTZ NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS login_email_otps (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  code_hash   TEXT NOT NULL,
+  expires_at  TIMESTAMPTZ NOT NULL,
+  used        BOOLEAN NOT NULL DEFAULT false,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS login_email_otps_user_created_idx
+  ON login_email_otps (user_id, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS event_reviews (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  event_id   UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+  user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  rating     SMALLINT NOT NULL CHECK (rating BETWEEN 1 AND 5),
+  body       TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (event_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS event_shifts (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  event_id      UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+  title         TEXT NOT NULL,
+  starts_at     TIMESTAMPTZ NOT NULL,
+  ends_at       TIMESTAMPTZ NOT NULL,
+  gate          TEXT,
+  slots_needed  INTEGER NOT NULL DEFAULT 1 CHECK (slots_needed >= 1),
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT event_shifts_time_check CHECK (ends_at > starts_at)
+);
+
+CREATE TABLE IF NOT EXISTS event_shift_assignments (
+  shift_id   UUID NOT NULL REFERENCES event_shifts(id) ON DELETE CASCADE,
+  user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  status     TEXT NOT NULL DEFAULT 'assigned'
+             CHECK (status IN ('assigned', 'confirmed', 'no_show')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (shift_id, user_id)
 );

@@ -1,7 +1,9 @@
 'use client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function TransferTicketButton({ code }: { code: string }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -27,6 +29,7 @@ export default function TransferTicketButton({ code }: { code: string }) {
 
       if (res.ok) {
         setSuccess(true);
+        router.refresh();
       } else {
         setError(data.error || 'Failed to transfer ticket');
       }
