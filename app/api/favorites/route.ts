@@ -13,14 +13,12 @@ export async function GET() {
       SELECT event_id FROM event_favorites WHERE user_id = ${session.userId}
     `;
     return NextResponse.json({
-      eventIds: rows.map((r) => r.event_id as string),
+      eventIds: rows.map((r) => String(r.event_id)),
     });
   } catch (err: any) {
     const msg = String(err?.message || err);
-    if (msg.includes('event_favorites') || msg.includes('does not exist')) {
-      return NextResponse.json({ eventIds: [] });
-    }
-    throw err;
+    console.error('favorites GET:', msg);
+    return NextResponse.json({ eventIds: [], error: msg }, { status: 503 });
   }
 }
 
@@ -60,7 +58,7 @@ export async function POST(req: NextRequest) {
       await sql`
         INSERT INTO event_favorites (user_id, event_id)
         VALUES (${userId}, ${eventIdStr})
-        ON CONFLICT DO NOTHING
+        ON CONFLICT (user_id, event_id) DO NOTHING
       `;
     } else if (!next && isFavorited) {
       await sql`
@@ -73,12 +71,12 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     const msg = String(err?.message || err);
     console.error('favorites POST error:', msg);
-    if (msg.includes('event_favorites') || msg.includes('does not exist')) {
-      return NextResponse.json(
-        { error: 'Favorites not set up. Run the event_favorites migration.' },
-        { status: 503 }
-      );
-    }
-    return NextResponse.json({ error: 'Could not update favorite' }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: 'Could not update favorite',
+        detail: msg,
+      },
+      { status: 503 }
+    );
   }
 }
