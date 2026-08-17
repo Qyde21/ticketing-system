@@ -6,33 +6,53 @@ import FavoriteButton from '@/components/FavoriteButton';
 
 export const dynamic = 'force-dynamic';
 
+async function ensureFavoritesTable() {
+  await sql`
+    CREATE TABLE IF NOT EXISTS event_favorites (
+      user_id    TEXT NOT NULL,
+      event_id   TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      PRIMARY KEY (user_id, event_id)
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS idx_event_favorites_user_id ON event_favorites(user_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_event_favorites_event_id ON event_favorites(event_id)`;
+}
+
 export default async function FavoritesPage() {
   const session = await getSession();
   if (!session?.userId) {
     redirect('/login?next=/favorites');
   }
 
+  const userId = String(session.userId);
   let events: any[] = [];
-  let setupError = '';
+  let loadError = '';
+
   try {
-    events = await sql`
-      SELECT
-        e.id, e.title, e.slug, e.venue_name, e.start_at, e.end_at, e.status,
-        e.cover_image_url, e.category,
-        f.created_at AS saved_at
-      FROM event_favorites f
-      JOIN events e ON e.id = f.event_id
-      WHERE f.user_id = ${session.userId}
-      ORDER BY f.created_at DESC
-    `;
-  } catch (err: any) {
-    const msg = String(err?.message || err);
-    if (msg.includes('event_favorites') || msg.includes('does not exist')) {
-      setupError = 'Run migrations/008_event_favorites.sql on the database first.';
-    } else {
-      setupError = 'Could not load saved events.';
-      console.error(err);
+    try {
+      events = await sql`
+        SELECT
+          e.id, e.title, e.slug, e.venue_name, e.start_at, e.end_at, e.status,
+          e.cover_image_url, e.category,
+          f.created_at AS saved_at
+        FROM event_favorites f
+        JOIN events e ON e.id::text = f.event_id
+        WHERE f.user_id = ${userId}
+        ORDER BY f.created_at DESC
+      `;
+    } catch (err: any) {
+      const msg = String(err?.message || err);
+      if (msg.toLowerCase().includes('event_favorites') && msg.toLowerCase().includes('does not exist')) {
+        await ensureFavoritesTable();
+        events = [];
+      } else {
+        throw err;
+      }
     }
+  } catch (err: any) {
+    console.error('favorites page:', err);
+    loadError = 'Could not load saved events. Try again in a moment.';
   }
 
   return (
@@ -40,13 +60,13 @@ export default async function FavoritesPage() {
       <h1 className="text-2xl font-extrabold mb-1">Saved events</h1>
       <p className="text-gray-400 text-sm mb-6">Your wishlist — events you have hearted for later.</p>
 
-      {setupError && (
+      {loadError && (
         <div className="bg-amber-950/40 border border-amber-800/60 text-amber-200 text-sm rounded-xl px-4 py-3 mb-4">
-          {setupError}
+          {loadError}
         </div>
       )}
 
-      {!setupError && events.length === 0 && (
+      {!loadError && events.length === 0 && (
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center">
           <p className="text-gray-400 mb-4">No saved events yet.</p>
           <Link href="/" className="text-indigo-400 hover:underline font-semibold text-sm">
@@ -89,7 +109,7 @@ export default async function FavoritesPage() {
                       </p>
                     )}
                   </div>
-                  <FavoriteButton eventId={e.id} initialFavorited size="sm" />
+                  <FavoriteButton eventId={String(e.id)} initialFavorited size="sm" />
                 </div>
               </div>
             </li>
