@@ -18,10 +18,7 @@ export async function GET() {
   } catch (err: any) {
     const msg = String(err?.message || err);
     if (msg.includes('event_favorites') || msg.includes('does not exist')) {
-      return NextResponse.json({
-        eventIds: [],
-        error: 'Favorites table not set up. Run migrations/008_event_favorites.sql',
-      });
+      return NextResponse.json({ eventIds: [] });
     }
     throw err;
   }
@@ -39,40 +36,49 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'eventId is required' }, { status: 400 });
   }
 
+  const wantFavorited =
+    typeof body.favorited === 'boolean' ? body.favorited : null;
+
   try {
     const [event] = await sql`SELECT id FROM events WHERE id = ${eventId} LIMIT 1`;
     if (!event) {
       return NextResponse.json({ error: 'Event not found' }, { status: 404 });
     }
 
+    const userId = String(session.userId);
+    const eventIdStr = String(event.id);
+
     const existing = await sql`
       SELECT user_id FROM event_favorites
-      WHERE user_id = ${session.userId} AND event_id = ${eventId}
+      WHERE user_id = ${userId} AND event_id = ${eventIdStr}
       LIMIT 1
     `;
+    const isFavorited = existing.length > 0;
+    const next = wantFavorited === null ? !isFavorited : wantFavorited;
 
-    if (existing.length > 0) {
+    if (next && !isFavorited) {
+      await sql`
+        INSERT INTO event_favorites (user_id, event_id)
+        VALUES (${userId}, ${eventIdStr})
+        ON CONFLICT DO NOTHING
+      `;
+    } else if (!next && isFavorited) {
       await sql`
         DELETE FROM event_favorites
-        WHERE user_id = ${session.userId} AND event_id = ${eventId}
+        WHERE user_id = ${userId} AND event_id = ${eventIdStr}
       `;
-      return NextResponse.json({ favorited: false });
     }
 
-    await sql`
-      INSERT INTO event_favorites (user_id, event_id)
-      VALUES (${session.userId}, ${eventId})
-      ON CONFLICT DO NOTHING
-    `;
-    return NextResponse.json({ favorited: true });
+    return NextResponse.json({ favorited: next });
   } catch (err: any) {
     const msg = String(err?.message || err);
+    console.error('favorites POST error:', msg);
     if (msg.includes('event_favorites') || msg.includes('does not exist')) {
       return NextResponse.json(
-        { error: 'Favorites not set up. Run migrations/008_event_favorites.sql on the database.' },
+        { error: 'Favorites not set up. Run the event_favorites migration.' },
         { status: 503 }
       );
     }
-    throw err;
+    return NextResponse.json({ error: 'Could not update favorite' }, { status: 500 });
   }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function FavoriteButton({
@@ -14,19 +14,21 @@ export default function FavoriteButton({
 }) {
   const [favorited, setFavorited] = useState(initialFavorited);
   const [busy, setBusy] = useState(false);
+  const lockRef = useRef(false);
   const router = useRouter();
 
-  // Only reset when switching to a different event — not after every toggle
   useEffect(() => {
     setFavorited(initialFavorited);
-  }, [eventId]); // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [eventId]);
 
   const dim = size === 'sm' ? 18 : 22;
 
   async function toggle(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
-    if (busy) return;
+    if (lockRef.current || busy) return;
+    lockRef.current = true;
 
     const previous = favorited;
     const next = !previous;
@@ -37,7 +39,7 @@ export default function FavoriteButton({
       const res = await fetch('/api/favorites', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ eventId }),
+        body: JSON.stringify({ eventId, favorited: next }),
       });
 
       if (res.status === 401) {
@@ -58,6 +60,7 @@ export default function FavoriteButton({
       setFavorited(previous);
     } finally {
       setBusy(false);
+      lockRef.current = false;
     }
   }
 
