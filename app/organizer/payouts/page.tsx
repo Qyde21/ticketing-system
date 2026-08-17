@@ -33,6 +33,13 @@ export default async function PayoutsPage() {
   return (
     <div style={{ maxWidth: 700, margin: '2rem auto', padding: '0 1rem', color: '#fff' }}>
       <h1 style={{ color: '#fff' }}>Payout Overview</h1>
+      <div style={{ background: '#111827', border: '1px solid #1f2937', borderRadius: 12, padding: 16, marginBottom: 24, fontSize: 14, color: '#d1d5db', lineHeight: 1.6 }}>
+        <strong style={{ color: '#e5e7eb' }}>How payouts work</strong>
+        <p style={{ margin: '8px 0 0' }}>
+          After your event ends, TicketHub reviews paid ticket revenue and pays your <strong>net payout</strong> (gross − 10% platform fee) manually via M-Pesa or bank.
+          Paystack processing fees are separate and may affect settlement timing. Contact support if a payout seems delayed.
+        </p>
+      </div>
 
       {/* Summary cards */}
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>

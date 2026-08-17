@@ -51,6 +51,20 @@ export default async function AdminPayoutsPage() {
   return (
     <div style={{ maxWidth: 800, margin: '2rem auto', padding: '0 1rem', color: '#fff' }}>
       <h1 style={{ color: '#fff' }}>Platform Payouts</h1>
+      <div style={{ background: '#111827', border: '1px solid #1f2937', borderRadius: 12, padding: 20, marginBottom: 28 }}>
+        <h2 style={{ margin: '0 0 12px', fontSize: 16, fontWeight: 800, color: '#e5e7eb' }}>Manual payout steps</h2>
+        <ol style={{ margin: 0, paddingLeft: 20, color: '#d1d5db', fontSize: 14, lineHeight: 1.7 }}>
+          <li>Wait until the <strong>event has ended</strong> and the refund window is closed (e.g. 3–7 days after).</li>
+          <li>Confirm <strong>Net to Organizers</strong> below (gross paid tickets minus TicketHub 10% fee). Refunded orders are not included in gross.</li>
+          <li>Check <strong>Paystack</strong> that settlements are available in your balance (Paystack fees may reduce what you actually received).</li>
+          <li>Transfer the net amount to the organizer via <strong>M-Pesa or bank</strong> using the details you have on file.</li>
+          <li>Save the transfer <strong>reference, date, and amount</strong> (spreadsheet or notes) next to the event name.</li>
+          <li>Optional: message the organizer that payout was sent and include the reference.</li>
+        </ol>
+        <p style={{ margin: '12px 0 0', fontSize: 12, color: '#9ca3af' }}>
+          TicketHub does not send bank transfers automatically yet. This page is your payout worksheet.
+        </p>
+      </div>
 
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 32 }}>
         {[
