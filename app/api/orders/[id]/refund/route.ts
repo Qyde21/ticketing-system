@@ -1,9 +1,23 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { refundTransaction } from '@/lib/paystack';
 import { sendCancellationEmail } from '@/lib/email';
 import { notifyWaitlistIfSpotsFreed } from '@/lib/waitlist';
+
+function isEventEnded(event: {
+  status?: string;
+  start_at?: string | Date;
+  end_at?: string | Date | null;
+}) {
+  if (event.status === 'completed' || event.status === 'cancelled') return true;
+  const end = event.end_at
+    ? new Date(event.end_at)
+    : event.start_at
+      ? new Date(event.start_at)
+      : null;
+  return !!end && end < new Date();
+}
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
@@ -15,8 +29,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const [order] = await sql`
     SELECT o.id, o.payment_status, o.paystack_reference, o.buyer_name, o.buyer_email,
-           o.ticket_type_id, o.quantity, o.is_flash_sale,
-           e.title AS event_title, e.organizer_id, e.start_at, e.end_at
+           o.ticket_type_id, o.quantity, o.is_flash_sale, o.total_amount_kes,
+           e.title AS event_title, e.organizer_id, e.start_at, e.end_at, e.status AS event_status
     FROM orders o
     JOIN events e ON e.id = o.event_id
     WHERE o.id = ${id}
@@ -31,9 +45,36 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (order.payment_status !== 'paid') {
     return NextResponse.json({ error: 'Only paid orders can be refunded' }, { status: 400 });
   }
+  if (
+    isEventEnded({
+      status: order.event_status,
+      start_at: order.start_at,
+      end_at: order.end_at,
+    })
+  ) {
+    return NextResponse.json(
+      { error: 'This event has ended. Refunds are closed.' },
+      { status: 400 }
+    );
+  }
+
+  // If several order rows share one Paystack reference (multi-tier cart), refund only this line amount
+  let refundAmountKes: number | undefined;
+  if (order.paystack_reference) {
+    const siblings = await sql`
+      SELECT id FROM orders
+      WHERE paystack_reference = ${order.paystack_reference}
+        AND payment_status = 'paid'
+    `;
+    if (siblings.length > 1) {
+      refundAmountKes = Number(order.total_amount_kes) || 0;
+    }
+  }
 
   try {
-    await refundTransaction(order.paystack_reference);
+    if (order.paystack_reference) {
+      await refundTransaction(order.paystack_reference, refundAmountKes);
+    }
   } catch (err: any) {
     console.error('Paystack refund error:', err);
     return NextResponse.json({ error: err.message || 'Refund failed at Paystack' }, { status: 500 });
@@ -44,27 +85,28 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   await sql`
     UPDATE ticket_types
     SET quantity_sold = GREATEST(0, quantity_sold - ${order.quantity}),
-        flash_sale_quantity_sold = GREATEST(0, flash_sale_quantity_sold - ${order.is_flash_sale ? order.quantity : 0})
+        flash_sale_quantity_sold = GREATEST(
+          0,
+          flash_sale_quantity_sold - ${order.is_flash_sale ? order.quantity : 0}
+        )
     WHERE id = ${order.ticket_type_id}
   `;
 
   try {
-    console.log('Sending cancellation email to:', order.buyer_email);
     await sendCancellationEmail({
       toEmail: order.buyer_email,
       buyerName: order.buyer_name,
       eventTitle: order.event_title,
       reason: 'Your order has been refunded by the organizer.',
     });
-    console.log('Cancellation email sent successfully');
   } catch (emailErr) {
     console.error('Failed to send cancellation email:', emailErr);
   }
 
   try {
     await notifyWaitlistIfSpotsFreed(order.ticket_type_id, order.quantity, req.nextUrl.origin);
-  } catch (waitlistErr) {
-    console.error('Failed to notify waitlist:', waitlistErr);
+  } catch (wErr) {
+    console.error('Waitlist notify failed:', wErr);
   }
 
   return NextResponse.json({ success: true });

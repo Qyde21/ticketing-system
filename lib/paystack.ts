@@ -31,14 +31,20 @@ export async function initializeTransaction(params: {
   return data.data as { authorization_url: string; access_code: string; reference: string };
 }
 
-export async function refundTransaction(reference: string) {
+/** Full refund, or partial when amountKes is set (Paystack amount is in kobo). */
+export async function refundTransaction(reference: string, amountKes?: number) {
+  const body: Record<string, unknown> = { transaction: reference };
+  if (amountKes != null && amountKes > 0) {
+    body.amount = Math.round(amountKes * 100);
+  }
+
   const res = await fetch(`${PAYSTACK_BASE_URL}/refund`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ transaction: reference }),
+    body: JSON.stringify(body),
   });
 
   const data = await res.json();
