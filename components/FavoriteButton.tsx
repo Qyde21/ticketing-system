@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function FavoriteButton({
@@ -16,32 +16,45 @@ export default function FavoriteButton({
   const [busy, setBusy] = useState(false);
   const router = useRouter();
 
+  useEffect(() => {
+    setFavorited(initialFavorited);
+  }, [initialFavorited]);
+
   const dim = size === 'sm' ? 18 : 22;
 
   async function toggle(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
     if (busy) return;
+
+    const previous = favorited;
+    setFavorited(!previous);
     setBusy(true);
+
     try {
       const res = await fetch('/api/favorites', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ eventId }),
       });
+
       if (res.status === 401) {
+        setFavorited(previous);
         router.push(`/login?next=${encodeURIComponent(window.location.pathname)}`);
         return;
       }
-      const data = await res.json();
+
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        console.error(data.error);
+        setFavorited(previous);
+        console.error(data.error || 'Favorite toggle failed');
         return;
       }
+
       setFavorited(!!data.favorited);
       router.refresh();
     } catch {
-      /* ignore */
+      setFavorited(previous);
     } finally {
       setBusy(false);
     }
@@ -53,8 +66,9 @@ export default function FavoriteButton({
       onClick={toggle}
       disabled={busy}
       aria-label={favorited ? 'Remove from saved' : 'Save event'}
+      aria-pressed={favorited}
       title={favorited ? 'Saved — click to remove' : 'Save to wishlist'}
-      className="inline-flex items-center justify-center rounded-full bg-black/50 hover:bg-black/70 border border-white/10 transition disabled:opacity-50"
+      className="inline-flex items-center justify-center rounded-full bg-black/55 hover:bg-black/75 border border-white/15 transition disabled:opacity-60"
       style={{ width: dim + 14, height: dim + 14 }}
     >
       <svg
@@ -63,8 +77,12 @@ export default function FavoriteButton({
         width={dim}
         height={dim}
         fill={favorited ? '#f43f5e' : 'none'}
-        stroke={favorited ? '#f43f5e' : '#e2e8f0'}
-        strokeWidth={2}
+        stroke={favorited ? '#f43f5e' : '#f1f5f9'}
+        strokeWidth={favorited ? 1.5 : 2}
+        style={{
+          transition: 'fill 0.15s ease, stroke 0.15s ease, transform 0.15s ease',
+          transform: favorited ? 'scale(1.08)' : 'scale(1)',
+        }}
       >
         <path
           strokeLinecap="round"
