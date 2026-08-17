@@ -36,13 +36,11 @@ export async function generateMetadata({
     ? event.description.slice(0, 160)
     : `${dateStr} at ${venue}. Get your tickets on TicketHub.`;
 
-  const images = event.cover_image_url ? [{ url: event.cover_image_url }] : undefined;
-
   return {
     title: `${event.title} — TicketHub`,
     description,
-    openGraph: { title: event.title, description, images, type: 'website' },
-    twitter: { card: images ? 'summary_large_image' : 'summary', title: event.title, description, images },
+    openGraph: { title: event.title, description, type: 'website' },
+    twitter: { card: 'summary_large_image', title: event.title, description },
   };
 }
 
