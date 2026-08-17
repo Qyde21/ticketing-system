@@ -2,8 +2,10 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import FlashSaleBadge from '@/components/FlashSaleBadge';
+import FavoriteButton from '@/components/FavoriteButton';
 
-export default function EventList({ events, showFilters = true }: { events: any[], showFilters?: boolean }) {
+export default function EventList({ events, showFilters = true, favoriteIds = [] }: { events: any[], showFilters?: boolean, favoriteIds?: string[] }) {
+  const favSet = useMemo(() => new Set(favoriteIds), [favoriteIds]);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
   const [whenFilter, setWhenFilter] = useState<'all' | 'tonight' | 'weekend'>('all');
@@ -112,6 +114,9 @@ export default function EventList({ events, showFilters = true }: { events: any[
             <div key={e.id} style={{ position: 'relative', background: '#121212', borderRadius: 12, overflow: 'hidden', border: '1px solid #1f1f1f', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.5)' }}>
               <div style={{ position: 'relative', height: 180, background: '#1a1a1a' }}>
                 {e.cover_image_url && <img src={e.cover_image_url} alt={e.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+                <div style={{ position: 'absolute', top: 10, right: 10, zIndex: 5 }}>
+                  <FavoriteButton eventId={e.id} initialFavorited={favSet.has(e.id)} size="sm" />
+                </div>
                 <div style={{ position: 'absolute', top: 10, right: 10, display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-end' }}>
                   {hasFlash && !isPastEvent && !isCancelled && (
                     <div className="animate-pulse" style={{ background: 'linear-gradient(to right, #f59e0b, #ef4444)', color: '#fff', padding: '4px 8px', borderRadius: 4, fontSize: 11, fontWeight: 800, letterSpacing: '0.03em' }}>FLASH SALE</div>

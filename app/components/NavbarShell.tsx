@@ -82,6 +82,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
               {(userRole === 'attendee' || userRole === 'organizer' || userRole === 'admin') && (
                 <>
                   <Link href="/attendee/dashboard" className={getLinkClass('/attendee/dashboard')}>My Tickets</Link>
+                  <Link href="/favorites" className={getLinkClass('/favorites')}>Saved</Link>
                   <Link href="/inbox" className={getLinkClass('/inbox')}>Inbox</Link>
                 </>
               )}

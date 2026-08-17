@@ -5,6 +5,7 @@ import JoinWaitlistButton from '@/components/JoinWaitlistButton';
 import FlashSaleCountdown from '@/components/FlashSaleCountdown';
 import MessageOrganizerWidget from '@/components/MessageOrganizerWidget';
 import ReviewForm from '@/components/ReviewForm';
+import FavoriteButton from '@/components/FavoriteButton';
 import { getSession } from '@/lib/auth';
 import type { Metadata } from 'next';
 
@@ -117,6 +118,20 @@ export default async function EventDetailPage({
   }
   const canMessageOrganizer = hasPaidTicket && !isCancelled && !isEnded;
 
+  let isFavorited = false;
+  if (session?.userId) {
+    try {
+      const [fav] = await sql`
+        SELECT user_id FROM event_favorites
+        WHERE user_id = ${session.userId} AND event_id = ${event.id}
+        LIMIT 1
+      `;
+      isFavorited = !!fav;
+    } catch {
+      /* table optional until migration */
+    }
+  }
+
   const reviews = await sql`
     SELECT r.id, r.rating, r.comment, r.created_at, u.full_name
     FROM event_reviews r
@@ -146,7 +161,10 @@ export default async function EventDetailPage({
 
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 text-white">
-      <h1 className="text-4xl font-extrabold mb-2">{event.title}</h1>
+      <div className="flex items-start justify-between gap-3 mb-2">
+        <h1 className="text-4xl font-extrabold">{event.title}</h1>
+        <FavoriteButton eventId={event.id} initialFavorited={isFavorited} />
+      </div>
       {organizerName && (
         <Link
           href={`/organizers/${event.organizer_id}`}

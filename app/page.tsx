@@ -1,6 +1,7 @@
 import EventList from '@/components/EventList';
 import FlashSaleBadge from '@/components/FlashSaleBadge';
 import { sql } from '@/lib/db';
+import { getSession } from '@/lib/auth';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
@@ -37,6 +38,19 @@ export default async function HomePage() {
     GROUP BY e.id, op.business_name, op.is_verified, u.full_name
     ORDER BY e.start_at ASC
   `;
+
+  const session = await getSession();
+  let favoriteIds: string[] = [];
+  if (session?.userId) {
+    try {
+      const favs = await sql`
+        SELECT event_id FROM event_favorites WHERE user_id = ${session.userId}
+      `;
+      favoriteIds = favs.map((r: any) => r.event_id as string);
+    } catch {
+      /* table may not exist yet */
+    }
+  }
 
   const now = new Date();
 
@@ -156,7 +170,7 @@ export default async function HomePage() {
           Events Coming Up
         </h2>
         {remainingUpcoming.length > 0 ? (
-          <EventList events={remainingUpcoming} showFilters={true} />
+          <EventList events={remainingUpcoming} showFilters={true} favoriteIds={favoriteIds} />
         ) : upcomingEvents.length === 1 ? (
           <p style={{ color: '#888', marginBottom: 32 }}>More events will appear here as they are published.</p>
         ) : (
@@ -166,7 +180,7 @@ export default async function HomePage() {
         {pastEvents.length > 0 && (
           <div style={{ marginTop: 48 }}>
             <h2 style={{ marginBottom: 16, color: '#666', fontSize: 20, fontWeight: 700 }}>Past Events</h2>
-            <EventList events={pastEvents} showFilters={false} />
+            <EventList events={pastEvents} showFilters={false} favoriteIds={favoriteIds} />
           </div>
         )}
       </div>
