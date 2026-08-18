@@ -53,34 +53,51 @@ export async function finalizePaidOrder(orderId: string, baseUrl: string): Promi
   // Already finalized with tickets - return existing codes (idempotent).
   const existing = await sql`SELECT ticket_code FROM tickets WHERE order_id = ${order.id}`;
   if (existing.length > 0) {
-    if (order.payment_status !== 'paid') {
-      await sql`UPDATE orders SET payment_status = 'paid' WHERE id = ${order.id}`;
-    }
     return existing.map((t) => String(t.ticket_code));
   }
 
-  // Mark paid if still pending. Promo use is counted only on the first transition to paid.
-  if (order.payment_status !== 'paid') {
-    await sql`UPDATE orders SET payment_status = 'paid' WHERE id = ${order.id}`;
+  // Atomically claim this order for finalizing before generating tickets,
+  // sending the confirmation email/SMS, awarding loyalty points, or
+  // incrementing promo usage. finalizePaidOrder is called from both the
+  // Paystack webhook and the browser verify-redirect route for the same
+  // payment, sometimes within milliseconds of each other. Without this
+  // claim, both calls could pass the "no tickets yet" check above before
+  // either has inserted anything, and both would generate a duplicate set
+  // of real tickets. Postgres serializes concurrent updates to the same
+  // row, so only one call ever wins this claim - the same pattern used to
+  // fix the payout and refund race conditions.
+  const [claimed] = await sql`
+    UPDATE orders SET payment_status = 'paid'
+    WHERE id = ${order.id} AND payment_status != 'paid'
+    RETURNING id
+  `;
 
-    if (order.promo_code_id) {
-      // Atomic guard: only increments if still under the limit, so the
-      // stored count can never overshoot max_uses even under concurrent
-      // near-simultaneous redemptions. (Payment has already succeeded via
-      // Paystack by this point, so a losing concurrent order still keeps
-      // its discount - this guard protects future validation, not this
-      // specific edge case, which is an acceptable tradeoff.)
-      await sql`
-        UPDATE promo_codes
-        SET uses_count = uses_count + 1
-        WHERE id = ${order.promo_code_id}
-          AND (max_uses IS NULL OR uses_count < max_uses)
-      `;
-    }
-
-    // Non-blocking: a loyalty-points failure should never stop ticket issuance.
-    awardPointsForOrder(order.id, order.buyer_email, Number(order.total_amount_kes || 0));
+  if (!claimed) {
+    // Another call already claimed (or already finished finalizing) this
+    // order. Return whatever tickets exist right now rather than risking
+    // a duplicate set - the winning call's tickets are what the buyer
+    // actually gets emailed/texted.
+    const nowExisting = await sql`SELECT ticket_code FROM tickets WHERE order_id = ${order.id}`;
+    return nowExisting.map((t) => String(t.ticket_code));
   }
+
+  if (order.promo_code_id) {
+    // Atomic guard: only increments if still under the limit, so the
+    // stored count can never overshoot max_uses even under concurrent
+    // near-simultaneous redemptions. (Payment has already succeeded via
+    // Paystack by this point, so a losing concurrent order still keeps
+    // its discount - this guard protects future validation, not this
+    // specific edge case, which is an acceptable tradeoff.)
+    await sql`
+      UPDATE promo_codes
+      SET uses_count = uses_count + 1
+      WHERE id = ${order.promo_code_id}
+        AND (max_uses IS NULL OR uses_count < max_uses)
+    `;
+  }
+
+  // Non-blocking: a loyalty-points failure should never stop ticket issuance.
+  awardPointsForOrder(order.id, order.buyer_email, Number(order.total_amount_kes || 0));
 
   const generatedCodes: string[] = [];
   for (let i = 0; i < order.quantity; i++) {

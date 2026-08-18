@@ -4,7 +4,7 @@ import Link from 'next/link';
 import ShareTicket from './ShareTicket';
 import TransferTicketButton from './TransferTicketButton';
 import LoyaltyPanel from './LoyaltyPanel';
-import { getLoyaltySummary } from '@/lib/loyalty';
+import { getLoyaltySummary, type LoyaltySummary } from '@/lib/loyalty';
 
 export const dynamic = 'force-dynamic';
 
@@ -46,7 +46,7 @@ export default async function AttendeeDashboard() {
     ORDER BY o.created_at DESC
   `;
 
-  let loyaltySummary = { balance: 0, lifetimeEarned: 0, tier: 'Bronze' as const };
+  let loyaltySummary: LoyaltySummary = { balance: 0, lifetimeEarned: 0, tier: 'Bronze' };
   try {
     loyaltySummary = await getLoyaltySummary(session.email);
   } catch (err) {

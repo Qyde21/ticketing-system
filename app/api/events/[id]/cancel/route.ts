@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { revalidateTag } from 'next/cache';
 import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
@@ -20,7 +20,19 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (event.organizer_id !== session.userId && session.role !== 'admin') {
     return NextResponse.json({ error: 'Not authorized for this event' }, { status: 403 });
   }
-  if (event.status === 'cancelled') {
+
+  // Atomically claim the event for cancellation first. If a duplicate/
+  // concurrent cancel request comes in (double-click, retry), only one
+  // wins this claim — the other is told the event is already cancelled
+  // instead of re-processing (and re-refunding) the same set of orders.
+  // This is the primary defense; the per-order/per-reference claims below
+  // are defense in depth in case some other path touches the same orders.
+  const [claimedEvent] = await sql`
+    UPDATE events SET status = 'cancelled', updated_at = now()
+    WHERE id = ${id} AND status != 'cancelled'
+    RETURNING id
+  `;
+  if (!claimedEvent) {
     return NextResponse.json({ error: 'Event is already cancelled' }, { status: 400 });
   }
 
@@ -47,8 +59,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   let refundedOrders = 0;
   const failed: { orderId: string; error: string }[] = [];
 
-  async function settleLocal(order: any) {
-    await sql`UPDATE orders SET payment_status = 'refunded' WHERE id = ${order.id} AND payment_status = 'paid'`;
+  // Handles tickets/inventory/email for an order whose payment_status has
+  // ALREADY been atomically claimed to 'refunded' by the caller — this
+  // function does not touch orders.payment_status itself.
+  async function settleClaimedOrder(order: any) {
     await sql`UPDATE tickets SET status = 'cancelled' WHERE order_id = ${order.id}`;
     await sql`
       UPDATE ticket_types
@@ -73,30 +87,58 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   }
 
   for (const [ref, orders] of byRef) {
+    const ids = (orders as any[]).map((o) => o.id);
+
+    // Atomically claim every order sharing this Paystack reference before
+    // calling Paystack. Only orders still 'paid' at the moment this UPDATE
+    // applies get claimed — if some other process already touched one
+    // (e.g. a concurrent single-order refund), it's excluded here rather
+    // than being refunded a second time.
+    const claimed = await sql`
+      UPDATE orders SET payment_status = 'refunded'
+      WHERE id = ANY(${ids}) AND payment_status = 'paid'
+      RETURNING id
+    `;
+    const claimedIds = new Set(claimed.map((c: any) => c.id as string));
+    const claimedOrders = (orders as any[]).filter((o) => claimedIds.has(o.id));
+
+    if (claimedOrders.length === 0) continue; // nothing left to do for this reference
+
     try {
       // Full refund of the original charge (covers all lines on that reference)
       await refundTransaction(ref);
-      for (const order of orders as any[]) {
-        await settleLocal(order);
+      for (const order of claimedOrders) {
+        await settleClaimedOrder(order);
       }
     } catch (err: any) {
       console.error(`Failed to refund Paystack ref ${ref}:`, err);
-      for (const order of orders as any[]) {
+      // Roll back the claim for these specific orders so they stay
+      // retriable rather than being stuck showing "refunded" when
+      // Paystack never actually processed the charge.
+      await sql`UPDATE orders SET payment_status = 'paid' WHERE id = ANY(${claimedOrders.map((o) => o.id)})`;
+      for (const order of claimedOrders) {
         failed.push({ orderId: order.id, error: err?.message || 'Paystack refund failed' });
       }
     }
   }
 
   for (const order of noRef as any[]) {
+    // Free / zero-ref paid rows — no Paystack call needed, but still claim
+    // atomically before touching tickets/inventory so a concurrent path
+    // can't double-decrement the same order's inventory.
+    const [claimed] = await sql`
+      UPDATE orders SET payment_status = 'refunded'
+      WHERE id = ${order.id} AND payment_status = 'paid'
+      RETURNING id
+    `;
+    if (!claimed) continue;
+
     try {
-      // Free / zero-ref paid rows — local settle only
-      await settleLocal(order);
+      await settleClaimedOrder(order);
     } catch (err: any) {
       failed.push({ orderId: order.id, error: err?.message || 'Local refund failed' });
     }
   }
-
-  await sql`UPDATE events SET status = 'cancelled', updated_at = now() WHERE id = ${id}`;
 
   revalidateTag('events', 'max');
   return NextResponse.json({

@@ -1,140 +1,125 @@
 import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
+import { redirect } from 'next/navigation';
+import Link from 'next/link';
+import { computeNet, PLATFORM_FEE_RATE } from '@/lib/payouts';
+import AdminProcessPayoutButton from '@/components/AdminProcessPayoutButton';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminPayoutsPage() {
   const session = await getSession();
+  if (!session || session.role !== 'admin') redirect('/login');
 
-  if (!session || session.role !== 'admin') {
-    return <div className="max-w-6xl mx-auto px-4 py-8 text-white">Unauthorized access.</div>;
-  }
-
-  const events = await sql`
-    SELECT
-      e.id, e.title, e.status, e.start_at,
-      u.id AS organizer_id, u.full_name, u.email, u.role,
-      COALESCE(op.business_name, u.full_name) AS business_name,
-      COUNT(o.id) FILTER (WHERE o.payment_status = 'paid') AS paid_orders,
-      COUNT(o.id) FILTER (WHERE o.payment_status = 'refunded') AS refunded_orders,
-      COALESCE(SUM(o.total_amount_kes) FILTER (WHERE o.payment_status = 'paid'), 0) AS gross_revenue,
-      COALESCE(SUM(o.total_amount_kes) FILTER (WHERE o.payment_status = 'refunded'), 0) AS refunded_amount
-    FROM events e
-    JOIN users u ON u.id = e.organizer_id
-    LEFT JOIN organizer_profiles op ON op.user_id = u.id
+  const organizers = await sql`
+    SELECT u.id, u.full_name, u.email,
+      COALESCE(SUM(o.total_amount_kes) FILTER (WHERE o.payment_status = 'paid'), 0) AS gross,
+      COALESCE(SUM(o.total_amount_kes) FILTER (WHERE o.payment_status = 'refunded'), 0) AS refunded
+    FROM users u
+    JOIN events e ON e.organizer_id = u.id
     LEFT JOIN orders o ON o.event_id = e.id
-    WHERE u.role IN ('organizer', 'admin')
-    GROUP BY e.id, u.id, u.full_name, u.email, u.role, op.business_name
-    ORDER BY u.full_name ASC, e.start_at DESC
+    WHERE u.role = 'organizer'
+    GROUP BY u.id
+    ORDER BY gross DESC
   `;
 
-  const totalGross = events.reduce((sum: number, e: any) => sum + Number(e.gross_revenue), 0);
-  const totalRefunded = events.reduce((sum: number, e: any) => sum + Number(e.refunded_amount), 0);
-  const totalFees = totalGross * 0.10;
-  // gross_revenue only includes payment_status = paid, so refunded rows are already excluded
-  const totalNet = totalGross - totalFees;
+  const pendingPayouts = await sql`
+    SELECT p.id, p.net_kes, p.status, p.failure_reason, p.requested_at,
+           e.title AS event_title, u.full_name, u.email
+    FROM organizer_payouts p
+    JOIN events e ON e.id = p.event_id
+    JOIN users u ON u.id = p.organizer_id
+    WHERE p.status IN ('pending', 'processing', 'failed')
+    ORDER BY p.requested_at ASC
+    LIMIT 50
+  `;
 
-  const grouped: Record<string, any> = {};
-  for (const e of events as any[]) {
-    if (!grouped[e.organizer_id]) {
-      grouped[e.organizer_id] = {
-        full_name: e.full_name,
-        email: e.email,
-        role: e.role,
-        business_name: e.business_name,
-        events: [],
-      };
-    }
-    grouped[e.organizer_id].events.push(e);
+  let totalGross = 0;
+  let totalRefunded = 0;
+  for (const o of organizers) {
+    totalGross += Number(o.gross);
+    totalRefunded += Number(o.refunded);
   }
+  const totalFees = Math.round((totalGross - totalRefunded) * PLATFORM_FEE_RATE * 100) / 100;
+  const totalNet = Math.round((totalGross - totalRefunded - totalFees) * 100) / 100;
 
   return (
-    <div style={{ maxWidth: 800, margin: '2rem auto', padding: '0 1rem', color: '#fff' }}>
-      <h1 style={{ color: '#fff' }}>Platform Payouts</h1>
-      <div style={{ background: '#111827', border: '1px solid #1f2937', borderRadius: 12, padding: 20, marginBottom: 28 }}>
-        <h2 style={{ margin: '0 0 12px', fontSize: 16, fontWeight: 800, color: '#e5e7eb' }}>Manual payout steps</h2>
-        <ol style={{ margin: 0, paddingLeft: 20, color: '#d1d5db', fontSize: 14, lineHeight: 1.7 }}>
-          <li>Wait until the <strong>event has ended</strong>.</li>
-          <li><strong>Refunds first:</strong> Process any approved attendee refunds from the event Orders page before paying the organizer. Refunds go through Paystack and cancel tickets; inventory is released automatically.</li>
-          <li>Close the refund window (e.g. <strong>3–7 days after</strong> the event) so late refunds do not change the payout amount after you have paid out.</li>
-          <li>Confirm figures below: <strong>Gross</strong> = currently paid orders only; <strong>Refunded</strong> is shown separately; <strong>Net</strong> = gross − TicketHub 10% fee (refunds are already excluded from gross).</li>
-          <li>If a refund happens <strong>after</strong> you already paid the organizer, record it and <strong>deduct from their next payout</strong> or agree a clawback offline—do not ignore it.</li>
-          <li>Check <strong>Paystack</strong> that settlements cover what you plan to send (Paystack fees may reduce available balance).</li>
-          <li>Transfer the net amount via <strong>M-Pesa or bank</strong>; save <strong>reference, date, amount</strong>, and note any post-payout refunds.</li>
-          <li>Optional: message the organizer with the payout reference and a short refund summary if any refunds applied.</li>
-        </ol>
-        <p style={{ margin: '12px 0 0', fontSize: 12, color: '#9ca3af' }}>
-          TicketHub does not send bank transfers automatically yet. This page is your payout worksheet.
-        </p>
-      </div>
+    <div className="max-w-3xl mx-auto py-10 px-4 text-white">
+      <Link href="/admin/dashboard" className="text-sm text-indigo-400 hover:underline">&larr; Admin</Link>
+      <h1 className="text-2xl font-extrabold mt-2 mb-6">Platform payouts</h1>
 
-      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 32 }}>
+      <div className="flex flex-wrap gap-2 mb-6">
+        <a
+          href="https://dashboard.paystack.com/#/transfers"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition"
+        >
+          Paystack dashboard â†’ Transfers
+        </a>
+        <a
+          href="https://dashboard.paystack.com/#/transfers/recipients"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-200 text-sm font-semibold px-4 py-2.5 rounded-xl transition"
+        >
+          Recipients
+        </a>
+      </div>
+      <div className="flex gap-3 flex-wrap mb-8">
         {[
-          { label: 'Total Gross Revenue', value: totalGross, color: '#818cf8' },
-          { label: 'TicketHub Fees (10%)', value: totalFees, color: '#fbbf24' },
-          { label: 'Total Refunded', value: totalRefunded, color: '#f87171' },
-          { label: 'Net to Organizers', value: totalNet, color: '#4ade80' },
-        ].map((stat) => (
-          <div key={stat.label} style={{ background: '#111827', border: '1px solid #1f2937', borderRadius: 8, padding: '16px 20px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', flex: 1, minWidth: 150 }}>
-            <div style={{ fontSize: 22, fontWeight: 700, color: stat.color }}>
-              KES {stat.value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+          { label: 'Gross paid', value: totalGross, color: 'text-indigo-400' },
+          { label: 'Platform fees (10%)', value: totalFees, color: 'text-amber-400' },
+          { label: 'Organizer net', value: totalNet, color: 'text-emerald-400' },
+        ].map((s) => (
+          <div key={s.label} className="bg-gray-900 border border-gray-800 rounded-xl px-5 py-3 min-w-[140px]">
+            <div className={`text-xl font-bold ${s.color}`}>
+              KES {s.value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
             </div>
-            <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 4 }}>{stat.label}</div>
+            <div className="text-xs text-gray-400">{s.label}</div>
           </div>
         ))}
       </div>
-
-      <h2 style={{ color: '#fff' }}>Per Organizer</h2>
-      {Object.values(grouped).map((org: any) => {
-        const orgGross = org.events.reduce((sum: number, e: any) => sum + Number(e.gross_revenue), 0);
-        const orgRefunded = org.events.reduce((sum: number, e: any) => sum + Number(e.refunded_amount), 0);
-        const orgFees = orgGross * 0.10;
-        const orgNet = orgGross - orgRefunded - orgFees;
-
-        return (
-          <div key={org.email} style={{ background: '#111827', border: '1px solid #1f2937', borderRadius: 8, marginBottom: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
-            <div style={{ background: '#0b1220', padding: '12px 16px', borderBottom: '1px solid #1f2937', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+      <h2 className="text-lg font-bold mb-3">Queue (pending / failed)</h2>
+      {pendingPayouts.length === 0 ? (
+        <p className="text-gray-500 text-sm mb-8">No payouts waiting.</p>
+      ) : (
+        <ul className="space-y-2 mb-8">
+          {pendingPayouts.map((p) => (
+            <li key={p.id as string} className="flex justify-between items-center gap-3 bg-gray-900 border border-gray-800 rounded-xl px-4 py-3">
               <div>
-                <strong style={{ color: '#fff' }}>{org.business_name}</strong>
-                {org.role === 'admin' && <span style={{ marginLeft: 8, fontSize: 11, background: '#fbbf24', color: '#000', padding: '2px 6px', borderRadius: 99, fontWeight: 700 }}>ADMIN</span>}
-                <div style={{ fontSize: 13, color: '#9ca3af', marginTop: 2 }}>{org.full_name} � {org.email}</div>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: 16, fontWeight: 700, color: '#4ade80' }}>KES {orgNet.toLocaleString(undefined, { maximumFractionDigits: 0 })} net</div>
-                <div style={{ fontSize: 12, color: '#fbbf24' }}>KES {orgFees.toLocaleString(undefined, { maximumFractionDigits: 0 })} fees</div>
-                <div style={{ fontSize: 12, color: '#818cf8' }}>KES {orgGross.toLocaleString(undefined, { maximumFractionDigits: 0 })} gross</div>
-              </div>
-            </div>
-
-            {org.events.map((e: any) => {
-              const gross = Number(e.gross_revenue);
-              const refunded = Number(e.refunded_amount);
-              const fees = gross * 0.10;
-              const net = gross - refunded - fees;
-              return (
-                <div key={e.id} style={{ padding: '10px 16px', borderBottom: '1px solid #1f2937', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-                  <div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: '#fff' }}>{e.title}</div>
-                    <div style={{ fontSize: 12, color: '#9ca3af' }}>
-                      {new Date(e.start_at).toLocaleDateString()} � {e.status} � {e.paid_orders} paid � {e.refunded_orders} refunded
-                    </div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: '#4ade80' }}>KES {net.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
-                    <div style={{ fontSize: 11, color: '#fbbf24' }}>KES {fees.toLocaleString(undefined, { maximumFractionDigits: 0 })} fee</div>
-                    {refunded > 0 && <div style={{ fontSize: 11, color: '#f87171' }}>-KES {refunded.toLocaleString()} refunded</div>}
-                    <div style={{ fontSize: 11, color: '#818cf8' }}>KES {gross.toLocaleString()} gross</div>
-                  </div>
+                <div className="font-semibold text-sm">{p.event_title as string}</div>
+                <div className="text-xs text-gray-500">
+                  {p.full_name as string} Â· {p.email as string} Â· {p.status as string}
+                  {p.failure_reason ? ` Â· ${p.failure_reason}` : ''}
                 </div>
-              );
-            })}
-          </div>
-        );
-      })}
-
-      <p style={{ fontSize: 12, color: '#9ca3af', marginTop: 16 }}>
-        Note: Paystack also deducts payment processing fees before settlement.
-      </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-emerald-400 font-bold text-sm">KES {Number(p.net_kes).toLocaleString()}</span>
+                <AdminProcessPayoutButton payoutId={p.id as string} />
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+      <h2 className="text-lg font-bold mb-3">Organizers</h2>
+      <ul className="space-y-2">
+        {organizers.map((o) => {
+          const c = computeNet(Number(o.gross), Number(o.refunded));
+          return (
+            <li key={o.id as string} className="flex justify-between bg-gray-900 border border-gray-800 rounded-xl px-4 py-3">
+              <div>
+                <div className="font-semibold text-sm">{(o.full_name as string) || 'Organizer'}</div>
+                <div className="text-xs text-gray-500">{o.email as string}</div>
+              </div>
+              <div className="text-right text-sm">
+                <div className="text-emerald-400 font-bold">KES {c.net.toLocaleString(undefined, { maximumFractionDigits: 0 })} net</div>
+                <div className="text-xs text-amber-400">KES {c.fee.toLocaleString(undefined, { maximumFractionDigits: 0 })} fees</div>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }
