@@ -1,3 +1,38 @@
+﻿# Run this from your project root: C:\Users\user\ticketing-system
+# Usage: powershell -ExecutionPolicy Bypass -File add-organizer-overview.ps1
+#
+# Feature 3/6: Organizer analytics dashboard
+#
+# Your per-event analytics page (organizer/events/[id]/analytics) was
+# already solid - revenue, sell-through, tier breakdown, sales trend chart.
+# The gap was a CROSS-event view: an organizer with several events had no
+# single place to see total revenue, total tickets sold, or which events
+# are performing best. This adds that as a new "Overview" section at the
+# top of the organizer dashboard:
+#
+#   - 3 KPI cards: total revenue, total tickets sold, total events
+#   - A sales trend chart across ALL events (reuses the existing
+#     SalesTrendChart component, unmodified)
+#   - A "Top Performing Events" leaderboard, linking each one to its
+#     existing per-event analytics page
+#
+# No database changes, no new tables - purely additive aggregation queries
+# on data that already exists. Admins see it scoped platform-wide, matching
+# how the rest of this dashboard already behaves for admins.
+
+$ErrorActionPreference = "Stop"
+$utf8NoBom = New-Object System.Text.UTF8Encoding $false
+
+function Write-ClaudeFile($path, $content) {
+    $dir = Split-Path $path -Parent
+    if ($dir -and -not (Test-Path -LiteralPath $dir)) {
+        New-Item -ItemType Directory -Force -Path $dir | Out-Null
+    }
+    [System.IO.File]::WriteAllText($path, $content, $utf8NoBom)
+}
+
+Write-Host "Writing: app\organizer\dashboard\page.tsx" -ForegroundColor Cyan
+$content = @'
 import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import Link from 'next/link';
@@ -307,3 +342,15 @@ export default async function OrganizerDashboardPage() {
     </main>
   );
 }
+'@
+Write-ClaudeFile "app\organizer\dashboard\page.tsx" $content
+
+Write-Host ""
+Write-Host "Done. Files updated:" -ForegroundColor Green
+Write-Host "  - app\organizer\dashboard\page.tsx"
+Write-Host ""
+Write-Host "Next steps:" -ForegroundColor Yellow
+Write-Host "  git log --oneline -3   (sanity check before force-pushing)"
+Write-Host "  git add -A"
+Write-Host "  git commit -m ""Add cross-event overview to organizer dashboard"""
+Write-Host "  git push --force"
