@@ -1,4 +1,4 @@
-'use client';
+﻿"use client";
 
 import React, { useState } from 'react';
 import Link from 'next/link';
@@ -25,49 +25,49 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
   };
 
   const isLoggedIn = !!userEmail;
-
-  const isActive = (path: string) => pathname === path;
+  const isActive = (path: string) => pathname === path || (path !== '/' && pathname.startsWith(path));
 
   const getLinkClass = (path: string) =>
     `transition py-1 ${
       isActive(path)
-        ? 'text-emerald-400 font-semibold border-b-2 border-emerald-500'
+        ? 'text-cyan-400 font-semibold border-b-2 border-cyan-500'
         : 'text-slate-300 hover:text-white'
     }`;
 
   const getMobileLinkClass = (path: string) =>
-    `block py-2 text-base font-medium transition ${
-      isActive(path) ? 'text-emerald-400 font-bold' : 'text-slate-300 hover:text-white'
+    `flex items-center gap-3 px-3 py-3 rounded-xl text-[15px] font-medium transition ${
+      isActive(path)
+        ? 'bg-indigo-600/25 text-cyan-300 border border-indigo-500/40'
+        : 'text-slate-200 hover:bg-white/5 border border-transparent'
     }`;
 
-  return (
-    <header className="bg-slate-900 border-b border-slate-800 text-white sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+  const roleLabel =
+    userRole === 'admin' ? 'Admin' : userRole === 'organizer' ? 'Organizer' : userRole === 'attendee' ? 'Attendee' : '';
 
-        {/* Left Side: Logo */}
-        <Link href="/" className="flex items-center gap-2.5 hover:opacity-90 transition shrink-0">
-          <img src="/logo-badge.png" alt="TicketHub" className="h-11 w-11" />
-          <span className="font-serif text-lg sm:text-xl font-bold tracking-tight">
-            <span className="text-slate-200">Ticket</span><span className="text-amber-400">Hub</span>
+  return (
+    <header className="bg-slate-950/95 backdrop-blur-md border-b border-slate-800/80 text-white sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-2.5 hover:opacity-90 transition shrink-0" onClick={() => setMobileMenuOpen(false)}>
+          <img src="/logo-badge.png" alt="TicketHub" className="h-10 w-10 rounded-lg" />
+          <span className="text-lg sm:text-xl font-extrabold tracking-tight">
+            <span className="text-white">Ticket</span>
+            <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">Hub</span>
           </span>
         </Link>
 
-        {/* Desktop Navigation Links */}
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
           {isLoggedIn ? (
             <>
               <Link href="/" className={getLinkClass('/')}>Events</Link>
-
               {userRole === 'admin' && (
                 <>
                   <Link href="/admin/dashboard" className={getLinkClass('/admin/dashboard')}>Admin</Link>
                   <Link href="/admin/organizers" className={getLinkClass('/admin/organizers')}>Organizers</Link>
                   <Link href="/admin/events" className={getLinkClass('/admin/events')}>All Events</Link>
                   <Link href="/admin/payouts" className={getLinkClass('/admin/payouts')}>Payouts</Link>
-                  <Link href="/account/security" className={getLinkClass('/account/security')}>Security</Link>
+                  <Link href="/attendee/dashboard" className={getLinkClass('/attendee/dashboard')}>My Tickets</Link>
                 </>
               )}
-
               {userRole === 'organizer' && (
                 <>
                   <Link href="/organizer/dashboard" className={getLinkClass('/organizer/dashboard')}>Dashboard</Link>
@@ -78,19 +78,16 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
                   <Link href="/account/security" className={getLinkClass('/account/security')}>Security</Link>
                 </>
               )}
-
               {(userRole === 'attendee' || userRole === 'organizer' || userRole === 'admin') && (
                 <>
-                  <Link href="/attendee/dashboard" className={getLinkClass('/attendee/dashboard')}>My Tickets</Link>
+                  {userRole !== 'admin' && (
+                    <Link href="/attendee/dashboard" className={getLinkClass('/attendee/dashboard')}>My Tickets</Link>
+                  )}
                   <Link href="/favorites" className={getLinkClass('/favorites')}>Saved</Link>
                   <Link href="/inbox" className={getLinkClass('/inbox')}>Inbox</Link>
                 </>
               )}
-
-              <button
-                onClick={handleLogout}
-                className="text-slate-300 hover:text-white transition cursor-pointer"
-              >
+              <button onClick={handleLogout} className="text-slate-300 hover:text-white transition cursor-pointer">
                 Log out
               </button>
             </>
@@ -100,19 +97,20 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
               <Link href="/signup?role=attendee" className={getLinkClass('/signup?role=attendee')}>Get Ticket</Link>
               <Link href="/signup?role=organizer" className={getLinkClass('/signup?role=organizer')}>Sell Tickets</Link>
               <Link href="/login" className={getLinkClass('/login')}>Sign in</Link>
-              <Link href="/signup" className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-md font-medium transition shadow-sm">
+              <Link href="/signup" className="bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white px-4 py-2 rounded-lg font-semibold transition shadow-sm">
                 Get Started
               </Link>
             </>
           )}
         </nav>
 
-        {/* Mobile Hamburger Button */}
         <div className="flex md:hidden items-center">
+
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="text-slate-300 hover:text-white focus:outline-none p-2"
+            className="text-slate-200 hover:text-white focus:outline-none p-2 rounded-lg hover:bg-white/5"
             aria-label="Toggle navigation menu"
+            aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? (
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -125,62 +123,91 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
             )}
           </button>
         </div>
-
       </div>
 
-      {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-slate-800 bg-slate-900 px-4 pt-2 pb-6 space-y-2">
-          {isLoggedIn ? (
-            <>
-              <Link href="/" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/')}>Events</Link>
+        <div className="md:hidden border-t border-slate-800/80 bg-slate-950">
+          <div className="px-4 pt-4 pb-2">
+            <div className="flex items-center gap-3 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-900/40 border border-slate-800 p-3.5 mb-3">
+              <img src="/logo-badge.png" alt="" className="h-11 w-11 rounded-xl shadow-lg shadow-indigo-950/50" />
+              <div className="min-w-0 flex-1">
+                <p className="font-extrabold text-base leading-tight">
+                  <span className="text-white">Ticket</span>
+                  <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">Hub</span>
+                </p>
+                {isLoggedIn ? (
+                  <p className="text-xs text-slate-400 truncate mt-0.5">
+                    {roleLabel && <span className="text-cyan-400/90 font-semibold">{roleLabel}</span>}
+                    {roleLabel && userEmail ? ' · ' : ''}
+                    {userEmail}
+                  </p>
+                ) : (
+                  <p className="text-xs text-slate-500 mt-0.5">Events & tickets in Kenya</p>
+                )}
+              </div>
+            </div>
+          </div>
 
-              {userRole === 'admin' && (
-                <>
-                  <Link href="/admin/dashboard" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/admin/dashboard')}>Admin</Link>
-                  <Link href="/admin/organizers" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/admin/organizers')}>Organizers</Link>
-                  <Link href="/admin/events" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/admin/events')}>All Events</Link>
-                  <Link href="/admin/payouts" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/admin/payouts')}>Payouts</Link>
-                  <Link href="/account/security" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/account/security')}>Security</Link>
-                </>
-              )}
+          <nav className="px-3 pb-5 space-y-1">
+            {isLoggedIn ? (
+              <>
+                <Link href="/" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/')}>
+                  Events
+                </Link>
 
-              {userRole === 'organizer' && (
-                <>
-                  <Link href="/organizer/dashboard" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/organizer/dashboard')}>Dashboard</Link>
-                  {isVerifiedOrganizer && (
-                    <Link href="/organizer/events/new" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/organizer/events/new')}>Create Event</Link>
-                  )}
-                  <Link href="/organizer/payouts" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/organizer/payouts')}>Payouts</Link>
-                  <Link href="/account/security" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/account/security')}>Security</Link>
-                </>
-              )}
+                {userRole === 'admin' && (
+                  <>
+                    <Link href="/admin/dashboard" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/admin/dashboard')}>Admin</Link>
+                    <Link href="/admin/organizers" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/admin/organizers')}>Organizers</Link>
+                    <Link href="/admin/events" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/admin/events')}>All Events</Link>
+                    <Link href="/admin/payouts" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/admin/payouts')}>Payouts</Link>
+                  </>
+                )}
 
-              {(userRole === 'attendee' || userRole === 'organizer' || userRole === 'admin') && (
-                <>
-                  <Link href="/attendee/dashboard" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/attendee/dashboard')}>My Tickets</Link>
-                  <Link href="/inbox" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/inbox')}>Inbox</Link>
-                </>
-              )}
+                {userRole === 'organizer' && (
+                  <>
+                    <Link href="/organizer/dashboard" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/organizer/dashboard')}>Dashboard</Link>
+                    {isVerifiedOrganizer && (
+                      <Link href="/organizer/events/new" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/organizer/events/new')}>Create Event</Link>
+                    )}
+                    <Link href="/organizer/payouts" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/organizer/payouts')}>Payouts</Link>
+                    <Link href="/account/security" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/account/security')}>Security</Link>
+                  </>
+                )}
 
-              <button
-                onClick={() => { setMobileMenuOpen(false); handleLogout(); }}
-                className="w-full text-left py-2 text-base font-medium text-slate-300 hover:text-white transition"
-              >
-                Log out
-              </button>
-            </>
-          ) : (
-            <>
-              <Link href="/" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/')}>Events</Link>
-              <Link href="/signup?role=attendee" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/signup?role=attendee')}>Get Ticket</Link>
-              <Link href="/signup?role=organizer" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/signup?role=organizer')}>Sell Tickets</Link>
-              <Link href="/login" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/login')}>Sign in</Link>
-              <Link href="/signup" onClick={() => setMobileMenuOpen(false)} className="block w-full text-center bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-md font-medium transition mt-2">
-                Get Started
-              </Link>
-            </>
-          )}
+                {(userRole === 'attendee' || userRole === 'organizer' || userRole === 'admin') && (
+                  <>
+                    <div className="h-px bg-slate-800 my-2 mx-1" />
+                    <Link href="/attendee/dashboard" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/attendee/dashboard')}>My Tickets</Link>
+                    <Link href="/favorites" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/favorites')}>Saved</Link>
+                    <Link href="/inbox" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/inbox')}>Inbox</Link>
+                  </>
+                )}
+
+                <div className="h-px bg-slate-800 my-2 mx-1" />
+                <button
+                  onClick={() => { setMobileMenuOpen(false); handleLogout(); }}
+                  className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-[15px] font-medium text-red-300/90 hover:bg-red-950/40 border border-transparent hover:border-red-900/40 transition text-left"
+                >
+                  Log out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/')}>Events</Link>
+                <Link href="/signup?role=attendee" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/signup?role=attendee')}>Get Ticket</Link>
+                <Link href="/signup?role=organizer" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/signup?role=organizer')}>Sell Tickets</Link>
+                <Link href="/login" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/login')}>Sign in</Link>
+                <Link
+                  href="/signup"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="mt-3 block w-full text-center bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white px-4 py-3 rounded-xl font-bold transition shadow-lg shadow-indigo-950/40"
+                >
+                  Get Started
+                </Link>
+              </>
+            )}
+          </nav>
         </div>
       )}
     </header>
