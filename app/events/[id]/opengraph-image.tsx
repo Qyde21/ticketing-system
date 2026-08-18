@@ -1,4 +1,4 @@
-import { ImageResponse } from 'next/og';
+﻿import { ImageResponse } from 'next/og';
 import { sql } from '@/lib/db';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -37,8 +37,8 @@ export default async function OpengraphImage({
     : '';
   const venue = event?.venue_name || 'Venue TBA';
   const rawTitle = event?.title || 'TicketHub Event';
-  const title = rawTitle.length > 62 ? rawTitle.slice(0, 59) + '…' : rawTitle;
-  const metaLine = [dateStr, venue].filter(Boolean).join('   •   ');
+  const title = rawTitle.length > 62 ? rawTitle.slice(0, 59) + 'â€¦' : rawTitle;
+  const metaLine = [dateStr, venue].filter(Boolean).join('   â€¢   ');
 
   return new ImageResponse(
     (
@@ -88,8 +88,8 @@ export default async function OpengraphImage({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={badgeBase64} width={64} height={64} />
           <div style={{ marginLeft: 14, display: 'flex', fontSize: 34 }}>
-            <span style={{ color: '#cdd0d8' }}>Ticket</span>
-            <span style={{ color: '#c9a24b' }}>Hub</span>
+            <span style={{ color: '#818cf8' }}>Ticket</span>
+            <span style={{ color: '#22d3ee' }}>Hub</span>
           </div>
         </div>
 
