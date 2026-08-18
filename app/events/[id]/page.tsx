@@ -2,6 +2,7 @@ import { sql } from '@/lib/db';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import JoinWaitlistButton from '@/components/JoinWaitlistButton';
+import EventTicketPicker from '@/components/EventTicketPicker';
 import FlashSaleCountdown from '@/components/FlashSaleCountdown';
 import MessageOrganizerWidget from '@/components/MessageOrganizerWidget';
 import ReviewForm from '@/components/ReviewForm';
@@ -265,116 +266,10 @@ export default async function EventDetailPage({
         ) : ticketTypes.length === 0 ? (
           <p className="text-gray-400">No tickets are available for this event yet.</p>
         ) : (
-          ticketTypes.map((t: any) => {
-            const total = Number(t.quantity_total || 0);
-            const remaining = Math.max(0, total - Number(t.quantity_sold || 0));
-            const soldOut = remaining <= 0;
-            const percentSold = total > 0 ? Math.floor((Number(t.quantity_sold || 0) / total) * 100) : 0;
-            const almostSoldOut = total > 0 && !soldOut && percentSold >= 90;
-
-            const now = new Date();
-            const flashCapReached = t.flash_sale_quantity_cap !== null && t.flash_sale_quantity_cap !== undefined
-              && Number(t.flash_sale_quantity_sold || 0) >= Number(t.flash_sale_quantity_cap);
-            const flashActive = t.flash_sale_price_kes !== null && t.flash_sale_price_kes !== undefined
-              && t.flash_sale_starts_at && t.flash_sale_ends_at
-              && now >= new Date(t.flash_sale_starts_at) && now <= new Date(t.flash_sale_ends_at)
-              && !flashCapReached;
-
-            return (
-              <div key={t.id} className="flex items-center justify-between bg-gray-900 border border-gray-800 p-4 rounded-xl">
-                <div>
-                  <p className="font-bold text-white flex items-center gap-2">
-                    {t.name}
-                    {flashActive && (
-                      <span className="text-[10px] uppercase tracking-wider font-extrabold bg-amber-500 text-black px-2 py-0.5 rounded-full">
-                        Flash Sale
-                      </span>
-                    )}
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    {flashActive ? (
-                      <>
-                        <span className="line-through text-gray-500 mr-1.5">KES {Number(t.price_kes).toLocaleString()}</span>
-                        <span className="text-amber-400 font-bold">KES {Number(t.flash_sale_price_kes).toLocaleString()}</span>
-                        {' '}
-                        <FlashSaleCountdown endsAt={t.flash_sale_ends_at} />
-                      </>
-                    ) : (
-                      <>KES {Number(t.price_kes).toLocaleString()}</>
-                    )}
-                    {soldOut && <span> &middot; Sold out</span>}
-                    {almostSoldOut && (
-                      <span className="text-amber-400 font-bold"> &middot; Almost sold out!</span>
-                    )}
-                  </p>
-                </div>
-                {soldOut ? (
-                  <JoinWaitlistButton ticketTypeId={t.id} />
-                ) : (
-                  <Link
-                    href={`/checkout/${t.id}`}
-                    className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold uppercase tracking-wider transition shadow-lg shadow-indigo-950/50 text-center text-sm"
-                  >
-                    Buy Ticket
-                  </Link>
-                )}
-              </div>
-            );
-          })
-        )}
-      </div>
-
-      <div className="space-y-3 mt-10">
-        <div className="flex items-center gap-2 mb-2">
-          <h2 className="text-xl font-bold text-white">Reviews</h2>
-          {reviewCount > 0 && (
-            <span className="inline-flex items-center gap-1 text-amber-400 text-sm font-semibold">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style={{ width: 16, height: 16 }}>
-                <path d="M10 1.5l2.6 5.27 5.82.85-4.21 4.1.99 5.79L10 14.9l-5.2 2.73.99-5.79-4.21-4.1 5.82-.85L10 1.5z" />
-              </svg>
-              {averageRating.toFixed(1)} · {reviewCount} review{reviewCount === 1 ? '' : 's'}
-            </span>
-          )}
-        </div>
-
-        {canReview && (
-          <div className="mb-4">
-            <ReviewForm eventId={event.id} />
-          </div>
-        )}
-        {alreadyReviewed && (
-          <p className="text-gray-400 text-sm mb-4">You've already reviewed this event — thanks!</p>
-        )}
-
-        {reviews.length === 0 ? (
-          <p className="text-gray-400">No reviews yet.</p>
-        ) : (
-          <div className="space-y-3">
-            {reviews.map((r: any) => (
-              <div key={r.id} className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-semibold text-white text-sm">{r.full_name}</span>
-                  <span className="flex gap-0.5">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <svg
-                        key={star}
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill={star <= r.rating ? '#fbbf24' : 'none'}
-                        stroke="#fbbf24"
-                        strokeWidth={1.5}
-                        style={{ width: 14, height: 14 }}
-                      >
-                        <path d="M10 1.5l2.6 5.27 5.82.85-4.21 4.1.99 5.79L10 14.9l-5.2 2.73.99-5.79-4.21-4.1 5.82-.85L10 1.5z" />
-                      </svg>
-                    ))}
-                  </span>
-                </div>
-                {r.comment && <p className="text-gray-300 text-sm">{r.comment}</p>}
-                <p className="text-gray-500 text-xs mt-1">{new Date(r.created_at).toLocaleDateString()}</p>
-              </div>
-            ))}
-          </div>
+          <EventTicketPicker
+            eventId={String(event.id)}
+            ticketTypes={ticketTypes as any[]}
+          />
         )}
       </div>
 
