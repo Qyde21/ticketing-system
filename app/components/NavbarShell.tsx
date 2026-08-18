@@ -49,10 +49,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2.5 hover:opacity-90 transition shrink-0" onClick={() => setMobileMenuOpen(false)}>
           <img src="/logo-badge.png" alt="TicketHub" className="h-10 w-10 rounded-lg" />
-          <span className="text-lg sm:text-xl font-extrabold tracking-tight">
-            <span className="text-white">Ticket</span>
-            <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">Hub</span>
-          </span>
+          <span className="text-lg sm:text-xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">TicketHub</span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
@@ -131,10 +128,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
             <div className="flex items-center gap-3 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-900/40 border border-slate-800 p-3.5 mb-3">
               <img src="/logo-badge.png" alt="" className="h-11 w-11 rounded-xl shadow-lg shadow-indigo-950/50" />
               <div className="min-w-0 flex-1">
-                <p className="font-extrabold text-base leading-tight">
-                  <span className="text-white">Ticket</span>
-                  <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">Hub</span>
-                </p>
+                <p className="font-extrabold text-base leading-tight bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">TicketHub</p>
                 {isLoggedIn ? (
                   <p className="text-xs text-slate-400 truncate mt-0.5">
                     {roleLabel && <span className="text-cyan-400/90 font-semibold">{roleLabel}</span>}
@@ -213,3 +207,4 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
     </header>
   );
 }
+
