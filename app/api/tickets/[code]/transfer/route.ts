@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { sendTicketTransferredToNewHolderEmail, sendTicketTransferConfirmationEmail } from '@/lib/email';
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ cod
     }
 
     const [ticket] = await sql`
-      SELECT t.id, t.ticket_code, t.holder_name, t.status,
+      SELECT t.id, t.ticket_code, t.holder_name, t.holder_email, t.status,
              o.buyer_email, o.buyer_name,
              e.title AS event_title, e.venue_name, e.start_at, e.end_at
       FROM tickets t
@@ -37,7 +37,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ cod
       return NextResponse.json({ error: 'Ticket not found' }, { status: 404 });
     }
 
-    const isOwner = ticket.buyer_email.toLowerCase() === session.email.toLowerCase();
+    const sessionEmail = session.email.toLowerCase();
+    const holderEmail = ticket.holder_email ? String(ticket.holder_email).toLowerCase() : '';
+    const isOwner =
+      String(ticket.buyer_email).toLowerCase() === sessionEmail ||
+      (holderEmail && holderEmail === sessionEmail);
     if (!isOwner && session.role !== 'admin') {
       return NextResponse.json({ error: 'You are not authorized to transfer this ticket' }, { status: 403 });
     }
@@ -95,3 +99,4 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ cod
     return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }
+

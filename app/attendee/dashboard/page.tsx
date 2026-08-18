@@ -1,4 +1,4 @@
-import { sql } from '@/lib/db';
+﻿import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import Link from 'next/link';
 import ShareTicket from './ShareTicket';
@@ -33,15 +33,23 @@ export default async function AttendeeDashboard() {
              FILTER (
                WHERE t.id IS NOT NULL
                  AND t.shared_at IS NULL
-                 AND (t.holder_email IS NULL OR LOWER(t.holder_email) = LOWER(o.buyer_email))
+                 AND LOWER(TRIM(COALESCE(t.holder_email, o.buyer_email))) = ${lowerEmail}
              ),
              '[]'
            ) AS tickets
     FROM orders o
     JOIN events e ON e.id = o.event_id
     LEFT JOIN tickets t ON t.order_id = o.id
-    WHERE o.buyer_email = ${lowerEmail}
-    AND o.payment_status = 'paid'
+    WHERE o.payment_status = 'paid'
+    AND (
+      LOWER(TRIM(o.buyer_email)) = ${lowerEmail}
+      OR EXISTS (
+        SELECT 1 FROM tickets tx
+        WHERE tx.order_id = o.id
+          AND tx.holder_email IS NOT NULL
+          AND LOWER(TRIM(tx.holder_email)) = ${lowerEmail}
+      )
+    )
     GROUP BY o.id, e.id
     ORDER BY o.created_at DESC
   `;
@@ -116,7 +124,7 @@ export default async function AttendeeDashboard() {
                     <p className="font-semibold text-white text-sm">{e.title}</p>
                     <p className="text-gray-500 text-xs">
                       {e.venue_name}
-                      {e.start_at && ` · ${new Date(e.start_at).toLocaleDateString('en-KE', { dateStyle: 'medium' })}`}
+                      {e.start_at && ` Â· ${new Date(e.start_at).toLocaleDateString('en-KE', { dateStyle: 'medium' })}`}
                     </p>
                   </div>
                   {ended ? (
