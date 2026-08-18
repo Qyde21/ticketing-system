@@ -3,6 +3,8 @@ import { getSession } from '@/lib/auth';
 import Link from 'next/link';
 import ShareTicket from './ShareTicket';
 import TransferTicketButton from './TransferTicketButton';
+import LoyaltyPanel from './LoyaltyPanel';
+import { getLoyaltySummary } from '@/lib/loyalty';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,6 +46,21 @@ export default async function AttendeeDashboard() {
     ORDER BY o.created_at DESC
   `;
 
+  let loyaltySummary = { balance: 0, lifetimeEarned: 0, tier: 'Bronze' as const };
+  try {
+    loyaltySummary = await getLoyaltySummary(session.email);
+  } catch (err) {
+    console.error('Failed to load loyalty summary:', err);
+  }
+
+  const redeemableEvents = await sql`
+    SELECT id, title, slug
+    FROM events
+    WHERE status = 'published' AND start_at > NOW()
+    ORDER BY start_at ASC
+    LIMIT 50
+  `;
+
   // Events this attendee has been added as door staff for - grants them
   // access to the check-in scanner, separate from any tickets they hold.
   const staffEvents = await sql`
@@ -74,6 +91,13 @@ export default async function AttendeeDashboard() {
         </Link>
       </div>
       <p className="text-gray-400 text-sm mb-6">{orders.length} paid order(s)</p>
+
+      <div className="mb-8">
+        <LoyaltyPanel
+          initialSummary={loyaltySummary}
+          events={redeemableEvents.map((e: any) => ({ id: e.id, title: e.title }))}
+        />
+      </div>
 
       {staffEvents.length > 0 && (
         <div className="mb-8">

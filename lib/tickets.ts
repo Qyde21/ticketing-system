@@ -2,6 +2,7 @@ import { sql } from '@/lib/db';
 import { nanoid } from 'nanoid';
 import { sendTicketEmail } from '@/lib/email';
 import { sendTicketConfirmationSms } from '@/lib/sms';
+import { awardPointsForOrder } from '@/lib/loyalty';
 
 export type TicketDisplayStatus = 'valid' | 'used' | 'cancelled' | 'expired';
 
@@ -43,7 +44,7 @@ export function getTicketDisplayStatus(
  */
 export async function finalizePaidOrder(orderId: string, baseUrl: string): Promise<string[]> {
   const [order] = await sql`
-    SELECT id, payment_status, ticket_type_id, quantity, buyer_name, buyer_email, buyer_phone, event_id, promo_code_id
+    SELECT id, payment_status, ticket_type_id, quantity, buyer_name, buyer_email, buyer_phone, event_id, promo_code_id, total_amount_kes
     FROM orders WHERE id = ${orderId}
   `;
 
@@ -76,6 +77,9 @@ export async function finalizePaidOrder(orderId: string, baseUrl: string): Promi
           AND (max_uses IS NULL OR uses_count < max_uses)
       `;
     }
+
+    // Non-blocking: a loyalty-points failure should never stop ticket issuance.
+    awardPointsForOrder(order.id, order.buyer_email, Number(order.total_amount_kes || 0));
   }
 
   const generatedCodes: string[] = [];

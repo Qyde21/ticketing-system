@@ -242,3 +242,14 @@ CREATE TABLE IF NOT EXISTS event_shift_assignments (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   PRIMARY KEY (shift_id, user_id)
 );
+
+-- Loyalty points ledger, keyed by (lowercased) buyer email - see
+-- migrations/009_loyalty_points.sql for the full explanation.
+CREATE TABLE IF NOT EXISTS loyalty_transactions (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email      TEXT NOT NULL,
+  order_id   UUID REFERENCES orders(id),
+  points     INTEGER NOT NULL,
+  reason     TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
