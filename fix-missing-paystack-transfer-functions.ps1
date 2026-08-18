@@ -1,58 +1,34 @@
-const PAYSTACK_BASE_URL = 'https://api.paystack.co';
+# Run this from your project root
+# Usage: powershell -ExecutionPolicy Bypass -File fix-missing-paystack-transfer-functions.ps1
+#
+# lib/paystack.ts was also reverted along with the rest of the payouts
+# feature, and is missing createTransferRecipient, initiateTransfer, and
+# fetchTransfer - which lib/payouts.ts imports, causing this build error.
+#
+# IMPORTANT: this file's current refundTransaction has a newer capability
+# (partial refunds via an amountKes parameter) that my restore snapshot
+# does NOT have - overwriting the whole file would have regressed that.
+# So this ONLY APPENDS the 3 missing transfer functions (plus their small
+# paystackFetch helper) to the end of your current file. Your existing
+# initializeTransaction and refundTransaction are completely untouched.
 
-export async function initializeTransaction(params: {
-  email: string;
-  amountKes: number;
-  reference: string;
-  callbackUrl: string;
-  metadata?: Record<string, unknown>;
-}) {
-  const res = await fetch(`${PAYSTACK_BASE_URL}/transaction/initialize`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      email: params.email,
-      amount: Math.round(params.amountKes * 100),
-      currency: 'KES',
-      reference: params.reference,
-      callback_url: params.callbackUrl,
-      channels: ['card', 'mobile_money'],
-      metadata: params.metadata ?? {},
-    }),
-  });
+$ErrorActionPreference = "Stop"
+$utf8NoBom = New-Object System.Text.UTF8Encoding $false
 
-  const data = await res.json();
-  if (!data.status) {
-    throw new Error(data.message || 'Failed to initialize Paystack transaction');
-  }
-  return data.data as { authorization_url: string; access_code: string; reference: string };
+$path = "lib\paystack.ts"
+if (-not (Test-Path -LiteralPath $path)) {
+    Write-Host "Could not find lib\paystack.ts - run this from your project root." -ForegroundColor Red
+    exit 1
 }
 
-/** Full refund, or partial when amountKes is set (Paystack amount is in kobo). */
-export async function refundTransaction(reference: string, amountKes?: number) {
-  const body: Record<string, unknown> = { transaction: reference };
-  if (amountKes != null && amountKes > 0) {
-    body.amount = Math.round(amountKes * 100);
-  }
+$existing = [System.IO.File]::ReadAllText($path)
 
-  const res = await fetch(`${PAYSTACK_BASE_URL}/refund`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(body),
-  });
-
-  const data = await res.json();
-  if (!data.status) {
-    throw new Error(data.message || 'Failed to process refund');
-  }
-  return data.data;
+if ($existing -match "createTransferRecipient") {
+    Write-Host "createTransferRecipient already present - nothing to do." -ForegroundColor Yellow
+    exit 0
 }
+
+$addition = @'
 
 
 async function paystackFetch(path: string, init?: RequestInit) {
@@ -137,3 +113,15 @@ export async function fetchTransfer(transferCodeOrReference: string) {
     reason?: string;
   };
 }
+
+'@
+
+$newContent = $existing + $addition
+[System.IO.File]::WriteAllText($path, $newContent, $utf8NoBom)
+
+Write-Host "Appended the 3 missing transfer functions to lib/paystack.ts" -ForegroundColor Green
+Write-Host ""
+Write-Host "Next steps:" -ForegroundColor Green
+Write-Host "  git add ."
+Write-Host "  git commit -m ""Fix: restore missing Paystack transfer functions for payouts"""
+Write-Host "  git push origin main"
