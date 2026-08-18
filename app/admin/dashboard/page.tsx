@@ -49,6 +49,14 @@ export default async function AdminDashboard() {
     ORDER BY created_at ASC
   `;
 
+  
+  const [risk] = await sql`
+    SELECT
+      (SELECT COUNT(*)::int FROM orders WHERE payment_status = 'pending' AND created_at > now() - interval '24 hours') AS pending_24h,
+      (SELECT COUNT(*)::int FROM orders WHERE payment_status = 'pending' AND created_at < now() - interval '30 minutes') AS pending_stale,
+      (SELECT COUNT(*)::int FROM orders WHERE payment_status = 'paid' AND created_at > now() - interval '1 hour') AS paid_1h,
+      (SELECT COUNT(*)::int FROM orders WHERE payment_status = 'refunded' AND created_at > now() - interval '24 hours') AS refunded_24h
+  `;
   const pendingOrganizers = await sql`
     SELECT u.id, u.full_name, u.email, op.business_name, op.created_at
     FROM organizer_profiles op
@@ -111,6 +119,30 @@ export default async function AdminDashboard() {
       <div className="flex justify-between items-center mb-8 pb-4 border-b border-gray-800">
         <div>
           <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Admin Dashboard</h1>
+      <div className="flex flex-wrap gap-3 mb-4 text-sm">
+        <Link href="/admin/orders" className="text-indigo-400 hover:underline">Order search</Link>
+        <Link href="/admin/audit" className="text-indigo-400 hover:underline">Audit log</Link>
+        <Link href="/admin/payouts" className="text-indigo-400 hover:underline">Payouts</Link>
+        <Link href="/admin/organizers" className="text-indigo-400 hover:underline">Organizers</Link>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-3">
+          <p className="text-xs text-gray-400">Pending (24h)</p>
+          <p className="text-xl font-bold text-amber-400">{Number(risk?.pending_24h ?? 0)}</p>
+        </div>
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-3">
+          <p className="text-xs text-gray-400">Stale pending (&gt;30m)</p>
+          <p className="text-xl font-bold text-red-400">{Number(risk?.pending_stale ?? 0)}</p>
+        </div>
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-3">
+          <p className="text-xs text-gray-400">Paid (1h)</p>
+          <p className="text-xl font-bold text-emerald-400">{Number(risk?.paid_1h ?? 0)}</p>
+        </div>
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-3">
+          <p className="text-xs text-gray-400">Refunded (24h)</p>
+          <p className="text-xl font-bold text-cyan-400">{Number(risk?.refunded_24h ?? 0)}</p>
+        </div>
+      </div>
           <p className="text-gray-400 text-sm mt-1">Platform overview and management controls</p>
         </div>
         <div className="flex items-center gap-3">
