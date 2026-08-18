@@ -4,20 +4,7 @@ import { getSession } from '@/lib/auth';
 import { refundTransaction } from '@/lib/paystack';
 import { sendCancellationEmail } from '@/lib/email';
 import { notifyWaitlistIfSpotsFreed } from '@/lib/waitlist';
-
-function isEventEnded(event: {
-  status?: string;
-  start_at?: string | Date;
-  end_at?: string | Date | null;
-}) {
-  if (event.status === 'completed' || event.status === 'cancelled') return true;
-  const end = event.end_at
-    ? new Date(event.end_at)
-    : event.start_at
-      ? new Date(event.start_at)
-      : null;
-  return !!end && end < new Date();
-}
+import { isEventEnded } from '@/lib/eventStatus';
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
@@ -58,7 +45,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     );
   }
 
-  // If several order rows share one Paystack reference (multi-tier cart), refund only this line amount
   let refundAmountKes: number | undefined;
   if (order.paystack_reference) {
     const siblings = await sql`
@@ -71,14 +57,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     }
   }
 
-  // Atomically claim this order for refunding before ever calling Paystack.
-  // The UPDATE only succeeds (and returns a row) if payment_status is still
-  // 'paid' at the exact moment the database applies it — Postgres
-  // serializes concurrent updates to the same row, so if two refund
-  // requests race here, only one wins the claim; the other gets zero rows
-  // back and is told there's nothing to refund, instead of both calling
-  // Paystack's refund API for the same order. Same pattern used to fix the
-  // duplicate-payout race in lib/payouts.ts.
   const [claimed] = await sql`
     UPDATE orders SET payment_status = 'refunded'
     WHERE id = ${id} AND payment_status = 'paid'
@@ -94,8 +72,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     }
   } catch (err: any) {
     console.error('Paystack refund error:', err);
-    // Roll back the claim so this order isn't stuck showing "refunded"
-    // when Paystack never actually processed it — leaves it retriable.
     await sql`UPDATE orders SET payment_status = 'paid' WHERE id = ${id}`;
     return NextResponse.json({ error: err.message || 'Refund failed at Paystack' }, { status: 500 });
   }
