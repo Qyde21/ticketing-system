@@ -1,134 +1,177 @@
 ﻿'use client';
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import TicketList from '@/components/TicketList';
-import AddToCalendarButton from '@/components/AddToCalendarButton';
+import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import EventTicket from '@/components/EventTicket';
+
+type TicketInfo = {
+  ticketCode: string;
+  holderName?: string | null;
+  status?: string;
+  checkedInAt?: string | null;
+  ticketTypeName?: string;
+  eventTitle?: string;
+  venueName?: string;
+  startAt?: string;
+  endAt?: string;
+  coverImageUrl?: string | null;
+  qrDataUrl?: string;
+};
 
 export default function SuccessContent() {
   const searchParams = useSearchParams();
-  const reference = searchParams.get('reference') || searchParams.get('trxref') || searchParams.get('reference_code');
+  const reference = searchParams.get('reference') || '';
 
-  const [tickets, setTickets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [eventTitle, setEventTitle] = useState("Your Event");
-  const [quantity, setQuantity] = useState(1);
-  const [eventInfo, setEventInfo] = useState<{ venueName?: string; startAt?: string; endAt?: string } | null>(null);
+  const [error, setError] = useState('');
+  const [status, setStatus] = useState('');
+  const [tickets, setTickets] = useState<TicketInfo[]>([]);
+  const [eventTitle, setEventTitle] = useState('');
 
-  useEffect(() => {
+  const load = useCallback(async () => {
     if (!reference) {
+      setError('Missing payment reference.');
       setLoading(false);
-      return;
+      return true;
     }
 
-    let isMounted = true;
-
-    const fetchTickets = async () => {
-      try {
-        const res = await fetch(`/api/orders/${reference}/status`);
-        if (!res.ok) {
-          return false;
-        }
-        const data = await res.json();
-
-        if (isMounted && data.status === 'paid' && data.tickets && data.tickets.length > 0) {
-          setTickets(data.tickets);
-          setEventTitle(data.tickets[0].event_title || data.tickets[0].eventTitle || "Event Ticket");
-          setQuantity(data.tickets.length);
-          if (data.event) {
-            setEventInfo({
-              venueName: data.event.venueName,
-              startAt: data.event.startAt,
-              endAt: data.event.endAt,
-            });
-          }
-          setLoading(false);
-          return true;
-        }
-      } catch (err) {
-        console.error("Polling error:", err);
+    try {
+      const res = await fetch(`/api/orders/${encodeURIComponent(reference)}/status`, {
+        cache: 'no-store',
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || 'Could not load order');
+        setLoading(false);
+        return true;
       }
-      return false;
-    };
 
-    fetchTickets().then((found) => {
-      if (found) return;
+      setStatus(data.status || '');
+      setEventTitle(data.event?.title || '');
 
-      const interval = setInterval(async () => {
-        const foundAgain = await fetchTickets();
-        if (foundAgain) {
-          clearInterval(interval);
+      if (data.status === 'paid' && Array.isArray(data.tickets) && data.tickets.length > 0) {
+        const QRCode = (await import('qrcode')).default;
+        const withQr: TicketInfo[] = [];
+        for (const t of data.tickets) {
+          const qrDataUrl = await QRCode.toDataURL(String(t.ticketCode), {
+            margin: 1,
+            width: 280,
+            color: { dark: '#000000', light: '#ffffff' },
+          });
+          withQr.push({ ...t, qrDataUrl });
         }
-      }, 3000);
+        setTickets(withQr);
+        setLoading(false);
+        return true;
+      }
 
-      const timeout = setTimeout(() => {
-        clearInterval(interval);
-        if (isMounted) setLoading(false);
-      }, 30000);
-
-      return () => {
-        clearInterval(interval);
-        clearTimeout(timeout);
-      };
-    });
-
-    return () => {
-      isMounted = false;
-    };
+      setLoading(false);
+      return false;
+    } catch {
+      setError('Network error loading tickets');
+      setLoading(false);
+      return true;
+    }
   }, [reference]);
+
+  useEffect(() => {
+    let cancelled = false;
+    let tries = 0;
+
+    async function poll() {
+      const done = await load();
+      if (cancelled || done) return;
+      tries += 1;
+      if (tries < 15) setTimeout(poll, 2000);
+    }
+
+    void poll();
+    return () => {
+      cancelled = true;
+    };
+  }, [load]);
 
   if (!reference) {
     return (
-      <div className="max-w-xl mx-auto py-20 px-4 text-center text-white">
-        <h1 className="text-3xl font-bold mb-4">No Reference Provided</h1>
-        <p className="text-gray-400 mb-8">We could not find a payment reference in your request.</p>
-        <Link href="/" className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold text-white transition">
-          Return Home
-        </Link>
+      <div className="max-w-2xl mx-auto py-16 px-4 text-center text-white">
+        <p className="text-red-400">Missing payment reference.</p>
+        <Link href="/" className="text-indigo-400 hover:underline mt-4 inline-block">Back home</Link>
+      </div>
+    );
+  }
+
+  if (loading && tickets.length === 0) {
+    return (
+      <div className="max-w-2xl mx-auto py-20 px-4 text-center text-white">
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-cyan-400 border-t-transparent mb-4" />
+        <p className="text-gray-400">Confirming payment and preparing your tickets…</p>
+      </div>
+    );
+  }
+
+  if (error && tickets.length === 0) {
+    return (
+      <div className="max-w-2xl mx-auto py-16 px-4 text-center text-white">
+        <p className="text-red-400 mb-4">{error}</p>
+        <Link href="/" className="text-indigo-400 hover:underline">Back home</Link>
       </div>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto py-12 px-4 text-white">
-      <div className="bg-gray-900 border border-gray-800 p-8 rounded-3xl shadow-xl">
-        <h1 className="text-3xl font-extrabold mb-2 text-center text-green-400">Payment Successful!</h1>
-        <p className="text-gray-400 text-center mb-8">Your order has been verified and confirmed.</p>
+    <div className="min-h-[70vh] w-full px-3 sm:px-6 py-8 sm:py-12 text-white">
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div className="text-center sm:text-left">
+          <p className="text-emerald-400 text-sm font-bold uppercase tracking-wider mb-1">Payment successful</p>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">
+            Your tickets are ready
+          </h1>
+          {eventTitle && <p className="text-gray-400 text-sm mt-2">{eventTitle}</p>}
+          <p className="text-gray-500 text-xs mt-1">
+            Save this page or open each ticket link. Show QR or barcode at the door.
+          </p>
+        </div>
 
-        {loading && tickets.length === 0 ? (
-          <div className="bg-yellow-950/40 border border-yellow-800/60 p-8 rounded-2xl text-center space-y-4">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-yellow-400 border-t-transparent"></div>
-            <p className="text-yellow-200 font-medium">Generating your tickets and verifying payment...</p>
-            <p className="text-xs text-gray-400 font-mono">Ref: {reference}</p>
-          </div>
-        ) : tickets.length > 0 ? (
-          <>
-            <TicketList tickets={tickets} eventTitle={eventTitle} quantity={quantity} />
-            {eventInfo && eventInfo.startAt && (
-              <div className="mt-5 pt-5 border-t border-gray-800">
-                <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Don&apos;t forget!</p>
-                <AddToCalendarButton
-                  title={eventTitle}
-                  location={eventInfo.venueName}
-                  startAt={eventInfo.startAt}
-                  endAt={eventInfo.endAt}
-                />
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="bg-yellow-950/40 border border-yellow-800/60 p-6 rounded-2xl text-center space-y-4">
-            <p className="text-yellow-200">We are processing your ticket generation. If your tickets don't appear automatically, please click refresh.</p>
-            <p className="text-xs text-gray-400 font-mono">Ref: {reference}</p>
-            <Link
-              href={`/success?reference=${reference}`}
-              className="inline-block px-6 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-xl text-sm font-semibold transition"
-            >
-              Refresh
-            </Link>
-          </div>
+        {tickets.length === 0 && status === 'paid' && (
+          <p className="text-amber-300 text-sm">Payment received — tickets are still being issued. Refresh in a moment.</p>
         )}
+
+        <div className="space-y-8">
+          {tickets.map((t) =>
+            t.qrDataUrl ? (
+              <div key={t.ticketCode} className="space-y-2">
+                <EventTicket
+                  eventTitle={t.eventTitle || eventTitle || 'Event'}
+                  ticketTypeName={t.ticketTypeName}
+                  venueName={t.venueName}
+                  startAt={t.startAt}
+                  endAt={t.endAt}
+                  holderName={t.holderName}
+                  ticketCode={t.ticketCode}
+                  qrDataUrl={t.qrDataUrl}
+                  status={t.status}
+                  checkedInAt={t.checkedInAt}
+                  coverImageUrl={t.coverImageUrl}
+                />
+                <div className="text-center">
+                  <Link href={`/tickets/${t.ticketCode}`} className="text-sm text-indigo-400 hover:text-cyan-400 font-semibold">
+                    Open full ticket page →
+                  </Link>
+                </div>
+              </div>
+            ) : null
+          )}
+        </div>
+
+        <div className="flex flex-wrap gap-3 justify-center sm:justify-start pt-4">
+          <Link href="/attendee/dashboard" className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition">
+            My Tickets
+          </Link>
+          <Link href="/" className="bg-gray-800 hover:bg-gray-700 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition">
+            Browse events
+          </Link>
+        </div>
       </div>
     </div>
   );
