@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from 'react';
 import Link from 'next/link';
@@ -71,7 +71,8 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
                   {isVerifiedOrganizer && (
                     <Link href="/organizer/events/new" className={getLinkClass('/organizer/events/new')}>Create Event</Link>
                   )}
-                  <Link href="/organizer/analytics" className={getLinkClass('/organizer/analytics')}>Analytics</Link>`n                  <Link href="/organizer/payouts" className={getLinkClass('/organizer/payouts')}>Payouts</Link>
+                  <Link href="/organizer/analytics" className={getLinkClass('/organizer/analytics')}>Analytics</Link>
+                  <Link href="/organizer/payouts" className={getLinkClass('/organizer/payouts')}>Payouts</Link>
                   <Link href="/account/security" className={getLinkClass('/account/security')}>Security</Link>
                 </>
               )}
