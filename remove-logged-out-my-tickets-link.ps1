@@ -1,3 +1,16 @@
+# Run this from your project root
+# Usage: powershell -ExecutionPolicy Bypass -File remove-logged-out-my-tickets-link.ps1
+#
+# Removes the "My tickets" link (pointing to /my-tickets) from the
+# logged-out navbar, both desktop and mobile. Everything else in the nav
+# (Get Ticket, Sell Tickets, Sign in, Get Started, and the logged-in
+# "My Tickets" link at /attendee/dashboard) is untouched.
+
+$ErrorActionPreference = "Stop"
+$utf8NoBom = New-Object System.Text.UTF8Encoding $false
+
+Write-Host "Writing: app\components\NavbarShell.tsx" -ForegroundColor Cyan
+$content = @'
 'use client';
 
 import React, { useState } from 'react';
@@ -185,4 +198,18 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
       )}
     </header>
   );
+}
+
+'@
+[System.IO.File]::WriteAllText("app\components\NavbarShell.tsx", $content, $utf8NoBom)
+
+if (-not (Test-Path -LiteralPath "app\components\NavbarShell.tsx")) {
+    Write-Host "ERROR: file was not created!" -ForegroundColor Red
+} else {
+    Write-Host "Confirmed on disk." -ForegroundColor Green
+    Write-Host ""
+    Write-Host "Next steps:" -ForegroundColor Green
+    Write-Host "  git add ."
+    Write-Host "  git commit -m ""Remove My tickets link from logged-out navbar"""
+    Write-Host "  git push origin main"
 }

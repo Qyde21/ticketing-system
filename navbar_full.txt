@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 import Link from 'next/link';
@@ -43,7 +43,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
   return (
     <header className="bg-slate-900 border-b border-slate-800 text-white sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-
+        
         {/* Left Side: Logo */}
         <Link href="/" className="flex items-center gap-2.5 hover:opacity-90 transition shrink-0">
           <img src="/logo-badge.png" alt="TicketHub" className="h-11 w-11" />
@@ -57,7 +57,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
           {isLoggedIn ? (
             <>
               <Link href="/" className={getLinkClass('/')}>Events</Link>
-
+              
               {userRole === 'admin' && (
                 <>
                   <Link href="/admin/dashboard" className={getLinkClass('/admin/dashboard')}>Admin</Link>
@@ -87,8 +87,8 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
                 </>
               )}
 
-              <button
-                onClick={handleLogout}
+              <button 
+                onClick={handleLogout} 
                 className="text-slate-300 hover:text-white transition cursor-pointer"
               >
                 Log out
@@ -99,6 +99,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
               <Link href="/" className={getLinkClass('/')}>Events</Link>
               <Link href="/signup?role=attendee" className={getLinkClass('/signup?role=attendee')}>Get Ticket</Link>
               <Link href="/signup?role=organizer" className={getLinkClass('/signup?role=organizer')}>Sell Tickets</Link>
+              <Link href="/my-tickets" className={getLinkClass('/my-tickets')}>My tickets</Link>
               <Link href="/login" className={getLinkClass('/login')}>Sign in</Link>
               <Link href="/signup" className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-md font-medium transition shadow-sm">
                 Get Started
@@ -134,7 +135,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
           {isLoggedIn ? (
             <>
               <Link href="/" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/')}>Events</Link>
-
+              
               {userRole === 'admin' && (
                 <>
                   <Link href="/admin/dashboard" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/admin/dashboard')}>Admin</Link>
@@ -163,8 +164,8 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
                 </>
               )}
 
-              <button
-                onClick={() => { setMobileMenuOpen(false); handleLogout(); }}
+              <button 
+                onClick={() => { setMobileMenuOpen(false); handleLogout(); }} 
                 className="w-full text-left py-2 text-base font-medium text-slate-300 hover:text-white transition"
               >
                 Log out
@@ -175,6 +176,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
               <Link href="/" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/')}>Events</Link>
               <Link href="/signup?role=attendee" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/signup?role=attendee')}>Get Ticket</Link>
               <Link href="/signup?role=organizer" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/signup?role=organizer')}>Sell Tickets</Link>
+              <Link href="/my-tickets" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/my-tickets')}>My tickets</Link>
               <Link href="/login" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/login')}>Sign in</Link>
               <Link href="/signup" onClick={() => setMobileMenuOpen(false)} className="block w-full text-center bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-md font-medium transition mt-2">
                 Get Started
