@@ -176,7 +176,7 @@ export default function DiceHomeClient({ events }: { events: Event[] }) {
                   {/* Card body */}
                   <div style={{ padding: '14px 14px 16px' }}>
                     <h3 style={{ color: '#fff', fontWeight: 800, fontSize: 15, margin: '0 0 4px', lineHeight: 1.3 }}>{e.title}</h3>
-                    <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, margin: '0 0 10px' }}>{e.venue_name}</p>
+                    <p style={{ color: '#67e8f9', fontSize: 13, margin: '0 0 10px', fontWeight: 500 }}>{e.venue_name}</p>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span style={{ color: '#fff', fontWeight: 700, fontSize: 14 }}>
                         {e.min_price ? 'KES ' + Number(e.min_price).toLocaleString() : 'Free'}
