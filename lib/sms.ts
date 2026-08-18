@@ -1,6 +1,6 @@
 ﻿/**
  * Africa's Talking SMS helper.
- * Env: AT_API_KEY, AT_USERNAME (sandbox | live username), optional AT_FROM (sender ID).
+ * Env: AT_API_KEY, AT_USERNAME, optional AT_FROM, NEXT_PUBLIC_APP_URL
  */
 function normalizeKenyaPhone(phone: string): string | null {
   let p = String(phone || '').replace(/[\s\-()]/g, '');
@@ -11,6 +11,15 @@ function normalizeKenyaPhone(phone: string): string | null {
   if (p.startsWith('1') && p.length === 9) p = '254' + p;
   if (!/^254\d{9}$/.test(p)) return null;
   return '+' + p;
+}
+
+function appBaseUrl(): string {
+  const u = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '');
+  if (u) return u;
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL.replace(/\/$/, '')}`;
+  }
+  return 'https://mytickethub.co.ke';
 }
 
 async function sendSmsRaw(toPhone: string, message: string): Promise<void> {
@@ -51,19 +60,33 @@ async function sendSmsRaw(toPhone: string, message: string): Promise<void> {
 
   const text = await res.text();
   if (!res.ok) {
-    console.error('Africa\'s Talking error', res.status, text);
+    console.error("Africa's Talking error", res.status, text);
     throw new Error('SMS failed: ' + res.status);
   }
-  console.log('SMS sent to', to, text.slice(0, 200));
 }
 
 export async function sendTicketConfirmationSms(params: {
   toPhone: string;
   eventTitle: string;
-  ticketUrl: string;
+  ticketUrl?: string;
+  quantity?: number;
+  ticketCodes?: string[];
 }) {
   const title = String(params.eventTitle || 'your event').slice(0, 40);
-  const msg = `TicketHub: You're in for ${title}. View ticket: ${params.ticketUrl}`;
+  const codes = (params.ticketCodes || []).filter(Boolean);
+  const qty = params.quantity ?? (codes.length || 1);
+
+  let ticketUrl = params.ticketUrl;
+  if (!ticketUrl && codes[0]) {
+    ticketUrl = `${appBaseUrl()}/tickets/${codes[0]}`;
+  }
+
+  let msg = `TicketHub: You're in for ${title}`;
+  if (qty > 1) msg += ` (${qty} tickets)`;
+  msg += '.';
+  if (ticketUrl) msg += ` View: ${ticketUrl}`;
+  else if (codes[0]) msg += ` Code: ${codes[0]}`;
+
   await sendSmsRaw(params.toPhone, msg);
 }
 
@@ -78,14 +101,18 @@ export async function sendEventReminderSms(params: {
   let when = '';
   if (params.startAt) {
     try {
-      when = ', ' + new Date(params.startAt).toLocaleString('en-KE', {
-        weekday: 'short',
-        day: 'numeric',
-        month: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-    } catch { /* ignore */ }
+      when =
+        ', ' +
+        new Date(params.startAt).toLocaleString('en-KE', {
+          weekday: 'short',
+          day: 'numeric',
+          month: 'short',
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+    } catch {
+      /* ignore */
+    }
   }
   const msg = `TicketHub reminder: ${title}${venue}${when}. See you there!`;
   await sendSmsRaw(params.toPhone, msg);
