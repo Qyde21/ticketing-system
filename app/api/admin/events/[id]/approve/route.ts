@@ -2,12 +2,21 @@ import { NextRequest, NextResponse } from 'next/server';
 import { revalidateTag } from 'next/cache';
 import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
+import { writeAuditLog } from '@/lib/audit';
 import { sendEventApprovedEmail } from '@/lib/email';
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
   if (!session || session.role !== 'admin') {
-    return NextResponse.json({ error: 'Not authorized' }, { status: 403 });
+    
+  await writeAuditLog({
+    actorId: session?.userId,
+    action: 'event.approve',
+    entityType: 'event',
+    entityId: id,
+  });
+
+  return NextResponse.json({ error: 'Not authorized' }, { status: 403 });
   }
 
   const { id } = await params;
@@ -20,10 +29,26 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   `;
 
   if (!event) {
-    return NextResponse.json({ error: 'Event not found' }, { status: 404 });
+    
+  await writeAuditLog({
+    actorId: session?.userId,
+    action: 'event.approve',
+    entityType: 'event',
+    entityId: id,
+  });
+
+  return NextResponse.json({ error: 'Event not found' }, { status: 404 });
   }
   if (event.status !== 'pending_review') {
-    return NextResponse.json({ error: 'Only events pending review can be approved' }, { status: 400 });
+    
+  await writeAuditLog({
+    actorId: session?.userId,
+    action: 'event.approve',
+    entityType: 'event',
+    entityId: id,
+  });
+
+  return NextResponse.json({ error: 'Only events pending review can be approved' }, { status: 400 });
   }
 
   await sql`UPDATE events SET status = 'published', updated_at = now() WHERE id = ${id}`;
@@ -40,5 +65,13 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   }
 
   revalidateTag('events', 'max');
+  
+  await writeAuditLog({
+    actorId: session?.userId,
+    action: 'event.approve',
+    entityType: 'event',
+    entityId: id,
+  });
+
   return NextResponse.json({ success: true });
 }

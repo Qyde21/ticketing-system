@@ -1,3 +1,17 @@
+# Run this from your project root
+# Usage: powershell -ExecutionPolicy Bypass -File fix-admin-analytics-dynamic-again.ps1
+#
+# app/admin/events/[id]/analytics/page.tsx lost its "force-dynamic" export
+# again (this file has been substantially rewritten since the last time,
+# so the earlier one-line patch didn't carry over). Reapplying it -
+# without this, the admin analytics page can serve stale cached revenue
+# and ticket-sold numbers instead of fresh ones.
+
+$ErrorActionPreference = "Stop"
+$utf8NoBom = New-Object System.Text.UTF8Encoding $false
+
+$path = "app\admin\events\[id]\analytics\page.tsx"
+$content = @'
 import { sql } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { notFound } from "next/navigation";
@@ -146,4 +160,17 @@ export default async function AdminEventAnalyticsPage({ params }: PageProps) {
       </div>
     </main>
   );
+}
+'@
+[System.IO.File]::WriteAllText($path, $content, $utf8NoBom)
+
+if (-not (Test-Path -LiteralPath $path)) {
+    Write-Host "ERROR: file was not created!" -ForegroundColor Red
+} else {
+    Write-Host "Confirmed on disk." -ForegroundColor Green
+    Write-Host ""
+    Write-Host "Next steps:" -ForegroundColor Green
+    Write-Host "  git add ."
+    Write-Host "  git commit -m ""Fix: re-add force-dynamic to admin analytics page"""
+    Write-Host "  git push origin main"
 }

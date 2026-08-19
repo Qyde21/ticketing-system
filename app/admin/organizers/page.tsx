@@ -35,6 +35,7 @@ export default async function AdminOrganizersPage() {
       <div className="flex justify-between items-center mb-8 pb-4 border-b border-gray-800">
         <div>
           <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Organizer Management</h1>
+      <p className="text-sm text-gray-400 mb-4">Open an organizer → add <code className="text-amber-400">/support</code> to the URL for read-only support view, or use Support links on event rows once listed.</p>
           <p className="text-gray-400 text-sm mt-1">Monitor event creators and manage their hosting status</p>
         </div>
         <div className="bg-gray-900 border border-gray-800 px-4 py-2 rounded-xl text-sm text-gray-300 shadow">

@@ -1,9 +1,10 @@
-﻿import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { refundTransaction } from '@/lib/paystack';
 import { sendCancellationEmail } from '@/lib/email';
 import { notifyWaitlistIfSpotsFreed } from '@/lib/waitlist';
+import { writeAuditLog } from '@/lib/audit';
 import { isEventEnded } from '@/lib/eventStatus';
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -104,5 +105,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     console.error('Waitlist notify failed:', wErr);
   }
 
+  
+  await writeAuditLog({
+    actorId: session.userId,
+    action: 'order.refund',
+    entityType: 'order',
+    entityId: order.id,
+    meta: { eventTitle: order.event_title },
+  });
   return NextResponse.json({ success: true });
 }

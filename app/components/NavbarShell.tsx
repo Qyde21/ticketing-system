@@ -61,6 +61,8 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
                   <Link href="/admin/dashboard" className={getLinkClass('/admin/dashboard')}>Admin</Link>
                   <Link href="/admin/organizers" className={getLinkClass('/admin/organizers')}>Organizers</Link>
                   <Link href="/admin/events" className={getLinkClass('/admin/events')}>All Events</Link>
+                  <Link href="/admin/orders" className={getLinkClass('/admin/orders')}>Orders</Link>`r`n                  <Link href="/admin/audit" className={getLinkClass('/admin/audit')}>Audit</Link>`r`n                  <Link href="/admin/orders" className={getLinkClass('/admin/orders')}>Orders</Link>
+                  <Link href="/admin/audit" className={getLinkClass('/admin/audit')}>Audit</Link>
                   <Link href="/admin/payouts" className={getLinkClass('/admin/payouts')}>Payouts</Link>
                   <Link href="/attendee/dashboard" className={getLinkClass('/attendee/dashboard')}>My Tickets</Link>
                 </>
