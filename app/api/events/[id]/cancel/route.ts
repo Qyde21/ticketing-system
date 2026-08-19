@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { revalidateTag } from 'next/cache';
 import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
+import { writeAuditLog } from '@/lib/audit';
 import { refundTransaction } from '@/lib/paystack';
 import { sendCancellationEmail } from '@/lib/email';
+import { notifyWaitlistIfSpotsFreed } from '@/lib/waitlist';
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
@@ -140,7 +142,34 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     }
   }
 
+  // Notify waitlist for seats released by successful refunds on this cancel
+  try {
+    const origin = process.env.NEXT_PUBLIC_APP_URL || 'https://www.mytickethub.co.ke';
+    const byTier = new Map<string, number>();
+    for (const order of paidOrders as any[]) {
+      // only count if now refunded
+      const [row] = await sql`SELECT payment_status FROM orders WHERE id = ${order.id}`;
+      if (row?.payment_status === 'refunded') {
+        const tid = String(order.ticket_type_id);
+        byTier.set(tid, (byTier.get(tid) || 0) + Number(order.quantity || 0));
+      }
+    }
+    for (const [tid, qty] of byTier) {
+      await notifyWaitlistIfSpotsFreed(tid, qty, origin);
+    }
+  } catch (wErr) {
+    console.error('Waitlist notify on cancel failed', wErr);
+  }
+
   revalidateTag('events', 'max');
+
+  await writeAuditLog({
+    actorId: session?.userId,
+    action: 'event.cancel',
+    entityType: 'event',
+    entityId: String(id),
+    meta: { refundedOrders, failedCount: failed.length },
+  });
   return NextResponse.json({
     success: true,
     refundedOrders,

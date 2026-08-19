@@ -1,3 +1,4 @@
+import { notifyWaitlistIfSpotsFreed } from '@/lib/waitlist';
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 
@@ -78,6 +79,12 @@ export async function GET(req: NextRequest) {
 
       expired++;
       released += qty;
+      try {
+        const origin = process.env.NEXT_PUBLIC_APP_URL || 'https://www.mytickethub.co.ke';
+        await notifyWaitlistIfSpotsFreed(String(order.ticket_type_id), qty, origin);
+      } catch (wErr) {
+        console.error('Waitlist notify on expire failed', order.id, wErr);
+      }
     } catch (err) {
       console.error('Failed to expire order', order.id, err);
       failed++;
