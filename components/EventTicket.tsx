@@ -13,6 +13,7 @@ type Props = {
   ticketCode: string;
   qrDataUrl: string;
   status?: string | null;
+  isExpired?: boolean;
   checkedInAt?: string | Date | null;
   coverImageUrl?: string | null;
 };
@@ -43,11 +44,13 @@ export default function EventTicket({
   ticketCode,
   qrDataUrl,
   status,
+  isExpired,
   checkedInAt,
   coverImageUrl,
 }: Props) {
   const code = String(ticketCode || '').trim();
   const used = status === 'used' || !!checkedInAt;
+  const expired = !!isExpired && !used;
 
   return (
     <div className="w-full max-w-3xl mx-auto" style={{ aspectRatio: '2.35 / 1', minHeight: 200 }}>
@@ -218,20 +221,28 @@ export default function EventTicket({
         >
           <img src="/logo-badge.png" alt="" className="absolute top-2 right-2 h-6 w-6 rounded opacity-40" />
 
-          {used && (
+          {(used || expired) && (
             <div
               className="absolute inset-0 z-20 flex items-center justify-center"
               style={{ background: 'rgba(15,23,42,0.72)' }}
             >
               <span
                 className="rotate-[-12deg] rounded-lg px-3 py-1.5 text-sm font-extrabold uppercase tracking-wider"
-                style={{
-                  color: '#fca5a5',
-                  border: '2px solid #f87171',
-                  background: 'rgba(127,29,29,0.5)',
-                }}
+                style={
+                  used
+                    ? {
+                        color: '#fca5a5',
+                        border: '2px solid #f87171',
+                        background: 'rgba(127,29,29,0.5)',
+                      }
+                    : {
+                        color: '#fcd34d',
+                        border: '2px solid #f59e0b',
+                        background: 'rgba(120,53,15,0.55)',
+                      }
+                }
               >
-                Checked in
+                {used ? 'Checked in' : 'Expired'}
               </span>
             </div>
           )}
@@ -260,3 +271,4 @@ export default function EventTicket({
     </div>
   );
 }
+
