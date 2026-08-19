@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import Link from 'next/link';
 
 export default function Footer() {
@@ -11,7 +11,7 @@ export default function Footer() {
             <Link href="/" className="flex items-center gap-2 mb-3">
               <img src="/logo-badge.png" alt="TicketHub" className="h-10 w-10" />
               <span className="font-serif text-xl font-bold tracking-tight">
-                <span className="text-slate-200">Ticket</span><span className="text-amber-400">Hub</span>
+                <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent font-bold">TicketHub</span>
               </span>
             </Link>
             <p className="text-sm text-slate-400 leading-relaxed">
