@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from 'react';
 import Link from 'next/link';
@@ -61,7 +61,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
                   <Link href="/admin/dashboard" className={getLinkClass('/admin/dashboard')}>Admin</Link>
                   <Link href="/admin/organizers" className={getLinkClass('/admin/organizers')}>Organizers</Link>
                   <Link href="/admin/events" className={getLinkClass('/admin/events')}>All Events</Link>
-                  <Link href="/admin/orders" className={getLinkClass('/admin/orders')}>Orders</Link>
+                  <Link href="/admin/orders" className={getLinkClass('/admin/orders')}>Orders</Link>`r`n                  <Link href="/admin/audit" className={getLinkClass('/admin/audit')}>Audit</Link>`r`n                  <Link href="/admin/orders" className={getLinkClass('/admin/orders')}>Orders</Link>
                   <Link href="/admin/audit" className={getLinkClass('/admin/audit')}>Audit</Link>
                   <Link href="/admin/payouts" className={getLinkClass('/admin/payouts')}>Payouts</Link>
                   <Link href="/attendee/dashboard" className={getLinkClass('/attendee/dashboard')}>My Tickets</Link>
@@ -135,7 +135,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
                 {isLoggedIn ? (
                   <p className="text-xs text-slate-400 truncate mt-0.5">
                     {roleLabel && <span className="text-cyan-400/90 font-semibold">{roleLabel}</span>}
-                    {roleLabel && userEmail ? ' Â· ' : ''}
+                    {roleLabel && userEmail ? ' ┬╖ ' : ''}
                     {userEmail}
                   </p>
                 ) : (
@@ -157,8 +157,6 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
                     <Link href="/admin/dashboard" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/admin/dashboard')}>Admin</Link>
                     <Link href="/admin/organizers" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/admin/organizers')}>Organizers</Link>
                     <Link href="/admin/events" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/admin/events')}>All Events</Link>
-                    <Link href="/admin/orders" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/admin/orders')}>Orders</Link>
-                    <Link href="/admin/audit" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/admin/audit')}>Audit</Link>
                     <Link href="/admin/payouts" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/admin/payouts')}>Payouts</Link>
                   </>
                 )}
@@ -213,3 +211,6 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
     </header>
   );
 }
+
+
+

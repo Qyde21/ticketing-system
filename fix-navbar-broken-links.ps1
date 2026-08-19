@@ -1,3 +1,23 @@
+# Run this from your project root
+# Usage: powershell -ExecutionPolicy Bypass -File fix-navbar-broken-links.ps1
+#
+# app/components/NavbarShell.tsx had two bugs from whatever added the
+# admin Orders/Audit links: literal `r`n` text embedded directly in the
+# JSX (rendering as visible text between the nav links - this is what
+# you saw on the page), and the Orders/Audit links duplicated back-to-back
+# in the desktop nav.
+#
+# Fixed: removed the stray `r`n` text and the duplicate copies (desktop
+# now has exactly one Orders + one Audit link, matching the one already
+# correctly on mobile navigation). Also added Orders and Audit to the
+# MOBILE admin nav, which was missing them entirely (desktop had them,
+# mobile did not) - a small consistency gap while I was in this file.
+
+$ErrorActionPreference = "Stop"
+$utf8NoBom = New-Object System.Text.UTF8Encoding $false
+
+$path = "app\components\NavbarShell.tsx"
+$content = @'
 "use client";
 
 import React, { useState } from 'react';
@@ -135,7 +155,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
                 {isLoggedIn ? (
                   <p className="text-xs text-slate-400 truncate mt-0.5">
                     {roleLabel && <span className="text-cyan-400/90 font-semibold">{roleLabel}</span>}
-                    {roleLabel && userEmail ? ' Â· ' : ''}
+                    {roleLabel && userEmail ? ' · ' : ''}
                     {userEmail}
                   </p>
                 ) : (
@@ -212,4 +232,18 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
       )}
     </header>
   );
+}
+
+'@
+[System.IO.File]::WriteAllText($path, $content, $utf8NoBom)
+
+if (-not (Test-Path -LiteralPath $path)) {
+    Write-Host "ERROR: file was not created!" -ForegroundColor Red
+} else {
+    Write-Host "Confirmed on disk." -ForegroundColor Green
+    Write-Host ""
+    Write-Host "Next steps:" -ForegroundColor Green
+    Write-Host "  git add ."
+    Write-Host "  git commit -m ""Fix: remove stray text and duplicate links from admin navbar, add missing mobile Orders/Audit links"""
+    Write-Host "  git push origin main"
 }
