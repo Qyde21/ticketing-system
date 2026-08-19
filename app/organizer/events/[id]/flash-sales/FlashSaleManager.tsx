@@ -78,7 +78,7 @@ export default function FlashSaleManager({ ticketTypes }: { ticketTypes: TicketT
       setTiers((prev) => prev.map((t) => (t.id === ticketTypeId ? { ...t, ...data.ticketType } : t)));
       setEditingId(null);
     } catch (e) {
-      setError('Network error â€” please try again.');
+      setError('Network error — please try again.');
     } finally {
       setLoading(false);
     }
@@ -195,7 +195,7 @@ export default function FlashSaleManager({ ticketTypes }: { ticketTypes: TicketT
                     value={form.cap}
                     onChange={(e) => setForm((f) => ({ ...f, cap: e.target.value }))}
                     className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white"
-                    placeholder="e.g. 20 â€” leave blank for no cap"
+                    placeholder="e.g. 20 — leave blank for no cap"
                   />
                 </div>
                 <button

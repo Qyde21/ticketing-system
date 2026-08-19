@@ -1,4 +1,4 @@
-﻿const faqs = [
+const faqs = [
   {
     q: 'How do I buy a ticket?',
     a: 'Browse events on the homepage, click on an event, fill in your details, and pay via M-Pesa or card. Your ticket will be sent to your email instantly.',

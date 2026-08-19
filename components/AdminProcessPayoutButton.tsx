@@ -24,7 +24,7 @@ export default function AdminProcessPayoutButton({ payoutId }: { payoutId: strin
     <div>
       <button type="button" onClick={() => void run()} disabled={loading}
         className="text-xs bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white px-3 py-1.5 rounded-lg font-semibold">
-        {loading ? 'â€¦' : 'Process transfer'}
+        {loading ? '…' : 'Process transfer'}
       </button>
       {msg && <div className="text-[10px] text-gray-400 mt-1">{msg}</div>}
     </div>

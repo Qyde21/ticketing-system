@@ -1,4 +1,4 @@
--- Ticketing System â€” database schema
+-- Ticketing System — database schema
 --
 -- NOTE: This file was reconstructed by reading every query in the codebase,
 -- since no migrations/schema file was committed to the repo and the app
@@ -28,7 +28,7 @@ CREATE TABLE users (
 
 -- Links a user to one or more OAuth identity providers. Designed to support
 -- multiple providers per user (e.g. Google now, Apple later) without further
--- schema changes â€” provider + provider_user_id together are unique.
+-- schema changes — provider + provider_user_id together are unique.
 CREATE TABLE oauth_accounts (
   id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id          UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,

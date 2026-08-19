@@ -5,7 +5,7 @@ import { Resend } from 'resend';
 
 function getResend() { if (!process.env.RESEND_API_KEY) throw new Error("RESEND_API_KEY is not set"); return new Resend(process.env.RESEND_API_KEY); }
 
-// Escapes text before it's interpolated into an HTML email â€” message body,
+// Escapes text before it's interpolated into an HTML email — message body,
 // names, and event titles are all ultimately user-supplied, so without this
 // a message could inject markup or deceptive links into the recipient's
 // notification email.

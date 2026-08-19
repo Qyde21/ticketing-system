@@ -1,4 +1,4 @@
-﻿import { neon, NeonQueryFunction } from '@neondatabase/serverless';
+import { neon, NeonQueryFunction } from '@neondatabase/serverless';
 
 function createSql(): NeonQueryFunction<false, false> {
   if (!process.env.DATABASE_URL) {

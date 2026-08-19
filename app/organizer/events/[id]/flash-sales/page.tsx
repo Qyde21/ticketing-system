@@ -46,7 +46,7 @@ export default async function FlashSalesPage({ params }: { params: Promise<{ id:
         &larr; Back to dashboard
       </Link>
       <h1 className="text-2xl font-extrabold mt-2 mb-1">Flash Sales</h1>
-      <p className="text-gray-400 text-sm mb-6">{event.title} &middot; Discount a ticket tier for a limited time and/or limited quantity â€” no code needed at checkout.</p>
+      <p className="text-gray-400 text-sm mb-6">{event.title} &middot; Discount a ticket tier for a limited time and/or limited quantity — no code needed at checkout.</p>
 
       <FlashSaleManager ticketTypes={ticketTypes as any} />
     </div>

@@ -8,7 +8,7 @@ const roleRules = [
   { prefix: '/organizer', roles: ['organizer', 'admin'] },
   // Attendees are included here because door staff are regular attendee
   // accounts granted per-event scanning access via the event_staff table.
-  // This middleware only checks broad role â€” the actual per-event check
+  // This middleware only checks broad role — the actual per-event check
   // (is this specific person allowed to scan for this specific event)
   // is enforced properly in /api/checkin, so this stays a coarse gate.
   { prefix: '/scan', roles: ['attendee', 'organizer', 'admin'] },

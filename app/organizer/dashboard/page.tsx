@@ -227,7 +227,7 @@ export default async function OrganizerDashboardPage() {
                     </div>
                     <div>
                       <span className="text-xs text-gray-400 block">Tickets Sold</span>
-                      <span className="text-lg font-extrabold text-emerald-400">{totalTicketsSold} / {totalInventory || 'âˆž'}</span>
+                      <span className="text-lg font-extrabold text-emerald-400">{totalTicketsSold} / {totalInventory || '∞'}</span>
                     </div>
                   </div>
                 </div>

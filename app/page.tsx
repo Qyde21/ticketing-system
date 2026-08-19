@@ -1,4 +1,4 @@
-﻿import EventList from '@/components/EventList';
+import EventList from '@/components/EventList';
 import FlashSaleBadge from '@/components/FlashSaleBadge';
 import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
@@ -115,7 +115,7 @@ export default async function HomePage() {
         </div>
       )}
 
-      {/* Flash sales strip â€” under hero, above Tonight / filters */}
+      {/* Flash sales strip — under hero, above Tonight / filters */}
       {flashSaleEvents.length > 0 && (
         <div style={{ maxWidth: 1000, margin: '0 auto 20px', padding: '0 1rem' }}>
           <div
@@ -136,7 +136,7 @@ export default async function HomePage() {
                 Flash sales on now
               </p>
               <p style={{ margin: '4px 0 0', color: '#d1d5db', fontSize: 13 }}>
-                {flashSaleEvents.map((e: any) => e.title).join(' Â· ')}
+                {flashSaleEvents.map((e: any) => e.title).join(' · ')}
               </p>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
@@ -154,7 +154,7 @@ export default async function HomePage() {
                     fontWeight: 700,
                   }}
                 >
-                  {(e.title.length > 28 ? e.title.slice(0, 28) + 'â€¦' : e.title) + ' â†’'}
+                  {(e.title.length > 28 ? e.title.slice(0, 28) + '…' : e.title) + ' →'}
                 </Link>
               ))}
             </div>

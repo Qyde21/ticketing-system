@@ -56,7 +56,7 @@ export default function PayoutAccountForm() {
       <h2 className="text-lg font-bold text-white mb-1">Payout destination</h2>
       <p className="text-sm text-gray-400 mb-4">
         Net earnings (after 10% fee) are paid via Paystack, usually ~48h after the event ends.
-        {ready && <span className="text-emerald-400 font-semibold"> Â· Account ready</span>}
+        {ready && <span className="text-emerald-400 font-semibold"> · Account ready</span>}
       </p>
       <form onSubmit={save} className="space-y-3">
         <div className="flex gap-2">
@@ -90,7 +90,7 @@ export default function PayoutAccountForm() {
         {msg && <p className="text-emerald-400 text-sm">{msg}</p>}
         <button type="submit" disabled={loading}
           className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold py-3 rounded-xl text-sm">
-          {loading ? 'Savingâ€¦' : ready ? 'Update payout account' : 'Save payout account'}
+          {loading ? 'Saving…' : ready ? 'Update payout account' : 'Save payout account'}
         </button>
       </form>
     </div>

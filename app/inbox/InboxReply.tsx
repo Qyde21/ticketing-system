@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useState } from 'react';
 
 export default function InboxReply({ eventId, recipientId, senderName }: { eventId: string; recipientId: string; senderName: string }) {

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Africa's Talking SMS helper.
  * Env: AT_API_KEY, AT_USERNAME, optional AT_FROM, NEXT_PUBLIC_APP_URL
  */

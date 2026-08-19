@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
@@ -41,7 +41,7 @@ function SignupForm() {
         throw new Error(data.error || 'Signup failed');
       }
 
-      // Account is created but not yet usable â€” the API doesn't set a session
+      // Account is created but not yet usable — the API doesn't set a session
       // cookie until the emailed confirmation link is clicked. Show a
       // check-your-email screen instead of sending them to the dashboard.
       setSubmittedEmail(email);
@@ -59,12 +59,12 @@ function SignupForm() {
           <Link href="/" className="flex items-center justify-center gap-2.5 mb-6">
             <img src="/logo-badge.png" alt="TicketHub" className="h-14 w-14" />
             <span className="font-serif text-2xl font-bold tracking-tight">
-              <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent font-bold">TicketHub</span>
+              <span className="text-slate-200">Ticket</span><span className="text-amber-400">Hub</span>
             </span>
           </Link>
           <div className="bg-slate-900 py-8 px-6 shadow sm:rounded-lg border border-slate-800">
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-900/50 border border-emerald-700 mb-4">
-              <span className="text-2xl">âœ‰ï¸</span>
+              <span className="text-2xl">✉️</span>
             </div>
             <h2 className="text-xl font-bold text-white mb-2">Check your email</h2>
             <p className="text-sm text-slate-400">
@@ -91,7 +91,7 @@ function SignupForm() {
           <Link href="/" className="flex items-center gap-2.5">
             <img src="/logo-badge.png" alt="TicketHub" className="h-14 w-14" />
             <span className="font-serif text-2xl font-bold tracking-tight">
-              <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent font-bold">TicketHub</span>
+              <span className="text-slate-200">Ticket</span><span className="text-amber-400">Hub</span>
             </span>
           </Link>
         </div>
@@ -194,7 +194,7 @@ function SignupForm() {
                 value={password}
                 onChange={setPassword}
                 required
-                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                placeholder="••••••••"
                 className="mt-1 block w-full rounded-md bg-slate-950 border border-slate-800 px-3 py-2 text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-sm"
                 autoComplete="new-password"
               />

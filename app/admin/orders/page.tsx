@@ -1,4 +1,4 @@
-﻿import { sql } from '@/lib/db';
+import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';

@@ -41,7 +41,7 @@ export default function RequestPayoutButton({
       <button type="button" disabled={loading || Boolean(disabledReason) || netKes < 50}
         onClick={() => void request()}
         className="text-xs font-bold px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white">
-        {loading ? 'â€¦' : 'Request payout'}
+        {loading ? '…' : 'Request payout'}
       </button>
       {disabledReason && <div className="text-[10px] text-gray-500 mt-1">{disabledReason}</div>}
       {msg && <div className="text-[10px] text-emerald-400 mt-1">{msg}</div>}

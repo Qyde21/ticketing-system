@@ -1,4 +1,5 @@
 'use client';
+
 import { useState } from 'react';
 
 interface PasswordInputProps {
@@ -33,8 +34,9 @@ export default function PasswordInput({
       />
       <button
         type="button"
-        onClick={() => setVisible((v) => !v)}
         tabIndex={-1}
+        onMouseDown={(e) => e.preventDefault()}
+        onClick={() => setVisible((v) => !v)}
         className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 transition"
         aria-label={visible ? 'Hide password' : 'Show password'}
       >

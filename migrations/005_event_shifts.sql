@@ -1,4 +1,4 @@
-﻿-- Phase 1: door staff shift windows + assignments
+-- Phase 1: door staff shift windows + assignments
 CREATE TABLE IF NOT EXISTS event_shifts (
   id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   event_id      UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,

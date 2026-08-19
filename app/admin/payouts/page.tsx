@@ -55,7 +55,7 @@ export default async function AdminPayoutsPage() {
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition"
         >
-          Paystack dashboard â†’ Transfers
+          Paystack dashboard → Transfers
         </a>
         <a
           href="https://dashboard.paystack.com/#/transfers/recipients"
@@ -90,8 +90,8 @@ export default async function AdminPayoutsPage() {
               <div>
                 <div className="font-semibold text-sm">{p.event_title as string}</div>
                 <div className="text-xs text-gray-500">
-                  {p.full_name as string} Â· {p.email as string} Â· {p.status as string}
-                  {p.failure_reason ? ` Â· ${p.failure_reason}` : ''}
+                  {p.full_name as string} · {p.email as string} · {p.status as string}
+                  {p.failure_reason ? ` · ${p.failure_reason}` : ''}
                 </div>
               </div>
               <div className="flex items-center gap-3">

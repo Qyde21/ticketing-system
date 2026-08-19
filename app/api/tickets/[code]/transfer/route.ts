@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { sendTicketTransferredToNewHolderEmail, sendTicketTransferConfirmationEmail } from '@/lib/email';

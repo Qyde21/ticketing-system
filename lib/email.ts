@@ -380,3 +380,52 @@ export async function sendShiftReminderEmail(params: {
     `,
   });
 }
+export async function sendLoginOtpEmail(params: {
+  toEmail: string;
+  fullName?: string;
+  code: string;
+}) {
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const name = params.fullName || 'there';
+  await resend.emails.send({
+    from: 'TicketHub <noreply@mytickethub.co.ke>',
+    to: params.toEmail,
+    subject: `${params.code} is your TicketHub login code`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+        <h2>Your login code</h2>
+        <p>Hi ${name},</p>
+        <p>Use this code to finish signing in to TicketHub:</p>
+        <p style="font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #4f46e5;">${params.code}</p>
+        <p>This code expires in <strong>10 minutes</strong>. If you did not try to log in, you can ignore this email.</p>
+        <p style="color: #888; font-size: 12px; margin-top: 24px;">Sent by TicketHub</p>
+      </div>
+    `,
+  });
+}
+
+export async function sendTicketsMagicLinkEmail(params: {
+  toEmail: string;
+  magicUrl: string;
+}) {
+  const resend = getResend();
+  await resend.emails.send({
+    from: 'TicketHub <noreply@mytickethub.co.ke>',
+    to: params.toEmail,
+    subject: 'Your TicketHub tickets — secure link',
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+        <h2>View your tickets</h2>
+        <p>Use this secure link to open your TicketHub tickets. It expires in <strong>1 hour</strong>.</p>
+        <p style="margin: 24px 0;">
+          <a href="${params.magicUrl}"
+             style="background: #4f46e5; color: #fff; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: 700;">
+            Open my tickets
+          </a>
+        </p>
+        <p style="color: #6b7280; font-size: 13px;">If you did not request this, you can ignore this email.</p>
+        <p style="color: #9ca3af; font-size: 12px; word-break: break-all;">${params.magicUrl}</p>
+      </div>
+    `,
+  });
+}

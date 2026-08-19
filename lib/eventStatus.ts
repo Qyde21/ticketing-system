@@ -1,4 +1,4 @@
-﻿/**
+/**
  * True when the event is no longer eligible for refunds / new sales.
  * Prefer end_at; if missing, fall back to start_at. Completed/cancelled always closed.
  */

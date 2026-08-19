@@ -325,16 +325,27 @@ export default function Scanner({
   useEffect(() => {
     let mounted = true;
     import('html5-qrcode')
-      .then(({ Html5QrcodeScanner }) => {
+      .then(({ Html5QrcodeScanner, Html5QrcodeSupportedFormats }) => {
         if (!mounted) return;
+        const formatsToSupport = [
+          Html5QrcodeSupportedFormats.QR_CODE,
+          Html5QrcodeSupportedFormats.CODE_128,
+          Html5QrcodeSupportedFormats.CODE_39,
+          Html5QrcodeSupportedFormats.CODE_93,
+          Html5QrcodeSupportedFormats.CODABAR,
+          Html5QrcodeSupportedFormats.EAN_13,
+          Html5QrcodeSupportedFormats.EAN_8,
+          Html5QrcodeSupportedFormats.UPC_A,
+          Html5QrcodeSupportedFormats.UPC_E,
+          Html5QrcodeSupportedFormats.ITF,
+        ];
         const scanner = new Html5QrcodeScanner(
           'reader',
           {
             fps: 10,
-            qrbox: { width: 260, height: 260 },
+            qrbox: { width: 280, height: 140 }, formatsToSupport, showTorchButtonIfSupported: true,
             rememberLastUsedCamera: true,
-            aspectRatio: 1,
-            videoConstraints: { facingMode: { ideal: 'environment' } },
+                        videoConstraints: { facingMode: { ideal: 'environment' } },
           },
           false
         );
@@ -488,3 +499,4 @@ export default function Scanner({
     </div>
   );
 }
+

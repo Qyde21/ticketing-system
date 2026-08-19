@@ -49,7 +49,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2.5 hover:opacity-90 transition shrink-0" onClick={() => setMobileMenuOpen(false)}>
           <img src="/logo-badge.png" alt="TicketHub" className="h-10 w-10 rounded-lg" />
-          <span className="text-lg sm:text-xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">TicketHub</span>
+          <span className="font-serif text-lg sm:text-xl font-bold tracking-tight"><span className="text-slate-200">Ticket</span><span className="text-amber-400">Hub</span></span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
@@ -96,6 +96,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
               <Link href="/" className={getLinkClass('/')}>Events</Link>
               <Link href="/signup?role=attendee" className={getLinkClass('/signup?role=attendee')}>Get Ticket</Link>
               <Link href="/signup?role=organizer" className={getLinkClass('/signup?role=organizer')}>Sell Tickets</Link>
+              <Link href="/my-tickets" className={getLinkClass('/my-tickets')}>My tickets</Link>
               <Link href="/login" className={getLinkClass('/login')}>Sign in</Link>
               <Link href="/signup" className="bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white px-4 py-2 rounded-lg font-semibold transition shadow-sm">
                 Get Started
@@ -131,11 +132,11 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
             <div className="flex items-center gap-3 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-900/40 border border-slate-800 p-3.5 mb-3">
               <img src="/logo-badge.png" alt="" className="h-11 w-11 rounded-xl shadow-lg shadow-indigo-950/50" />
               <div className="min-w-0 flex-1">
-                <p className="font-extrabold text-base leading-tight bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">TicketHub</p>
+                <p className="font-serif font-extrabold text-base leading-tight"><span className="text-slate-200">Ticket</span><span className="text-amber-400">Hub</span></p>
                 {isLoggedIn ? (
                   <p className="text-xs text-slate-400 truncate mt-0.5">
                     {roleLabel && <span className="text-cyan-400/90 font-semibold">{roleLabel}</span>}
-                    {roleLabel && userEmail ? ' Â· ' : ''}
+                    {roleLabel && userEmail ? ' · ' : ''}
                     {userEmail}
                   </p>
                 ) : (
@@ -197,6 +198,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
                 <Link href="/" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/')}>Events</Link>
                 <Link href="/signup?role=attendee" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/signup?role=attendee')}>Get Ticket</Link>
                 <Link href="/signup?role=organizer" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/signup?role=organizer')}>Sell Tickets</Link>
+                <Link href="/my-tickets" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/my-tickets')}>My tickets</Link>
                 <Link href="/login" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/login')}>Sign in</Link>
                 <Link
                   href="/signup"

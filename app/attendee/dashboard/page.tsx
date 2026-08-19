@@ -1,4 +1,4 @@
-﻿import { sql } from '@/lib/db';
+import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import Link from 'next/link';
 import ShareTicket from './ShareTicket';
@@ -124,7 +124,7 @@ export default async function AttendeeDashboard() {
                     <p className="font-semibold text-white text-sm">{e.title}</p>
                     <p className="text-gray-500 text-xs">
                       {e.venue_name}
-                      {e.start_at && ` Â· ${new Date(e.start_at).toLocaleDateString('en-KE', { dateStyle: 'medium' })}`}
+                      {e.start_at && ` · ${new Date(e.start_at).toLocaleDateString('en-KE', { dateStyle: 'medium' })}`}
                     </p>
                   </div>
                   {ended ? (

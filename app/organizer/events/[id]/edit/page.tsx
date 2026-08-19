@@ -1,4 +1,4 @@
-﻿import { sql } from '@/lib/db';
+import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import CoverUpload from './CoverUpload';

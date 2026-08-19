@@ -72,7 +72,7 @@ export default async function PayoutsPage() {
           const ended = new Date(String(e.end_at || e.start_at)).getTime() < Date.now();
           let disabledReason: string | null = null;
           if (existing?.status === 'paid') disabledReason = 'Already paid';
-          else if (existing?.status === 'processing') disabledReason = 'Processingâ€¦';
+          else if (existing?.status === 'processing') disabledReason = 'Processing…';
           else if (!ended) disabledReason = 'Available after event ends';
           else if (c.net < 50) disabledReason = 'Below minimum';
           return (
@@ -80,8 +80,8 @@ export default async function PayoutsPage() {
               <div>
                 <div className="font-semibold text-sm">{e.title as string}</div>
                 <div className="text-xs text-gray-500">
-                  {new Date(String(e.start_at)).toLocaleDateString()} Â· {e.status as string} Â· {Number(e.paid_orders)} paid
-                  {existing && <span className="ml-2 text-indigo-300">Â· payout {existing.status as string}</span>}
+                  {new Date(String(e.start_at)).toLocaleDateString()} · {e.status as string} · {Number(e.paid_orders)} paid
+                  {existing && <span className="ml-2 text-indigo-300">· payout {existing.status as string}</span>}
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -100,7 +100,7 @@ export default async function PayoutsPage() {
         })}
       </ul>
       <p className="text-xs text-gray-500 mt-6">
-        Net = (paid âˆ’ refunded) âˆ’ 10% platform fee. Automatic payouts run ~48 hours after the event ends if your account is saved.
+        Net = (paid − refunded) − 10% platform fee. Automatic payouts run ~48 hours after the event ends if your account is saved.
       </p>
     </div>
   );

@@ -3,7 +3,7 @@ import { Resend } from 'resend';
 
 function getResend() { if (!process.env.RESEND_API_KEY) throw new Error("RESEND_API_KEY is not set"); return new Resend(process.env.RESEND_API_KEY); }
 
-// Escapes user-supplied text before it's interpolated into an HTML email â€”
+// Escapes user-supplied text before it's interpolated into an HTML email —
 // these fields are attacker-controlled input, so without this a submitted
 // name/message could inject markup or deceptive links into the email your
 // support inbox (and the sender's own auto-reply) renders.

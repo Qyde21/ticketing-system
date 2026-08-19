@@ -23,7 +23,10 @@ export async function POST(req: NextRequest) {
 
     const [user] = await sql`SELECT * FROM users WHERE id = ${pending.userId}`;
     if (!user || !user.totp_enabled) {
-      return NextResponse.json({ error: 'Two-factor authentication is not enabled for this account.' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Two-factor authentication is not enabled for this account.' },
+        { status: 400 }
+      );
     }
 
     const allowed = await checkRateLimit({
@@ -46,7 +49,6 @@ export async function POST(req: NextRequest) {
     if (/^\d{6}$/.test(cleanCode)) {
       verified = verifyTotpToken(user.totp_secret, cleanCode);
     } else {
-      // Treat as a backup code
       const codeHash = hashBackupCode(cleanCode);
       const [backupCode] = await sql`
         SELECT id FROM totp_backup_codes
@@ -64,10 +66,16 @@ export async function POST(req: NextRequest) {
     }
 
     if (user.status === 'suspended') {
-      return NextResponse.json({ error: 'This account has been suspended. Contact support for help.' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'This account has been suspended. Contact support for help.' },
+        { status: 403 }
+      );
     }
 
-    await setSessionCookie({ userId: user.id, email: user.email, role: user.role });
+    await setSessionCookie(
+      { userId: user.id, email: user.email, role: user.role },
+      { rememberMe: pending.rememberMe }
+    );
 
     return NextResponse.json({
       user: { id: user.id, email: user.email, fullName: user.full_name, role: user.role },

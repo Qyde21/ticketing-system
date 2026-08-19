@@ -1,4 +1,4 @@
-﻿CREATE TABLE IF NOT EXISTS admin_audit_log (
+CREATE TABLE IF NOT EXISTS admin_audit_log (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   actor_id    UUID REFERENCES users(id) ON DELETE SET NULL,
   action      TEXT NOT NULL,
