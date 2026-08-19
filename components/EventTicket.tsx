@@ -51,6 +51,7 @@ export default function EventTicket({
   const code = String(ticketCode || '').trim();
   const used = status === 'used' || !!checkedInAt;
   const expired = !!isExpired && !used;
+  const expired = !!isExpired && !used;
 
   return (
     <div className="w-full max-w-3xl mx-auto" style={{ aspectRatio: '2.35 / 1', minHeight: 200 }}>
@@ -271,4 +272,5 @@ export default function EventTicket({
     </div>
   );
 }
+
 
