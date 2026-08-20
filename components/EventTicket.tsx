@@ -1,27 +1,34 @@
-﻿'use client';
+'use client';
 
-import React from 'react';
 import TicketBarcode from '@/components/TicketBarcode';
 
-type Props = {
+export type EventTicketProps = {
   eventTitle: string;
-  ticketTypeName?: string | null;
-  venueName?: string | null;
+  ticketTypeName?: string;
+  venueName?: string;
   startAt?: string | Date | null;
   endAt?: string | Date | null;
   holderName?: string | null;
   ticketCode: string;
   qrDataUrl: string;
-  status?: string | null;
+  status?: string;
   isExpired?: boolean;
   checkedInAt?: string | Date | null;
   coverImageUrl?: string | null;
 };
 
-function formatWhen(d?: string | Date | null) {
-  if (!d) return '';
+// TicketHub brand tokens for the physical-ticket treatment.
+const GOLD = '#F2B33D';
+const GOLD_LIGHT = '#F8D98A';
+const INK = '#11141C';
+const PANEL_FROM = '#0B0E14';
+const PANEL_VIA = '#151a26';
+const PANEL_TO = '#1c2233';
+
+function formatWhen(startAt?: string | Date | null) {
+  if (!startAt) return 'Date TBA';
   try {
-    return new Date(d).toLocaleString('en-KE', {
+    return new Date(startAt).toLocaleString('en-KE', {
       weekday: 'short',
       day: 'numeric',
       month: 'short',
@@ -30,8 +37,95 @@ function formatWhen(d?: string | Date | null) {
       minute: '2-digit',
     });
   } catch {
-    return '';
+    return String(startAt);
   }
+}
+
+function CalendarGlyph() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style={{ display: 'inline-block', flexShrink: 0 }}>
+      <rect x="3" y="5" width="18" height="16" rx="2" stroke={GOLD} strokeWidth="1.8" />
+      <path d="M3 10h18M8 3v4M16 3v4" stroke={GOLD} strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function PinGlyph() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style={{ display: 'inline-block', flexShrink: 0 }}>
+      <path
+        d="M12 21s7-6.4 7-11.5A7 7 0 0 0 5 9.5C5 14.6 12 21 12 21Z"
+        stroke={GOLD}
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+      <circle cx="12" cy="9.5" r="2.4" stroke={GOLD} strokeWidth="1.8" />
+    </svg>
+  );
+}
+
+/** Logo seal that straddles the perforation, like a hologram sticker on a physical ticket. */
+function SealBadge() {
+  return (
+    <div
+      className="absolute z-20 flex items-center justify-center rounded-full"
+      style={{
+        left: '100%',
+        top: '50%',
+        width: 36,
+        height: 36,
+        transform: 'translate(-50%, -50%)',
+        boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
+      }}
+      aria-hidden
+    >
+      <img src="/logo-badge.png" alt="" className="h-full w-full rounded-full" />
+    </div>
+  );
+}
+
+/** Faint diagonal security-style watermark, blue-to-cyan, tiled across the ticket panel. */
+function Watermark() {
+  const rows = [0, 1, 2];
+  return (
+    <div
+      className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none"
+      aria-hidden
+      style={{ opacity: 0.1 }}
+    >
+      <div
+        className="absolute flex flex-col justify-around"
+        style={{
+          top: '-40%',
+          left: '-25%',
+          width: '160%',
+          height: '180%',
+          transform: 'rotate(-18deg)',
+        }}
+      >
+        {rows.map((row) => (
+          <div key={row} className="flex whitespace-nowrap gap-10">
+            {[0, 1, 2, 3].map((col) => (
+              <span
+                key={col}
+                className="font-serif font-black uppercase"
+                style={{
+                  fontSize: 34,
+                  letterSpacing: '0.04em',
+                  backgroundImage: 'linear-gradient(90deg, #38bdf8 0%, #22d3ee 100%)',
+                  WebkitBackgroundClip: 'text',
+                  backgroundClip: 'text',
+                  color: 'transparent',
+                }}
+              >
+                TicketHub
+              </span>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export default function EventTicket({
@@ -39,131 +133,93 @@ export default function EventTicket({
   ticketTypeName,
   venueName,
   startAt,
-  endAt,
   holderName,
   ticketCode,
   qrDataUrl,
   status,
-  isExpired,
+  isExpired = false,
   checkedInAt,
   coverImageUrl,
-}: Props) {
+}: EventTicketProps) {
   const code = String(ticketCode || '').trim();
-  const used = status === 'used' || !!checkedInAt;
-  const expired = !!isExpired && !used;
-  const expired = !!isExpired && !used;
+  const isUsed = status === 'used' || status === 'checked_in';
+  const isDimmed = isUsed || isExpired;
+  const poster =
+    coverImageUrl && String(coverImageUrl).trim()
+      ? String(coverImageUrl).trim()
+      : null;
 
   return (
-    <div className="w-full max-w-3xl mx-auto" style={{ aspectRatio: '2.35 / 1', minHeight: 200 }}>
-      <div
-        className="relative flex h-full w-full overflow-hidden rounded-2xl border shadow-2xl"
-        style={{
-          borderColor: 'rgba(99, 102, 241, 0.45)',
-          background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 45%, #0f172a 100%)',
-          boxShadow: '0 0 0 1px rgba(34, 211, 238, 0.12), 0 20px 50px rgba(0,0,0,0.45)',
-        }}
-      >
-        <div className="relative flex-[1.35] min-w-0 overflow-hidden">
-          {coverImageUrl ? (
-            <>
-              <img src={coverImageUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
-              <div
-                className="absolute inset-0"
-                style={{
-                  background:
-                    'linear-gradient(90deg, rgba(15,23,42,0.94) 0%, rgba(30,27,75,0.8) 55%, rgba(15,23,42,0.6) 100%)',
-                }}
-              />
-            </>
-          ) : (
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  'radial-gradient(ellipse at 20% 30%, rgba(99,102,241,0.35), transparent 55%), radial-gradient(ellipse at 80% 70%, rgba(34,211,238,0.2), transparent 50%)',
-              }}
-            />
-          )}
+    <div className="w-full flex flex-col items-center gap-3">
+      <p className="text-[11px] text-gray-500 sm:hidden text-center px-2">
+        Tip: rotate your phone for the largest view
+      </p>
 
-          {/* Watermark */}
-          <div
-            className="pointer-events-none absolute inset-0 z-[1] flex items-center justify-center overflow-hidden"
-            aria-hidden
-          >
-            <img
-              src="/logo-badge.png"
-              alt=""
-              className="absolute"
-              style={{
-                width: '42%',
-                maxWidth: 180,
-                opacity: 0.12,
-                filter: 'grayscale(20%)',
-                transform: 'rotate(-18deg)',
-              }}
-            />
-            <span
-              className="absolute font-extrabold select-none"
-              style={{
-                fontSize: 'clamp(2.5rem, 9vw, 4.5rem)',
-                letterSpacing: '-0.02em',
-                background: 'linear-gradient(120deg, rgba(129,140,248,0.22), rgba(34,211,238,0.18))',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                transform: 'rotate(-12deg)',
-                whiteSpace: 'nowrap',
-                userSelect: 'none',
-              }}
-            >
-              TicketHub
-            </span>
-          </div>
-
-          <div className="relative z-10 flex h-full flex-col justify-between p-4 sm:p-5">
-            <div>
-              <div className="flex items-center gap-2 mb-2.5">
+      <div className="w-full max-w-[920px] mx-auto">
+        <div
+          className={'relative flex w-full overflow-hidden rounded-2xl shadow-2xl ' + (isDimmed ? 'opacity-90' : '')}
+          style={{
+            aspectRatio: '2.35 / 1',
+            minHeight: 160,
+            background: `linear-gradient(135deg, ${PANEL_FROM} 0%, ${PANEL_VIA} 55%, ${PANEL_TO} 100%)`,
+            boxShadow: '0 20px 50px rgba(0,0,0,0.45), 0 0 0 1px rgba(242,179,61,0.12)',
+          }}
+        >
+          <div className="relative flex flex-[1.55] flex-col justify-between p-3 sm:p-5 md:p-6 text-left min-w-0 overflow-hidden">
+            {poster && (
+              <>
                 <img
-                  src="/logo-badge.png"
-                  alt="TicketHub"
-                  className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg shadow-md"
-                  style={{ boxShadow: '0 4px 14px rgba(99,102,241,0.35)' }}
+                  src={poster}
+                  alt=""
+                  aria-hidden
+                  className="absolute inset-0 h-full w-full object-cover"
                 />
-                <div>
-                  <p
-                    className="text-sm sm:text-base font-extrabold leading-tight"
-                    style={{
-                      background: 'linear-gradient(90deg, #818cf8, #22d3ee)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                    }}
-                  >
-                    TicketHub
-                  </p>
-                  <p
-                    className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.18em]"
-                    style={{ color: 'rgba(165,180,252,0.85)' }}
-                  >
-                    Official ticket
-                  </p>
-                </div>
-              </div>
+                <div
+                  aria-hidden
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      'linear-gradient(105deg, rgba(6,8,13,0.94) 0%, rgba(15,18,28,0.84) 45%, rgba(28,34,51,0.7) 100%)',
+                  }}
+                />
+              </>
+            )}
 
+            <Watermark />
+
+            <div className="relative z-10">
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <img src="/logo-badge.png" alt="" className="h-4 w-4 sm:h-5 sm:w-5 rounded-full flex-shrink-0" />
+                <span
+                  className="font-serif font-bold uppercase tracking-[0.15em]"
+                  style={{ fontSize: 'clamp(9px, 1.6vw, 11px)' }}
+                >
+                  <span className="text-slate-200">Ticket</span>
+                  <span style={{ color: GOLD }}>Hub</span>
+                </span>
+                <span className="text-slate-500" style={{ fontSize: 'clamp(9px, 1.6vw, 11px)' }}>
+                  · Official ticket
+                </span>
+              </div>
               <h2
-                className="font-extrabold leading-tight text-white"
+                className="font-serif font-black leading-[1.08] text-white line-clamp-2"
                 style={{
-                  fontSize: 'clamp(1rem, 2.8vw, 1.45rem)',
-                  textShadow: '0 2px 12px rgba(0,0,0,0.55)',
+                  fontSize: 'clamp(1rem, 3.8vw, 1.85rem)',
+                  letterSpacing: '-0.01em',
+                  textShadow: '0 2px 14px rgba(0,0,0,0.55)',
                 }}
               >
-                {eventTitle || 'Event'}
+                {eventTitle}
               </h2>
               {ticketTypeName && (
                 <span
-                  className="inline-block mt-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
+                  className="inline-block mt-2 font-bold uppercase tracking-wider rounded-full"
                   style={{
-                    background: 'linear-gradient(90deg, rgba(99,102,241,0.4), rgba(34,211,238,0.28))',
-                    border: '1px solid rgba(129,140,248,0.55)',
-                    color: '#c7d2fe',
+                    color: GOLD_LIGHT,
+                    border: `1px solid rgba(242,179,61,0.5)`,
+                    background: 'rgba(242,179,61,0.08)',
+                    fontSize: 'clamp(0.55rem, 1.5vw, 0.7rem)',
+                    padding: '0.15rem 0.6rem',
                   }}
                 >
                   {ticketTypeName}
@@ -171,106 +227,98 @@ export default function EventTicket({
               )}
             </div>
 
-            <div className="space-y-1.5 mt-3">
-              {venueName && (
-                <p className="text-xs sm:text-sm font-semibold" style={{ color: '#67e8f9' }}>
-                  📍 {venueName}
-                </p>
-              )}
-              {startAt && (
-                <p className="text-xs sm:text-sm font-medium" style={{ color: '#c7d2fe' }}>
-                  <span style={{ color: '#818cf8' }}>🗓 </span>
-                  {formatWhen(startAt)}
-                  {endAt ? ` – ${formatWhen(endAt)}` : ''}
-                </p>
-              )}
-              {holderName && (
-                <p className="text-xs sm:text-sm" style={{ color: '#e0e7ff' }}>
-                  <span className="font-semibold" style={{ color: '#a5b4fc' }}>Guest: </span>
-                  {holderName}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div
-          className="relative flex w-3 flex-col items-center justify-between py-3 shrink-0"
-          style={{
-            background: 'linear-gradient(180deg, #1e1b4b, #0f172a)',
-            borderLeft: '1px dashed rgba(129,140,248,0.35)',
-            borderRight: '1px dashed rgba(34,211,238,0.25)',
-          }}
-        >
-          {[0, 1, 2, 3, 4, 5].map((i) => (
-            <span
-              key={i}
-              className="w-2 h-2 rounded-full"
-              style={{
-                background: 'rgba(15,23,42,0.9)',
-                boxShadow: 'inset 0 0 0 1px rgba(99,102,241,0.4)',
-              }}
-            />
-          ))}
-        </div>
-
-        <div
-          className="relative flex w-[38%] min-w-[140px] max-w-[220px] flex-col items-center justify-center gap-2 p-3 sm:p-4"
-          style={{
-            background: 'linear-gradient(180deg, #f8fafc 0%, #eef2ff 50%, #ecfeff 100%)',
-          }}
-        >
-          <img src="/logo-badge.png" alt="" className="absolute top-2 right-2 h-6 w-6 rounded opacity-40" />
-
-          {(used || expired) && (
-            <div
-              className="absolute inset-0 z-20 flex items-center justify-center"
-              style={{ background: 'rgba(15,23,42,0.72)' }}
-            >
-              <span
-                className="rotate-[-12deg] rounded-lg px-3 py-1.5 text-sm font-extrabold uppercase tracking-wider"
-                style={
-                  used
-                    ? {
-                        color: '#fca5a5',
-                        border: '2px solid #f87171',
-                        background: 'rgba(127,29,29,0.5)',
-                      }
-                    : {
-                        color: '#fcd34d',
-                        border: '2px solid #f59e0b',
-                        background: 'rgba(120,53,15,0.55)',
-                      }
-                }
+            <div className="relative z-10 mt-2 space-y-1.5 min-w-0">
+              <p
+                className="text-white/95 font-medium truncate flex items-center gap-1.5"
+                style={{ fontSize: 'clamp(0.65rem, 1.8vw, 0.85rem)' }}
               >
-                {used ? 'Checked in' : 'Expired'}
-              </span>
+                <CalendarGlyph />
+                {formatWhen(startAt)}
+              </p>
+              <p
+                className="text-white/90 truncate flex items-center gap-1.5"
+                style={{ fontSize: 'clamp(0.65rem, 1.8vw, 0.85rem)' }}
+              >
+                <PinGlyph />
+                {venueName || 'Venue TBA'}
+              </p>
+
+              <div className="flex items-center gap-2 flex-wrap pt-1.5" style={{ borderTop: '1px solid rgba(242,179,61,0.18)' }}>
+                {holderName && (
+                  <span className="text-white/70 truncate" style={{ fontSize: 'clamp(0.6rem, 1.6vw, 0.78rem)' }}>
+                    {holderName}
+                  </span>
+                )}
+                <span
+                  className="font-mono truncate rounded"
+                  style={{
+                    color: GOLD_LIGHT,
+                    fontSize: 'clamp(0.58rem, 1.6vw, 0.76rem)',
+                    fontWeight: 700,
+                    letterSpacing: '0.12em',
+                    border: '1px solid rgba(242,179,61,0.3)',
+                    background: 'rgba(0,0,0,0.25)',
+                    padding: '0.1rem 0.45rem',
+                  }}
+                >
+                  {code}
+                </span>
+              </div>
             </div>
-          )}
-
-          <img
-            src={qrDataUrl}
-            alt={'QR ' + code}
-            width={120}
-            height={120}
-            className="rounded-lg border border-indigo-200 shadow-sm"
-            style={{ width: 'min(120px, 28vw)', height: 'auto', aspectRatio: '1' }}
-          />
-          <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest" style={{ color: '#6366f1' }}>
-            Scan at door
-          </p>
-
-          <div className="w-full max-w-[160px]">
-            <TicketBarcode value={code} height={48} />
           </div>
 
-          <p className="font-mono text-[10px] sm:text-xs font-bold tracking-widest" style={{ color: '#4338ca' }}>
-            {code}
-          </p>
+          <div className="relative z-10 flex w-3 sm:w-4 flex-shrink-0 flex-col items-center justify-between py-2" aria-hidden>
+            <div
+              className="absolute inset-y-0 left-1/2 w-0 -translate-x-1/2 border-l border-dashed"
+              style={{ borderColor: 'rgba(242,179,61,0.5)' }}
+            />
+            <div className="relative z-10 h-3 w-3 sm:h-4 sm:w-4 rounded-full" style={{ background: INK, marginTop: -6 }} />
+            <SealBadge />
+            <div className="relative z-10 h-3 w-3 sm:h-4 sm:w-4 rounded-full" style={{ background: INK, marginBottom: -6 }} />
+          </div>
+
+          <div
+            className="relative flex flex-1 flex-col items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 min-w-0"
+            style={{ background: 'linear-gradient(180deg, #FBF8F1 0%, #F3EEDF 100%)' }}
+          >
+            <p
+              className="font-bold uppercase tracking-[0.15em] text-center"
+              style={{ color: '#8a6a1f', fontSize: 'clamp(0.55rem, 1.5vw, 0.75rem)' }}
+            >
+              Scan at door
+            </p>
+            <div className="rounded-lg sm:rounded-xl border-2 p-1 sm:p-1.5 bg-white" style={{ borderColor: GOLD }}>
+              <img
+                src={qrDataUrl}
+                alt={'QR ' + code}
+                className="block"
+                style={{ width: 'clamp(72px, 18vw, 128px)', height: 'clamp(72px, 18vw, 128px)' }}
+              />
+            </div>
+            <div className="w-full max-w-[140px] sm:max-w-[160px] opacity-90 hidden sm:block">
+              <TicketBarcode value={code} height={36} />
+            </div>
+            {isUsed && (
+              <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'rgba(127,29,29,0.85)' }}>
+                <div className="text-center px-2">
+                  <p className="text-white font-extrabold text-sm sm:text-base">Already scanned</p>
+                  {checkedInAt && (
+                    <p className="text-red-100 text-[10px] sm:text-xs mt-1">{new Date(checkedInAt).toLocaleString()}</p>
+                  )}
+                </div>
+              </div>
+            )}
+            {!isUsed && isExpired && (
+              <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'rgba(28,34,51,0.88)' }}>
+                <div className="text-center px-2">
+                  <p className="text-white font-extrabold text-sm sm:text-base">Expired</p>
+                  <p className="text-gray-200 text-[10px] sm:text-xs mt-1">Event has ended</p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
   );
 }
-
-
