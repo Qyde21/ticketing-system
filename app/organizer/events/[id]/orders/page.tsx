@@ -74,9 +74,17 @@ export default async function EventOrdersPage({ params }: { params: Promise<{ id
             )}
           </p>
         </div>
-        <Link href="/organizer/dashboard" className="text-sm text-indigo-400 hover:underline shrink-0">
-          &larr; Dashboard
-        </Link>
+        <div className="flex items-center gap-4 shrink-0">
+          <a
+            href={`/api/events/${event.id}/orders/export`}
+            className="inline-flex items-center gap-1.5 bg-gray-800 hover:bg-gray-700 text-white text-xs font-semibold px-3 py-2 rounded-lg border border-gray-700 transition"
+          >
+            Export CSV
+          </a>
+          <Link href="/organizer/dashboard" className="text-sm text-indigo-400 hover:underline">
+            &larr; Dashboard
+          </Link>
+        </div>
       </div>
 
       {orders.length === 0 ? (

@@ -140,11 +140,13 @@ CREATE TABLE orders (
   promo_code_id       UUID REFERENCES promo_codes(id),
   discount_amount_kes NUMERIC NOT NULL DEFAULT 0,
   payment_status      TEXT NOT NULL DEFAULT 'pending' CHECK (payment_status IN ('pending', 'paid', 'refunded', 'expired')),
-  paystack_reference  TEXT UNIQUE,
+  paystack_reference  TEXT,
   is_flash_sale       BOOLEAN NOT NULL DEFAULT false,
   reminder_sent_at     TIMESTAMPTZ,
   created_at          TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+CREATE INDEX IF NOT EXISTS idx_orders_paystack_reference ON orders (paystack_reference);
 
 CREATE TABLE tickets (
   id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
