@@ -1,5 +1,6 @@
 import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
+import { writeAuditLog } from '@/lib/audit';
 import { NextResponse } from 'next/server';
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -15,6 +16,15 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     const current = users[0]?.status === 'suspended' ? 'active' : 'suspended';
 
     await sql`UPDATE users SET status = ${current} WHERE id = ${id}`;
+
+    await writeAuditLog({
+      actorId: session.userId,
+      action: 'organizer.toggle_status',
+      entityType: 'user',
+      entityId: id,
+      meta: { newStatus: current },
+    });
+
     return NextResponse.json({ success: true, status: current });
   } catch (err) {
     return NextResponse.json({ error: 'Failed to update' }, { status: 500 });

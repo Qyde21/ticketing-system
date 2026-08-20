@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
+import { writeAuditLog } from '@/lib/audit';
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
@@ -20,6 +21,13 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     if (!profile) {
       return NextResponse.json({ error: 'Organizer profile not found' }, { status: 404 });
     }
+
+    await writeAuditLog({
+      actorId: session.userId,
+      action: 'organizer.approve',
+      entityType: 'user',
+      entityId: id,
+    });
 
     return NextResponse.json({ success: true, profile });
   } catch (err) {

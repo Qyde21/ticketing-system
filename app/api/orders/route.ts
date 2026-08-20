@@ -3,6 +3,7 @@ import { sql } from '@/lib/db';
 import { nanoid } from 'nanoid';
 import { finalizePaidOrder } from '@/lib/tickets';
 import { validatePromoCode } from '@/lib/promoCodes';
+import { checkRateLimit, recordAttempt, getClientIp } from '@/lib/rateLimit';
 
 type CartItem = { ticketTypeId: string; quantity: number };
 
@@ -111,6 +112,26 @@ export async function POST(req: NextRequest) {
     if (!buyerName || !buyerEmail || !buyerPhone) {
       return NextResponse.json({ error: 'Missing required fields', received: body }, { status: 400 });
     }
+
+    // Rate limit by buyer email and IP before any reservation work begins —
+    // this protects ticket inventory from being locked up by repeated
+    // automated checkout attempts, the same protection already applied to
+    // login, signup, and forgot-password.
+    const ip = getClientIp(req);
+    const rateLimitOk = await checkRateLimit({
+      type: 'checkout',
+      email: String(buyerEmail),
+      ip,
+      maxAttempts: 8,
+      windowMinutes: 15,
+    });
+    if (!rateLimitOk) {
+      return NextResponse.json(
+        { error: 'Too many checkout attempts. Please wait a few minutes and try again.' },
+        { status: 429 }
+      );
+    }
+    await recordAttempt('checkout', String(buyerEmail), ip);
 
     let items: CartItem[] = [];
     if (Array.isArray(body.items) && body.items.length > 0) {
