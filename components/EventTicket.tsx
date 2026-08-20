@@ -18,8 +18,8 @@ export type EventTicketProps = {
 };
 
 // TicketHub brand tokens for the physical-ticket treatment.
-const GOLD = '#F2B33D';
-const GOLD_LIGHT = '#F8D98A';
+const ACCENT = '#22d3ee';
+const ACCENT_LIGHT = '#67e8f9';
 const INK = '#11141C';
 const PANEL_FROM = '#0B0E14';
 const PANEL_VIA = '#151a26';
@@ -44,8 +44,8 @@ function formatWhen(startAt?: string | Date | null) {
 function CalendarGlyph() {
   return (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style={{ display: 'inline-block', flexShrink: 0 }}>
-      <rect x="3" y="5" width="18" height="16" rx="2" stroke={GOLD} strokeWidth="1.8" />
-      <path d="M3 10h18M8 3v4M16 3v4" stroke={GOLD} strokeWidth="1.8" strokeLinecap="round" />
+      <rect x="3" y="5" width="18" height="16" rx="2" stroke={ACCENT} strokeWidth="1.8" />
+      <path d="M3 10h18M8 3v4M16 3v4" stroke={ACCENT} strokeWidth="1.8" strokeLinecap="round" />
     </svg>
   );
 }
@@ -55,11 +55,11 @@ function PinGlyph() {
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style={{ display: 'inline-block', flexShrink: 0 }}>
       <path
         d="M12 21s7-6.4 7-11.5A7 7 0 0 0 5 9.5C5 14.6 12 21 12 21Z"
-        stroke={GOLD}
+        stroke={ACCENT}
         strokeWidth="1.8"
         strokeLinejoin="round"
       />
-      <circle cx="12" cy="9.5" r="2.4" stroke={GOLD} strokeWidth="1.8" />
+      <circle cx="12" cy="9.5" r="2.4" stroke={ACCENT} strokeWidth="1.8" />
     </svg>
   );
 }
@@ -162,7 +162,7 @@ export default function EventTicket({
             aspectRatio: '2.35 / 1',
             minHeight: 160,
             background: `linear-gradient(135deg, ${PANEL_FROM} 0%, ${PANEL_VIA} 55%, ${PANEL_TO} 100%)`,
-            boxShadow: '0 20px 50px rgba(0,0,0,0.45), 0 0 0 1px rgba(242,179,61,0.12)',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.45), 0 0 0 1px rgba(34,211,238,0.14)',
           }}
         >
           <div className="relative flex flex-[1.55] flex-col justify-between p-3 sm:p-5 md:p-6 text-left min-w-0 overflow-hidden">
@@ -194,8 +194,7 @@ export default function EventTicket({
                   className="font-serif font-bold uppercase tracking-[0.15em]"
                   style={{ fontSize: 'clamp(9px, 1.6vw, 11px)' }}
                 >
-                  <span className="text-slate-200">Ticket</span>
-                  <span style={{ color: GOLD }}>Hub</span>
+                  <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent font-bold">TicketHub</span>
                 </span>
                 <span className="text-slate-500" style={{ fontSize: 'clamp(9px, 1.6vw, 11px)' }}>
                   · Official ticket
@@ -215,9 +214,9 @@ export default function EventTicket({
                 <span
                   className="inline-block mt-2 font-bold uppercase tracking-wider rounded-full"
                   style={{
-                    color: GOLD_LIGHT,
-                    border: `1px solid rgba(242,179,61,0.5)`,
-                    background: 'rgba(242,179,61,0.08)',
+                    color: ACCENT_LIGHT,
+                    border: `1px solid rgba(34,211,238,0.5)`,
+                    background: 'rgba(34,211,238,0.08)',
                     fontSize: 'clamp(0.55rem, 1.5vw, 0.7rem)',
                     padding: '0.15rem 0.6rem',
                   }}
@@ -243,7 +242,7 @@ export default function EventTicket({
                 {venueName || 'Venue TBA'}
               </p>
 
-              <div className="flex items-center gap-2 flex-wrap pt-1.5" style={{ borderTop: '1px solid rgba(242,179,61,0.18)' }}>
+              <div className="flex items-center gap-2 flex-wrap pt-1.5" style={{ borderTop: '1px solid rgba(34,211,238,0.18)' }}>
                 {holderName && (
                   <span className="text-white/70 truncate" style={{ fontSize: 'clamp(0.6rem, 1.6vw, 0.78rem)' }}>
                     {holderName}
@@ -252,11 +251,11 @@ export default function EventTicket({
                 <span
                   className="font-mono truncate rounded"
                   style={{
-                    color: GOLD_LIGHT,
+                    color: ACCENT_LIGHT,
                     fontSize: 'clamp(0.58rem, 1.6vw, 0.76rem)',
                     fontWeight: 700,
                     letterSpacing: '0.12em',
-                    border: '1px solid rgba(242,179,61,0.3)',
+                    border: '1px solid rgba(34,211,238,0.3)',
                     background: 'rgba(0,0,0,0.25)',
                     padding: '0.1rem 0.45rem',
                   }}
@@ -270,7 +269,7 @@ export default function EventTicket({
           <div className="relative z-10 flex w-3 sm:w-4 flex-shrink-0 flex-col items-center justify-between py-2" aria-hidden>
             <div
               className="absolute inset-y-0 left-1/2 w-0 -translate-x-1/2 border-l border-dashed"
-              style={{ borderColor: 'rgba(242,179,61,0.5)' }}
+              style={{ borderColor: 'rgba(34,211,238,0.5)' }}
             />
             <div className="relative z-10 h-3 w-3 sm:h-4 sm:w-4 rounded-full" style={{ background: INK, marginTop: -6 }} />
             <SealBadge />
@@ -279,15 +278,15 @@ export default function EventTicket({
 
           <div
             className="relative flex flex-1 flex-col items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 min-w-0"
-            style={{ background: 'linear-gradient(180deg, #FBF8F1 0%, #F3EEDF 100%)' }}
+            style={{ background: 'linear-gradient(180deg, #F5F7FF 0%, #E7ECFA 100%)' }}
           >
             <p
               className="font-bold uppercase tracking-[0.15em] text-center"
-              style={{ color: '#8a6a1f', fontSize: 'clamp(0.55rem, 1.5vw, 0.75rem)' }}
+              style={{ color: '#4338ca', fontSize: 'clamp(0.55rem, 1.5vw, 0.75rem)' }}
             >
               Scan at door
             </p>
-            <div className="rounded-lg sm:rounded-xl border-2 p-1 sm:p-1.5 bg-white" style={{ borderColor: GOLD }}>
+            <div className="rounded-lg sm:rounded-xl border-2 p-1 sm:p-1.5 bg-white" style={{ borderColor: ACCENT }}>
               <img
                 src={qrDataUrl}
                 alt={'QR ' + code}
