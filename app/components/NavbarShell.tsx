@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from 'react';
 import Link from 'next/link';
@@ -136,7 +136,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
                 {isLoggedIn ? (
                   <p className="text-xs text-slate-400 truncate mt-0.5">
                     {roleLabel && <span className="text-cyan-400/90 font-semibold">{roleLabel}</span>}
-                    {roleLabel && userEmail ? ' Â· ' : ''}
+                    {roleLabel && userEmail ? ' · ' : ''}
                     {userEmail}
                   </p>
                 ) : (
