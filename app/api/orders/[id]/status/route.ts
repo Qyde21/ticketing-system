@@ -2,6 +2,7 @@
 import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { verifyOrderClaim } from '@/lib/orderClaim';
+import QRCode from 'qrcode';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id: reference } = await params;
@@ -70,21 +71,38 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     `;
   }
 
+  const tickets = await Promise.all(
+    ticketRows.map(async (t) => {
+      let qrDataUrl = '';
+      try {
+        qrDataUrl = await QRCode.toDataURL(String(t.ticket_code), {
+          margin: 1,
+          width: 280,
+          color: { dark: '#000000', light: '#ffffff' },
+        });
+      } catch {
+        qrDataUrl = '';
+      }
+      return {
+        ticketCode: t.ticket_code,
+        holderName: t.holder_name,
+        status: t.status,
+        checkedInAt: t.checked_in_at,
+        ticketTypeName: t.ticket_type_name,
+        eventTitle: t.event_title,
+        venueName: t.venue_name,
+        startAt: t.start_at,
+        endAt: t.end_at,
+        coverImageUrl: t.cover_image_url,
+        qrDataUrl,
+      };
+    })
+  );
+
   return NextResponse.json({
     status: paid,
     ticketCodes: ticketRows.map((t) => t.ticket_code),
-    tickets: ticketRows.map((t) => ({
-      ticketCode: t.ticket_code,
-      holderName: t.holder_name,
-      status: t.status,
-      checkedInAt: t.checked_in_at,
-      ticketTypeName: t.ticket_type_name,
-      eventTitle: t.event_title,
-      venueName: t.venue_name,
-      startAt: t.start_at,
-      endAt: t.end_at,
-      coverImageUrl: t.cover_image_url,
-    })),
+    tickets,
     event: publicEvent,
   });
 }

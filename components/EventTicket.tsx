@@ -1,6 +1,7 @@
-'use client';
+﻿'use client';
 
 import TicketBarcode from '@/components/TicketBarcode';
+import { QRCodeSVG } from 'qrcode.react';
 
 export type EventTicketProps = {
   eventTitle: string;
@@ -10,7 +11,7 @@ export type EventTicketProps = {
   endAt?: string | Date | null;
   holderName?: string | null;
   ticketCode: string;
-  qrDataUrl: string;
+  qrDataUrl?: string | null;
   status?: string;
   isExpired?: boolean;
   checkedInAt?: string | Date | null;
@@ -197,7 +198,7 @@ export default function EventTicket({
                   <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent font-bold">TicketHub</span>
                 </span>
                 <span className="text-slate-500" style={{ fontSize: 'clamp(9px, 1.6vw, 11px)' }}>
-                  · Official ticket
+                  Â· Official ticket
                 </span>
               </div>
               <h2
@@ -287,12 +288,23 @@ export default function EventTicket({
               Scan at door
             </p>
             <div className="rounded-lg sm:rounded-xl border-2 p-1 sm:p-1.5 bg-white" style={{ borderColor: ACCENT }}>
-              <img
-                src={qrDataUrl}
-                alt={'QR ' + code}
-                className="block"
-                style={{ width: 'clamp(72px, 18vw, 128px)', height: 'clamp(72px, 18vw, 128px)' }}
-              />
+              {qrDataUrl ? (
+                <img
+                  src={qrDataUrl}
+                  alt={'QR ' + code}
+                  className="block"
+                  style={{ width: 'clamp(72px, 18vw, 128px)', height: 'clamp(72px, 18vw, 128px)' }}
+                />
+              ) : (
+                <QRCodeSVG
+                  value={code || 'INVALID'}
+                  size={128}
+                  className="block"
+                  style={{ width: 'clamp(72px, 18vw, 128px)', height: 'clamp(72px, 18vw, 128px)' }}
+                  level="M"
+                  includeMargin={false}
+                />
+              )}
             </div>
             <div className="w-full max-w-[140px] sm:max-w-[160px] opacity-90 hidden sm:block">
               <TicketBarcode value={code} height={36} />
@@ -321,3 +333,4 @@ export default function EventTicket({
     </div>
   );
 }
+
