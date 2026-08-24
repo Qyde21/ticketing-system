@@ -3,7 +3,7 @@ import { getSession } from '@/lib/auth';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -13,7 +13,6 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    const force = request.nextUrl.searchParams.get('force') === '1';
 
     const [event] = await sql`SELECT id, title, status FROM events WHERE id = ${id}`;
     if (!event) {
@@ -26,12 +25,11 @@ export async function DELETE(
       WHERE event_id = ${id} AND payment_status = 'paid'
     `;
 
-    if (Number(paid_count) > 0 && !force) {
+    if (Number(paid_count) > 0) {
       return NextResponse.json(
         {
-          error: `This event has ${paid_count} paid order(s). Cancel it first, or delete with force if you are sure.`,
+          error: `Cannot delete: this event has ${paid_count} paid order(s). Cancel the event and handle refunds first. Delete is only for drafts, copies, or events with no paid sales.`,
           paidCount: paid_count,
-          needsForce: true,
         },
         { status: 400 }
       );
@@ -49,14 +47,10 @@ export async function DELETE(
 
     try {
       await sql`DELETE FROM waitlist_entries WHERE ticket_type_id IN (SELECT id FROM ticket_types WHERE event_id = ${id})`;
-    } catch {
-      /* table may not exist */
-    }
+    } catch {}
     try {
       await sql`DELETE FROM promo_codes WHERE event_id = ${id}`;
-    } catch {
-      /* may not exist on older schema */
-    }
+    } catch {}
 
     await sql`DELETE FROM ticket_types WHERE event_id = ${id}`;
     await sql`DELETE FROM events WHERE id = ${id}`;

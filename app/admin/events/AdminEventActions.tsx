@@ -37,7 +37,7 @@ export default function AdminEventActions({ eventId, status, title }: AdminEvent
     const label = title || 'this event';
     if (
       !confirm(
-        `Permanently delete "${label}"?\n\nThis removes the event, ticket types, and related data. This cannot be undone.`
+        `Permanently delete "${label}"?\n\nOnly allowed if there are no paid orders (drafts, copies, test events).\nThis cannot be undone.`
       )
     ) {
       return;
@@ -45,27 +45,13 @@ export default function AdminEventActions({ eventId, status, title }: AdminEvent
 
     setLoading('delete');
     try {
-      let res = await fetch(`/api/admin/events/${eventId}`, { method: 'DELETE' });
-      let data = await res.json().catch(() => ({}));
-
-      if (!res.ok && data.needsForce) {
-        const ok = confirm(
-          `${data.error}\n\nForce delete anyway? Paid ticket records will also be removed.`
-        );
-        if (!ok) {
-          setLoading(null);
-          return;
-        }
-        res = await fetch(`/api/admin/events/${eventId}?force=1`, { method: 'DELETE' });
-        data = await res.json().catch(() => ({}));
-      }
-
+      const res = await fetch(`/api/admin/events/${eventId}`, { method: 'DELETE' });
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         alert(data.error || 'Failed to delete event');
         setLoading(null);
         return;
       }
-
       router.refresh();
     } catch {
       alert('An error occurred while deleting');

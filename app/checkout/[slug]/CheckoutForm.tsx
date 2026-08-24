@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 
@@ -109,7 +109,8 @@ export default function CheckoutForm({ event, ticketTypes }: { event: any, ticke
       if (res.ok && paystackUrl) {
         window.location.href = paystackUrl;
       } else if (res.ok && data.isFree && data.reference) {
-        window.location.href = `/success?reference=${data.reference}`;
+        const claimQ = data.claimToken ? `&claim=${encodeURIComponent(data.claimToken)}` : '';
+        window.location.href = `/success?reference=${encodeURIComponent(data.reference)}${claimQ}`;
       } else {
         alert(data.error || 'Failed to initialize payment');
         setLoading(false);
@@ -260,3 +261,4 @@ export default function CheckoutForm({ event, ticketTypes }: { event: any, ticke
     </form>
   );
 }
+

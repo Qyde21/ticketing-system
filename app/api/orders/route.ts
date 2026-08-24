@@ -1,3 +1,4 @@
+﻿import { signOrderClaim } from '@/lib/orderClaim';
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { nanoid } from 'nanoid';
@@ -113,7 +114,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields', received: body }, { status: 400 });
     }
 
-    // Rate limit by buyer email and IP before any reservation work begins —
+    // Rate limit by buyer email and IP before any reservation work begins â€”
     // this protects ticket inventory from being locked up by repeated
     // automated checkout attempts, the same protection already applied to
     // login, signup, and forgot-password.
@@ -216,6 +217,7 @@ export async function POST(req: NextRequest) {
 
     const amountInSubunits = Math.round(amountKes * 100);
     const reference = `tk-${nanoid(16)}`;
+    const claimToken = await signOrderClaim(reference);
     const isFree = amountKes <= 0;
     let authorizationUrl = '';
 
@@ -295,6 +297,7 @@ export async function POST(req: NextRequest) {
       orderIds,
       orderId: orderIds[0],
       reference,
+      claimToken,
       authorizationUrl: authorizationUrl || null,
       isFree,
     });
