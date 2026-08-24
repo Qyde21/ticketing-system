@@ -1,61 +1,97 @@
-'use client';
+﻿'use client';
 
-import Link from 'next/link';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface AdminEventActionsProps {
   eventId: string;
   status: string;
+  title?: string;
 }
 
-export default function AdminEventActions({ eventId, status }: AdminEventActionsProps) {
+export default function AdminEventActions({ eventId, status, title }: AdminEventActionsProps) {
+  const [loading, setLoading] = useState<'cancel' | 'delete' | null>(null);
+  const router = useRouter();
+
   const handleCancel = async () => {
-    if (!confirm('Are you sure you want to cancel this event?')) return;
+    if (!confirm(`Cancel "${title || 'this event'}"?\n\nIt will stop ticket sales. Paid tickets stay valid until you refund.`)) {
+      return;
+    }
+    setLoading('cancel');
     try {
       const res = await fetch(`/api/events/${eventId}/cancel`, { method: 'PATCH' });
-      if (res.ok) window.location.reload();
-      else alert('Failed to cancel event');
+      if (res.ok) {
+        router.refresh();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || 'Failed to cancel event');
+      }
     } catch {
       alert('An error occurred while cancelling');
+    } finally {
+      setLoading(null);
     }
   };
 
   const handleDelete = async () => {
-    if (!confirm('Permanently delete this event? This cannot be undone.')) return;
+    const label = title || 'this event';
+    if (
+      !confirm(
+        `Permanently delete "${label}"?\n\nThis removes the event, ticket types, and related data. This cannot be undone.`
+      )
+    ) {
+      return;
+    }
+
+    setLoading('delete');
     try {
-      const res = await fetch(`/api/admin/events/${eventId}`, { method: 'DELETE' });
-      if (res.ok) window.location.reload();
-      else {
-        const data = await res.json().catch(() => ({}));
-        alert(data.error || 'Failed to delete event');
+      let res = await fetch(`/api/admin/events/${eventId}`, { method: 'DELETE' });
+      let data = await res.json().catch(() => ({}));
+
+      if (!res.ok && data.needsForce) {
+        const ok = confirm(
+          `${data.error}\n\nForce delete anyway? Paid ticket records will also be removed.`
+        );
+        if (!ok) {
+          setLoading(null);
+          return;
+        }
+        res = await fetch(`/api/admin/events/${eventId}?force=1`, { method: 'DELETE' });
+        data = await res.json().catch(() => ({}));
       }
+
+      if (!res.ok) {
+        alert(data.error || 'Failed to delete event');
+        setLoading(null);
+        return;
+      }
+
+      router.refresh();
     } catch {
       alert('An error occurred while deleting');
+      setLoading(null);
     }
   };
 
-  const linkClass =
-    'text-xs font-semibold text-indigo-300 hover:text-cyan-300 px-2 py-1 rounded border border-gray-700 bg-gray-900/80';
-
   return (
-    <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-      <Link href={`/admin/events/${eventId}/orders`} className={linkClass}>Orders</Link>
-      <Link href={`/admin/events/${eventId}/analytics`} className={linkClass}>Analytics</Link>
-      <Link href={`/organizer/events/${eventId}/scan-overview`} className={linkClass}>Scan</Link>
-      <Link href={`/organizer/events/${eventId}/staff`} className={linkClass}>Staff</Link>
-      <Link href={`/organizer/events/${eventId}/shifts`} className={linkClass}>Shifts</Link>
-      {status !== 'cancelled' ? (
-        <button type="button" onClick={handleCancel} className="text-xs font-semibold text-yellow-400 px-2 py-1">
-          Cancel
+    <div className="flex flex-wrap gap-2 items-center">
+      {status !== 'cancelled' && (
+        <button
+          type="button"
+          onClick={() => void handleCancel()}
+          disabled={!!loading}
+          className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-amber-700/60 bg-amber-950/40 text-amber-300 hover:bg-amber-900/50 transition disabled:opacity-50"
+        >
+          {loading === 'cancel' ? 'Cancelling…' : 'Cancel'}
         </button>
-      ) : (
-        <span className="text-xs text-gray-500 italic">Cancelled</span>
       )}
       <button
         type="button"
-        onClick={handleDelete}
-        className="text-xs font-semibold text-red-400 px-2 py-1 border border-red-800 rounded"
+        onClick={() => void handleDelete()}
+        disabled={!!loading}
+        className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-red-700/70 bg-red-950/50 text-red-300 hover:bg-red-900/60 transition disabled:opacity-50"
       >
-        Delete
+        {loading === 'delete' ? 'Deleting…' : 'Delete'}
       </button>
     </div>
   );
