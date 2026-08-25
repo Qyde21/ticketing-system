@@ -16,7 +16,7 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
   const [event] = await sql`
     SELECT e.id, e.title, e.description, e.category, e.venue_name, e.venue_address,
            e.start_at, e.end_at, e.cover_image_url, e.organizer_id, e.status,
-           u.name AS organizer_name, u.email AS organizer_email
+           u.full_name AS organizer_name, u.email AS organizer_email
     FROM events e
     JOIN users u ON u.id = e.organizer_id
     WHERE e.id = ${id}
