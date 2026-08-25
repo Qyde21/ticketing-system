@@ -1,7 +1,7 @@
 import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
-import CoverUpload from './CoverUpload';
+import EditEventForm from './EditEventForm';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,7 +14,12 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
   }
 
   const [event] = await sql`
-    SELECT id, title, cover_image_url, organizer_id FROM events WHERE id = ${id}
+    SELECT e.id, e.title, e.description, e.category, e.venue_name, e.venue_address,
+           e.start_at, e.end_at, e.cover_image_url, e.organizer_id, e.status,
+           u.name AS organizer_name, u.email AS organizer_email
+    FROM events e
+    JOIN users u ON u.id = e.organizer_id
+    WHERE e.id = ${id}
   `;
 
   if (!event) {
@@ -34,25 +39,34 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
     );
   }
 
-  return (
-    <div className="max-w-lg mx-auto py-12 px-4 text-white">
-      <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400 mb-1">
-        Edit Cover Image
-      </h1>
-      <h2 className="text-gray-400 mb-6">{event.title}</h2>
+  const ticketTypes = await sql`
+    SELECT id, name, price_kes, quantity_total, quantity_sold, max_per_order
+    FROM ticket_types WHERE event_id = ${id} ORDER BY created_at ASC
+  `;
 
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-        {event.cover_image_url ? (
-          <img
-            src={event.cover_image_url}
-            alt="Current cover"
-            className="w-full max-h-52 object-cover rounded-xl mb-4"
-          />
-        ) : (
-          <p className="text-gray-500 mb-4">No cover image yet.</p>
-        )}
-        <CoverUpload eventId={event.id} />
-      </div>
-    </div>
+  return (
+    <EditEventForm
+      event={{
+        id: event.id,
+        title: event.title,
+        description: event.description || '',
+        category: event.category || '',
+        venueName: event.venue_name || '',
+        venueAddress: event.venue_address || '',
+        startAt: event.start_at ? new Date(event.start_at).toISOString().slice(0, 16) : '',
+        endAt: event.end_at ? new Date(event.end_at).toISOString().slice(0, 16) : '',
+        coverImageUrl: event.cover_image_url || '',
+      }}
+      ticketTypes={ticketTypes.map((tt: any) => ({
+        id: tt.id,
+        name: tt.name,
+        priceKes: String(tt.price_kes),
+        quantityTotal: String(tt.quantity_total),
+        quantitySold: Number(tt.quantity_sold),
+        maxPerOrder: tt.max_per_order,
+      }))}
+      isAdminEditingOther={isAdmin && !isOwner}
+      organizerLabel={event.organizer_name || event.organizer_email}
+    />
   );
 }

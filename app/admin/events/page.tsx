@@ -114,8 +114,14 @@ export default async function AdminEventsPage({ searchParams }: { searchParams: 
                 </div>
 
                 <div className="pt-3 border-t border-gray-800 space-y-3">
+                  <p className="text-xs text-gray-400">{ev.start_at ? new Date(ev.start_at).toLocaleDateString() : 'Date TBD'}</p>
                   <div className="flex justify-between items-center text-xs text-gray-400">
-                    <span>{ev.start_at ? new Date(ev.start_at).toLocaleDateString() : 'Date TBD'}</span>
+                    <Link
+                      href={`/organizer/events/${ev.id}/edit`}
+                      className="text-indigo-300 hover:underline font-semibold"
+                    >
+                      Manage Details
+                    </Link>
                     <Link
                       href={`/events/${ev.slug || ev.id}`}
                       target="_blank"
