@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import TicketBarcode from '@/components/TicketBarcode';
 import { QRCodeSVG } from 'qrcode.react';
@@ -198,7 +198,7 @@ export default function EventTicket({
                   <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent font-bold">TicketHub</span>
                 </span>
                 <span className="text-slate-500" style={{ fontSize: 'clamp(9px, 1.6vw, 11px)' }}>
-                  Â· Official ticket
+                  · Official ticket
                 </span>
               </div>
               <h2

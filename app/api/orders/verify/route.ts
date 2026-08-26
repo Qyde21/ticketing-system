@@ -1,4 +1,4 @@
-﻿import { signOrderClaim } from '@/lib/orderClaim';
+import { signOrderClaim } from '@/lib/orderClaim';
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { finalizePaidOrder } from '@/lib/tickets';
