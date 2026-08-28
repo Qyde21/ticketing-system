@@ -35,7 +35,7 @@ export default function TermsPage() {
         },
         {
           title: '8. Contact',
-          body: 'For questions about these terms, contact us at support@tickethub.co.ke.',
+          body: 'For questions about these terms, contact us at tickethub199@gmail.com.',
         },
       ].map((section) => (
         <section key={section.title} className="mb-7">

@@ -45,8 +45,8 @@ export default function ContactPage() {
         <a href="https://wa.me/254114525941" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white py-2.5 px-5 rounded-lg font-semibold text-sm" style={{ background: '#25D366' }}>
           WhatsApp Support
         </a>
-        <a href="mailto:support@tickethub.co.ke" className="inline-flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-white py-2.5 px-5 rounded-lg font-semibold text-sm transition">
-          support@tickethub.co.ke
+        <a href="mailto:tickethub199@gmail.com" className="inline-flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-white py-2.5 px-5 rounded-lg font-semibold text-sm transition">
+          tickethub199@gmail.com
         </a>
       </div>
 

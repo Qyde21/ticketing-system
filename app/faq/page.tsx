@@ -37,7 +37,7 @@ const faqs = [
   },
   {
     q: 'How do I contact support?',
-    a: 'You can reach us via WhatsApp at +254 114 525 941 or email us at support@tickethub.co.ke.',
+    a: 'You can reach us via WhatsApp at +254 114 525 941 or email us at tickethub199@gmail.com.',
   },
 ];
 

@@ -27,11 +27,11 @@ export default function PrivacyPage() {
         },
         {
           title: '6. Your Rights',
-          body: 'You can request access to, correction of, or deletion of your personal data by contacting us at support@tickethub.co.ke.',
+          body: 'You can request access to, correction of, or deletion of your personal data by contacting us at tickethub199@gmail.com.',
         },
         {
           title: '7. Contact',
-          body: 'For privacy-related questions, contact us at support@tickethub.co.ke or via WhatsApp at +254 114 525 941.',
+          body: 'For privacy-related questions, contact us at tickethub199@gmail.com or via WhatsApp at +254 114 525 941.',
         },
       ].map((section) => (
         <section key={section.title} className="mb-7">

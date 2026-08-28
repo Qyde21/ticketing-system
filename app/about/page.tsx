@@ -35,7 +35,7 @@ export default function AboutPage() {
       <section>
         <h2 className="text-lg font-bold text-white mb-3">Contact Us</h2>
         <p className="text-gray-300" style={{ lineHeight: 1.8 }}>
-          Email: <a href="mailto:support@tickethub.co.ke" className="text-indigo-400 hover:underline">support@tickethub.co.ke</a><br/>
+          Email: <a href="mailto:tickethub199@gmail.com" className="text-indigo-400 hover:underline">tickethub199@gmail.com</a><br/>
           WhatsApp: <a href="https://wa.me/254114525941" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline">+254 114 525 941</a>
         </p>
       </section>

@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
 
     await getResend().emails.send({
       from: 'TicketHub <noreply@mytickethub.co.ke>',
-      to: 'support@mytickethub.co.ke',
+      to: 'tickethub199@gmail.com',
       replyTo: email,
       subject: 'Contact Form: ' + subject,
       html: `
