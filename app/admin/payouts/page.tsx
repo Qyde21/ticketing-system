@@ -69,7 +69,7 @@ export default async function AdminPayoutsPage() {
       <div className="flex gap-3 flex-wrap mb-8">
         {[
           { label: 'Gross paid', value: totalGross, color: 'text-indigo-400' },
-          { label: 'Platform fees (10%)', value: totalFees, color: 'text-amber-400' },
+          { label: 'Platform fees (4%)', value: totalFees, color: 'text-amber-400' },
           { label: 'Organizer net', value: totalNet, color: 'text-emerald-400' },
         ].map((s) => (
           <div key={s.label} className="bg-gray-900 border border-gray-800 rounded-xl px-5 py-3 min-w-[140px]">

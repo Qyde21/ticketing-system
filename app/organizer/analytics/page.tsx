@@ -71,7 +71,7 @@ export default async function OrganizerAnalyticsOverviewPage() {
           <p className="text-2xl font-bold text-cyan-400 mt-2">KES {totalRevenue.toLocaleString()}</p>
         </div>
         <div className="bg-gray-900 p-5 rounded-xl border border-gray-800">
-          <p className="text-xs uppercase tracking-wider text-indigo-300 font-medium">Net after 10%</p>
+          <p className="text-xs uppercase tracking-wider text-indigo-300 font-medium">Net after 4%</p>
           <p className="text-2xl font-bold text-emerald-400 mt-2">KES {net.toLocaleString()}</p>
           <p className="text-xs text-gray-500 mt-1">Fees KES {platformFee.toLocaleString()}</p>
         </div>

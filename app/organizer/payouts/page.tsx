@@ -52,7 +52,7 @@ export default async function PayoutsPage() {
       <div className="flex gap-3 flex-wrap mb-6">
         {[
           { label: 'Gross (paid)', value: totalGross, color: 'text-indigo-400' },
-          { label: 'Fee (10%)', value: totalFees, color: 'text-amber-400' },
+          { label: 'Fee (4%)', value: totalFees, color: 'text-amber-400' },
           { label: 'Refunded', value: totalRefunded, color: 'text-red-400' },
           { label: 'Net earnings', value: totalNet, color: 'text-emerald-400' },
         ].map((s) => (
@@ -100,7 +100,7 @@ export default async function PayoutsPage() {
         })}
       </ul>
       <p className="text-xs text-gray-500 mt-6">
-        Net = (paid − refunded) − 10% platform fee. Automatic payouts run ~48 hours after the event ends if your account is saved.
+        Net = (paid − refunded) − 4% platform fee. Automatic payouts run ~48 hours after the event ends if your account is saved.
       </p>
     </div>
   );

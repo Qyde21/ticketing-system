@@ -2,7 +2,7 @@ import { sql } from '@/lib/db';
 import { createTransferRecipient, initiateTransfer, fetchTransfer } from '@/lib/paystack';
 import { nanoid } from 'nanoid';
 
-export const PLATFORM_FEE_RATE = 0.1;
+export const PLATFORM_FEE_RATE = 0.04;
 export const MIN_PAYOUT_KES = 50;
 export const PAYOUT_DELAY_HOURS = 48;
 

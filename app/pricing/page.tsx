@@ -40,7 +40,7 @@ export default function PricingPage() {
             MOST POPULAR
           </div>
           <div className="text-xs font-bold text-indigo-200 uppercase tracking-wider mb-3">Organizer</div>
-          <div className="text-5xl font-extrabold text-white mb-1">10%</div>
+          <div className="text-5xl font-extrabold text-white mb-1">4%</div>
           <p className="text-indigo-200 text-sm mb-6">Per ticket sold. No upfront costs.</p>
           <ul className="flex flex-col gap-2.5 mb-6 list-none p-0">
             {[
@@ -71,12 +71,12 @@ export default function PricingPage() {
         <div className="flex flex-col gap-5">
           {[
             {
-              q: 'How does the 10% fee work?',
-              a: 'For every ticket sold, TicketHub deducts a 10% service fee from the ticket price. For example, if you sell a KES 1,000 ticket, you receive KES 900. The fee is automatically deducted - no invoices or manual payments needed.',
+              q: 'How does the 4% fee work?',
+              a: 'For every ticket sold, TicketHub deducts a 4% service fee from the ticket price. For example, if you sell a KES 1,000 ticket, you receive KES 960. The fee is automatically deducted - no invoices or manual payments needed.',
             },
             {
               q: 'Are there any other fees?',
-              a: "Paystack charges a separate payment processing fee (typically 1.5% + KES 100 per transaction for local cards, and 3.9% for international cards). This is charged by Paystack directly and is separate from TicketHub's 10% fee.",
+              a: "Paystack charges a separate payment processing fee (typically 1.5% + KES 100 per transaction for local cards, and 3.9% for international cards). This is charged by Paystack directly and is separate from TicketHub's 4% fee.",
             },
             {
               q: 'When do I get paid?',
@@ -84,7 +84,7 @@ export default function PricingPage() {
             },
             {
               q: 'What if I need to refund a ticket?',
-              a: 'If you cancel an event, all paid tickets are automatically refunded in full. For individual refunds, you can process them from your organizer dashboard. The 10% fee is also refunded to the attendee.',
+              a: 'If you cancel an event, all paid tickets are automatically refunded in full. For individual refunds, you can process them from your organizer dashboard. The 4% fee is also refunded to the attendee.',
             },
             {
               q: 'Is there a minimum number of tickets I need to sell?',
