@@ -46,6 +46,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       o.quantity,
       o.total_amount_kes,
       o.payment_status,
+      o.is_complimentary,
+      o.comp_note,
       o.paystack_reference,
       o.created_at
     FROM orders o
@@ -63,6 +65,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     'Quantity',
     'Total (KES)',
     'Payment Status',
+    'Complimentary',
+    'Comp Note',
     'Payment Reference',
     'Created At',
   ];
@@ -76,6 +80,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     o.quantity,
     o.total_amount_kes,
     o.payment_status,
+    o.is_complimentary ? 'Yes' : 'No',
+    o.comp_note || '',
     o.paystack_reference,
     o.created_at ? new Date(o.created_at).toISOString() : '',
   ]);
