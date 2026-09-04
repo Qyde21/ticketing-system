@@ -264,6 +264,7 @@ export default function Scanner({
             });
           } else {
             await enqueueCheckin(eventId, code);
+            void requestCheckinBackgroundSync();
             playTone('ok');
             setResult({
               status: 'success',
