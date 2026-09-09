@@ -1,3 +1,4 @@
+﻿import { getSession } from '@/lib/auth';
 import { signOrderClaim } from '@/lib/orderClaim';
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
@@ -103,6 +104,8 @@ async function releaseReservation(r: Reservation) {
 }
 
 export async function POST(req: NextRequest) {
+  const session = await getSession();
+  const buyerUserId = session?.userId || null;
   const reservations: Reservation[] = [];
 
   try {
@@ -114,7 +117,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields', received: body }, { status: 400 });
     }
 
-    // Rate limit by buyer email and IP before any reservation work begins —
+    // Rate limit by buyer email and IP before any reservation work begins â€”
     // this protects ticket inventory from being locked up by repeated
     // automated checkout attempts, the same protection already applied to
     // login, signup, and forgot-password.
@@ -313,3 +316,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: err.message || 'Something went wrong' }, { status: 500 });
   }
 }
+

@@ -1,4 +1,4 @@
-import { sql } from '@/lib/db';
+﻿import { sql } from '@/lib/db';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import JoinWaitlistButton from '@/components/JoinWaitlistButton';
@@ -20,14 +20,14 @@ export async function generateMetadata({
   const { id: identifier } = await params;
 
   let events: any = await sql`
-    SELECT title, description, venue_name, start_at, cover_image_url
+    SELECT title, description, venue_name, start_at, cover_image_url, slug, id
     FROM events WHERE id::text = ${identifier} OR slug = ${identifier} LIMIT 1
   `;
   const rows = Array.isArray(events) ? events : (events?.rows || []);
   const event = rows[0];
 
   if (!event) {
-    return { title: 'Event not found — TicketHub' };
+    return { title: 'Event not found â€” TicketHub' };
   }
 
   const dateStr = event.start_at
@@ -39,7 +39,7 @@ export async function generateMetadata({
     : `${dateStr} at ${venue}. Get your tickets on TicketHub.`;
 
   return {
-    title: `${event.title} — TicketHub`,
+    title: `${event.title} â€” TicketHub`,
     description,
     openGraph: { title: event.title, description, type: 'website' },
     twitter: { card: 'summary_large_image', title: event.title, description },
@@ -105,7 +105,7 @@ export default async function EventDetailPage({
 
   // A single "does this session's account have a paid ticket for this event"
   // check, reused for both the message-organizer gate (only while the event
-  // is still active) and the review gate (only once it's over) — avoids
+  // is still active) and the review gate (only once it's over) â€” avoids
   // running the same buyer_email lookup twice.
   const session = await getSession();
   let hasPaidTicket = false;
