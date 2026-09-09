@@ -38,11 +38,31 @@ export async function generateMetadata({
     ? event.description.slice(0, 160)
     : `${dateStr} at ${venue}. Get your tickets on TicketHub.`;
 
+const base = (process.env.NEXT_PUBLIC_APP_URL || 'https://www.mytickethub.co.ke').replace(/\/$/, '');
+  const slugOrId = event.slug || event.id || identifier;
+  const pageUrl = `${base}/events/${slugOrId}`;
+  let imageUrl = event.cover_image_url ? String(event.cover_image_url) : `${base}/logo-badge.png`;
+  if (imageUrl.startsWith('/')) imageUrl = `${base}${imageUrl}`;
+
   return {
-    title: `${event.title} â€” TicketHub`,
+    title: `${event.title} — TicketHub`,
     description,
-    openGraph: { title: event.title, description, type: 'website' },
-    twitter: { card: 'summary_large_image', title: event.title, description },
+    alternates: { canonical: pageUrl },
+    openGraph: {
+      title: event.title,
+      description,
+      type: 'website',
+      url: pageUrl,
+      siteName: 'TicketHub',
+      locale: 'en_KE',
+      images: [{ url: imageUrl, width: 1200, height: 630, alt: event.title }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: event.title,
+      description,
+      images: [imageUrl],
+    },
   };
 }
 

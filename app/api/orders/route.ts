@@ -274,13 +274,13 @@ export async function POST(req: NextRequest) {
         INSERT INTO orders (
           event_id, buyer_name, buyer_email, buyer_phone, total_amount_kes,
           promo_code_id, discount_amount_kes, payment_status, paystack_reference,
-          ticket_type_id, quantity, is_flash_sale
+          ticket_type_id, quantity, is_flash_sale, buyer_user_id
         )
         VALUES (
           ${eventId}, ${buyerName}, ${buyerEmail}, ${buyerPhone}, ${lineAmount},
           ${i === 0 ? promoCodeId : null}, ${lineDiscount},
           ${isFree ? 'paid' : 'pending'}, ${reference},
-          ${r.ticketTypeId}, ${r.quantity}, ${r.flashApplied}
+          ${r.ticketTypeId}, ${r.quantity}, ${r.flashApplied}, ${buyerUserId}
         )
         RETURNING id
       `;
@@ -316,4 +316,5 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: err.message || 'Something went wrong' }, { status: 500 });
   }
 }
+
 
