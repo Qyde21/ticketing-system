@@ -142,6 +142,7 @@ CREATE TABLE orders (
   payment_status      TEXT NOT NULL DEFAULT 'pending' CHECK (payment_status IN ('pending', 'paid', 'refunded', 'expired')),
   paystack_reference  TEXT,
   is_flash_sale       BOOLEAN NOT NULL DEFAULT false,
+  buyer_user_id       UUID REFERENCES users(id),
   reminder_sent_at     TIMESTAMPTZ,
   created_at          TIMESTAMPTZ NOT NULL DEFAULT now()
 );
