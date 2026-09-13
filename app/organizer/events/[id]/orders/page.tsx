@@ -53,7 +53,7 @@ export default async function EventOrdersPage({ params }: { params: Promise<{ id
 
   const orders = await sql`
     SELECT o.id, o.quantity, o.total_amount_kes, o.payment_status, o.created_at,
-           o.buyer_name, o.buyer_email, t.name as ticket_name
+           o.buyer_name, o.buyer_email, o.is_complimentary, t.name as ticket_name
     FROM orders o
     LEFT JOIN ticket_types t ON t.id = o.ticket_type_id
     WHERE o.event_id = ${event.id}
@@ -140,6 +140,11 @@ export default async function EventOrdersPage({ params }: { params: Promise<{ id
                       <span className="text-lg font-bold text-indigo-300">
                         KES {Number(order.total_amount_kes).toLocaleString()}
                       </span>
+                      {order.is_complimentary && (
+                        <span className="block text-[10px] font-bold uppercase tracking-wider text-purple-300 mt-0.5">
+                          Complimentary
+                        </span>
+                      )}
                     </div>
 
                     {showRefund && <RefundButton orderId={order.id} />}

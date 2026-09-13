@@ -123,6 +123,12 @@ export default async function AdminEventsPage({ searchParams }: { searchParams: 
                       Manage Details
                     </Link>
                     <Link
+                      href={`/organizer/events/${ev.id}/comp-tickets`}
+                      className="text-purple-300 hover:underline font-semibold"
+                    >
+                      Comp Tickets
+                    </Link>
+                    <Link
                       href={`/events/${ev.slug || ev.id}`}
                       target="_blank"
                       className="text-cyan-400 hover:underline font-semibold"

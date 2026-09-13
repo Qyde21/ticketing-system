@@ -1,0 +1,77 @@
+import { sql } from '@/lib/db';
+import { getSession } from '@/lib/auth';
+import { redirect } from 'next/navigation';
+import CompTicketForm from './CompTicketForm';
+
+export const dynamic = 'force-dynamic';
+
+export default async function CompTicketsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+
+  const session = await getSession();
+  if (!session) {
+    redirect('/login');
+  }
+
+  const [event] = await sql`
+    SELECT e.id, e.title, e.organizer_id, e.status,
+           u.full_name AS organizer_name, u.email AS organizer_email
+    FROM events e
+    JOIN users u ON u.id = e.organizer_id
+    WHERE e.id = ${id}
+  `;
+
+  if (!event) {
+    return <div className="max-w-lg mx-auto py-12 px-4 text-white">Event not found.</div>;
+  }
+
+  const isOwner = session.userId === event.organizer_id;
+  const isAdmin = session.role === 'admin';
+  if (!isOwner && !isAdmin) {
+    return (
+      <div className="max-w-lg mx-auto py-12 px-4 text-white">
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center">
+          <p className="text-lg font-bold text-white mb-1">Access Denied</p>
+          <p className="text-sm text-gray-400">You don&apos;t have permission to manage this event.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const ticketTypes = await sql`
+    SELECT id, name, price_kes, quantity_total, quantity_sold
+    FROM ticket_types WHERE event_id = ${id} ORDER BY created_at ASC
+  `;
+
+  const recentComps = await sql`
+    SELECT id, buyer_name, buyer_email, quantity, comp_note, created_at
+    FROM orders
+    WHERE event_id = ${id} AND is_complimentary = true
+    ORDER BY created_at DESC
+    LIMIT 20
+  `;
+
+  return (
+    <CompTicketForm
+      eventId={event.id}
+      eventTitle={event.title}
+      eventStatus={event.status}
+      ticketTypes={ticketTypes.map((tt: any) => ({
+        id: tt.id,
+        name: tt.name,
+        priceKes: Number(tt.price_kes),
+        remaining: Math.max(0, Number(tt.quantity_total) - Number(tt.quantity_sold)),
+      }))}
+      isAdminEditingOther={isAdmin && !isOwner}
+      organizerLabel={event.organizer_name || event.organizer_email}
+      recentComps={recentComps.map((c: any) => ({
+        id: c.id,
+        name: c.buyer_name,
+        email: c.buyer_email,
+        quantity: c.quantity,
+        note: c.comp_note,
+        createdAt: c.created_at,
+      }))}
+    />
+  );
+}

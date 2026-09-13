@@ -241,6 +241,7 @@ export default async function OrganizerDashboardPage() {
                     <Link href={`/organizer/events/${event.id}/flash-sales`} className="hover:underline text-amber-300 bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Flash Sales</Link>
                   )}
                   <Link href={`/organizer/events/${event.id}/edit`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Manage Details</Link>
+                  <Link href={`/organizer/events/${event.id}/comp-tickets`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Comp Tickets</Link>
                   <Link href={`/organizer/events/${event.id}/messages`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Messages</Link>
                   <Link href={`/organizer/events/${event.id}/scan-overview`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Scan Overview</Link>
                   {eventEnded ? (
