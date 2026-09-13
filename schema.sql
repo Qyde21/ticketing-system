@@ -144,6 +144,7 @@ CREATE TABLE orders (
   is_flash_sale       BOOLEAN NOT NULL DEFAULT false,
   is_complimentary    BOOLEAN NOT NULL DEFAULT false,
   comp_note           TEXT,
+  buyer_user_id       UUID REFERENCES users(id),
   reminder_sent_at     TIMESTAMPTZ,
   created_at          TIMESTAMPTZ NOT NULL DEFAULT now()
 );
