@@ -4,7 +4,12 @@ import { sendShiftReminderEmail } from '@/lib/email';
 
 export const dynamic = 'force-dynamic';
 
-/** Remind staff whose shift starts in the next 1–2 hours */
+/**
+ * Remind door staff about shifts starting roughly 12-36 hours from now.
+ * Runs once daily (Vercel Hobby plan = daily crons only); the wide window
+ * means every shift falls into exactly one run, and reminder_sent_at
+ * guarantees nobody is emailed twice for the same shift.
+ */
 export async function GET(req: NextRequest) {
   const auth = req.headers.get('authorization') || '';
   const secret = process.env.CRON_SECRET;
@@ -30,8 +35,9 @@ export async function GET(req: NextRequest) {
     JOIN event_shifts s ON s.id = a.shift_id
     JOIN events e ON e.id = s.event_id
     JOIN users u ON u.id = a.user_id
-    WHERE s.starts_at > now()
-      AND s.starts_at <= now() + interval '2 hours'
+    WHERE s.starts_at >= now() + interval '12 hours'
+      AND s.starts_at < now() + interval '36 hours'
+      AND a.reminder_sent_at IS NULL
       AND e.status = 'published'
   `;
 
@@ -48,6 +54,11 @@ export async function GET(req: NextRequest) {
         gate: r.gate,
         scanUrl: `${origin}/scan/${r.event_id}`,
       });
+      await sql`
+        UPDATE event_shift_assignments
+        SET reminder_sent_at = now()
+        WHERE shift_id = ${r.shift_id} AND user_id = ${r.user_id}
+      `;
       sent += 1;
     } catch (err) {
       console.error('Shift reminder failed', r.email, err);

@@ -246,6 +246,7 @@ CREATE TABLE IF NOT EXISTS event_shift_assignments (
   status     TEXT NOT NULL DEFAULT 'assigned'
              CHECK (status IN ('assigned', 'confirmed', 'no_show')),
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  reminder_sent_at TIMESTAMPTZ,
   PRIMARY KEY (shift_id, user_id)
 );
 
