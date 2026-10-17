@@ -59,6 +59,16 @@ export default function SuccessContent() {
         setError(data.message);
       }
 
+      if (data.status === 'refunded') {
+        // E.g. a payment that arrived after the 30-minute reservation window
+        // closed and the tickets had sold out: refunded automatically.
+        setError(
+          'This order has been refunded, so there are no tickets to show. If your payment arrived after your reservation window closed and the tickets sold out, we returned your money automatically. Refunds can take 5-10 business days to appear, depending on your payment method.'
+        );
+        setLoading(false);
+        return true;
+      }
+
       if (data.status === 'paid' && Array.isArray(data.tickets) && data.tickets.length > 0) {
         setTickets(data.tickets);
         setError('');
