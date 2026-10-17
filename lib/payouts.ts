@@ -161,6 +161,71 @@ export async function queuePayoutForEvent(eventId: string, opts?: { force?: bool
   return { payoutId: again.id as string, created: false };
 }
 
+const TRANSFER_FAILED_STATUSES = ['failed', 'reversed', 'rejected', 'blocked'];
+
+/**
+ * Apply a Paystack transfer's current status to a payout stuck in
+ * 'processing'. Success marks it paid. A Paystack-side failure/reversal
+ * marks it 'failed' and clears the old reference + transfer code so the
+ * normal retry mints a fresh reference (Paystack rejects reused ones).
+ * Safe: 'failed' means the money never left, 'reversed' means it came back.
+ * Every update is guarded by status = 'processing' so it can't clobber a
+ * concurrent change. Anything else (pending, otp, received...) is left alone.
+ */
+async function settleFromTransfer(
+  payoutId: string,
+  transfer: { status: string; transfer_code?: string; reference?: string }
+): Promise<'paid' | 'failed' | 'processing'> {
+  if (transfer.status === 'success') {
+    await sql`
+      UPDATE organizer_payouts
+      SET status = 'paid', paid_at = now(), processed_at = now()
+      WHERE id = ${payoutId} AND status = 'processing'
+    `;
+    return 'paid';
+  }
+  if (TRANSFER_FAILED_STATUSES.includes(transfer.status)) {
+    const reason = `Paystack transfer ${transfer.status} (ref ${transfer.reference ?? 'n/a'}, code ${transfer.transfer_code ?? 'n/a'})`;
+    await sql`
+      UPDATE organizer_payouts
+      SET status = 'failed',
+          failure_reason = ${reason},
+          paystack_reference = NULL,
+          paystack_transfer_code = NULL
+      WHERE id = ${payoutId} AND status = 'processing'
+    `;
+    return 'failed';
+  }
+  return 'processing';
+}
+
+/**
+ * Follow up on payouts whose transfer was accepted but not yet final
+ * (M-Pesa transfers usually start as 'pending'). Called by the daily cron.
+ */
+export async function reconcileProcessingPayouts(limit = 30) {
+  const rows = await sql`
+    SELECT id, paystack_transfer_code
+    FROM organizer_payouts
+    WHERE status = 'processing' AND paystack_transfer_code IS NOT NULL
+    ORDER BY processed_at ASC NULLS FIRST
+    LIMIT ${limit}
+  `;
+  const out = { checked: rows.length, paid: 0, failed: 0, stillProcessing: 0, errors: [] as string[] };
+  for (const r of rows as any[]) {
+    try {
+      const t = await fetchTransfer(r.paystack_transfer_code as string);
+      const result = await settleFromTransfer(r.id as string, t);
+      if (result === 'paid') out.paid++;
+      else if (result === 'failed') out.failed++;
+      else out.stillProcessing++;
+    } catch (err: unknown) {
+      out.errors.push(`${r.id}: ${err instanceof Error ? err.message : 'error'}`);
+    }
+  }
+  return out;
+}
+
 export async function processPayout(payoutId: string) {
   const [payout] = await sql`
     SELECT p.*, e.title AS event_title
@@ -174,14 +239,9 @@ export async function processPayout(payoutId: string) {
   if (payout.status === 'processing' && payout.paystack_transfer_code) {
     try {
       const t = await fetchTransfer(payout.paystack_transfer_code as string);
-      if (t.status === 'success') {
-        await sql`
-          UPDATE organizer_payouts
-          SET status = 'paid', paid_at = now(), processed_at = now()
-          WHERE id = ${payoutId}
-        `;
-        return { status: 'paid' as const, payout };
-      }
+      const settled = await settleFromTransfer(payoutId, t);
+      if (settled === 'paid') return { status: 'paid' as const, payout };
+      if (settled === 'failed') return { status: 'failed' as const, payout };
     } catch {
       /* retry transfer */
     }

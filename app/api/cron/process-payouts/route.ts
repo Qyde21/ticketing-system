@@ -3,6 +3,7 @@ import {
   listAutoPayoutCandidates,
   queuePayoutForEvent,
   processPayout,
+  reconcileProcessingPayouts,
   computeNet,
   MIN_PAYOUT_KES,
 } from '@/lib/payouts';
@@ -11,8 +12,8 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 export async function GET(req: NextRequest) {
-  const authHeader = req.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  const secret = process.env.CRON_SECRET;
+  if (!secret || req.headers.get('authorization') !== `Bearer ${secret}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -40,7 +41,18 @@ export async function GET(req: NextRequest) {
     }
   }
 
+  // Follow up on transfers that were accepted but not yet final (M-Pesa
+  // usually starts 'pending'). Runs after the loop so a transfer that just
+  // failed is retried on the next daily run, not hammered immediately.
+  let reconcile: Awaited<ReturnType<typeof reconcileProcessingPayouts>> | { error: string };
+  try {
+    reconcile = await reconcileProcessingPayouts(30);
+  } catch (err: unknown) {
+    reconcile = { error: err instanceof Error ? err.message : 'reconcile failed' };
+  }
+
   return NextResponse.json({
+    reconcile,
     candidates: candidates.length,
     paid,
     processing,
