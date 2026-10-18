@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     // is signed out instead of staying logged in for up to 30 days.
     await sql`
       UPDATE users
-      SET password_hash = ${passwordHash}, sessions_valid_after = now()
+      SET password_hash = ${passwordHash}, sessions_valid_after = now(), email_verified = true
       WHERE id = ${resetToken.user_id}
     `;
     await sql`DELETE FROM password_reset_tokens WHERE user_id = ${resetToken.user_id}`;

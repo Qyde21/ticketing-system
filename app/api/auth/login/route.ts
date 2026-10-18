@@ -57,6 +57,20 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Signup promises "no session until you confirm your email", but nothing
+    // enforced it: anyone could register someone else's address and log in as
+    // it, seeing every ticket and order bought with that address.
+    if (!user.email_verified) {
+      return NextResponse.json(
+        {
+          error:
+            'Please confirm your email address before signing in. Check your inbox for the confirmation link.',
+          emailNotVerified: true,
+        },
+        { status: 403 }
+      );
+    }
+
     if (user.totp_enabled) {
       const pendingToken = await signPendingLoginToken(user.id, '2fa_pending', rememberMe);
       return NextResponse.json({ twoFactorRequired: true, pendingToken });

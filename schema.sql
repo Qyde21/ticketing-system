@@ -206,6 +206,22 @@ CREATE TABLE rate_limit_buckets (
   window_start TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- One row per ticket transfer: who moved which ticket to whom, with the old and
+-- new ticket codes (a transfer re-issues the code so the old QR stops working).
+CREATE TABLE ticket_transfers (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  ticket_id   UUID NOT NULL REFERENCES tickets(id) ON DELETE CASCADE,
+  from_email  TEXT,
+  from_name   TEXT,
+  to_email    TEXT NOT NULL,
+  to_name     TEXT NOT NULL,
+  old_code    TEXT NOT NULL,
+  new_code    TEXT NOT NULL,
+  by_user_id  UUID REFERENCES users(id) ON DELETE SET NULL,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX ticket_transfers_ticket_idx ON ticket_transfers (ticket_id, created_at DESC);
+
 -- Stores hashed, single-use password reset tokens. The raw token is only
 -- ever emailed to the user; only its SHA-256 hash is stored here.
 CREATE TABLE password_reset_tokens (

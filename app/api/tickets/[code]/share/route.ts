@@ -18,7 +18,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ cod
 
   try {
     const [ticket] = await sql`
-      SELECT t.id, t.status, t.shared_at, o.buyer_email,
+      SELECT t.id, t.status, t.shared_at, t.holder_email, o.buyer_email,
              e.start_at, e.end_at
       FROM tickets t
       JOIN orders o ON o.id = t.order_id
@@ -30,7 +30,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ cod
       return NextResponse.json({ error: 'Ticket not found' }, { status: 404 });
     }
 
-    const isOwner = ticket.buyer_email.toLowerCase() === session.email.toLowerCase();
+    // Whoever currently holds the ticket (the buyer, until it is transferred).
+    const currentHolderEmail = String(ticket.holder_email || ticket.buyer_email).trim().toLowerCase();
+    const isOwner = currentHolderEmail === session.email.trim().toLowerCase();
     if (!isOwner && session.role !== 'admin') {
       return NextResponse.json({ error: 'You are not authorized to share this ticket' }, { status: 403 });
     }

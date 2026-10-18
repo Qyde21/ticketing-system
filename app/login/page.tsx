@@ -50,6 +50,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [resendMsg, setResendMsg] = useState('');
+  const [unverifiedEmail, setUnverifiedEmail] = useState('');
   const router = useRouter();
   const [step, setStep] = useState<Step>('credentials');
   const [pendingToken, setPendingToken] = useState('');
@@ -86,6 +87,7 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
     setResendMsg('');
+    setUnverifiedEmail('');
     setLoading(true);
     try {
       const res = await fetch('/api/auth/login', {
@@ -96,6 +98,7 @@ export default function LoginPage() {
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || 'Login failed');
+        if (data.emailNotVerified) setUnverifiedEmail(email);
         setLoading(false);
         return;
       }
@@ -201,9 +204,35 @@ export default function LoginPage() {
     }
   }
 
+  async function handleResendConfirmation() {
+    const target = unverifiedEmail;
+    setUnverifiedEmail('');
+    try {
+      const res = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: target }),
+      });
+      const data = await res.json();
+      setError('');
+      setResendMsg(data.message || data.error || 'If the account is unconfirmed, a new link is on its way.');
+    } catch {
+      setError('Could not resend the confirmation email. Please try again.');
+    }
+  }
+
   const errorBox = error ? (
     <div className="mb-5 p-3.5 bg-red-950/80 border border-red-800/80 text-red-300 rounded-xl text-sm font-medium">
       {error}
+      {unverifiedEmail ? (
+        <button
+          type="button"
+          onClick={handleResendConfirmation}
+          className="mt-2 block text-red-200 underline underline-offset-2 hover:text-white"
+        >
+          Resend confirmation email
+        </button>
+      ) : null}
     </div>
   ) : null;
 
