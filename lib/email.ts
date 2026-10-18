@@ -429,3 +429,40 @@ export async function sendTicketsMagicLinkEmail(params: {
     `,
   });
 }
+
+function escapeHtml(v: unknown): string {
+  return String(v)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+export async function sendAdminAlertEmail(params: {
+  toEmail: string;
+  subject: string;
+  details: Record<string, unknown>;
+}) {
+  const resend = getResend();
+  const rows = Object.entries(params.details)
+    .map(
+      ([k, v]) =>
+        `<tr><td style="padding:4px 12px 4px 0;color:#666;vertical-align:top;">${escapeHtml(k)}</td><td style="padding:4px 0;font-family:monospace;">${escapeHtml(
+          typeof v === 'object' ? JSON.stringify(v) : v
+        )}</td></tr>`
+    )
+    .join('');
+  await resend.emails.send({
+    from: 'TicketHub <noreply@mytickethub.co.ke>',
+    to: params.toEmail,
+    subject: `[TicketHub alert] ${params.subject}`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto;">
+        <h2>${escapeHtml(params.subject)}</h2>
+        <p>This needs a human to look at it. No tickets were issued for this payment.</p>
+        <table style="font-size:14px;">${rows}</table>
+        <p style="color: #888; font-size: 12px; margin-top: 24px;">Automatic alert from TicketHub</p>
+      </div>
+    `,
+  });
+}

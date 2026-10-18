@@ -1,18 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import crypto from 'crypto';
 import { sql } from '@/lib/db';
 import { finalizePaidOrder } from '@/lib/tickets';
+import { verifyPaystackSignature } from '@/lib/paystackWebhook';
+import { alertAdmins } from '@/lib/alerts';
 
 export async function POST(req: NextRequest) {
   const rawBody = await req.text();
   const signature = req.headers.get('x-paystack-signature');
 
-  const expectedSignature = crypto
-    .createHmac('sha512', process.env.PAYSTACK_SECRET_KEY!)
-    .update(rawBody)
-    .digest('hex');
+  const secret = process.env.PAYSTACK_SECRET_KEY;
+  if (!secret) {
+    console.error('PAYSTACK_SECRET_KEY is not set - cannot verify webhooks');
+    return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 });
+  }
 
-  if (signature !== expectedSignature) {
+  if (!verifyPaystackSignature(rawBody, signature, secret)) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
   }
 
@@ -29,8 +31,30 @@ export async function POST(req: NextRequest) {
     if (orders.length > 0) {
       const paidAmountKes = event.data.amount / 100;
       const expectedTotal = orders.reduce((s: number, o: any) => s + Number(o.total_amount_kes), 0);
+      const currency = event.data.currency;
+
+      // Never issue tickets for a payment that doesn't match what we asked
+      // for. Return 200 (a retry would not change the outcome) but tell an
+      // admin, since the buyer's money has been taken.
+      if (currency && currency !== 'KES') {
+        console.error('Currency mismatch for reference', reference, { currency });
+        await alertAdmins('Payment in unexpected currency', {
+          reference,
+          currency,
+          paid: event.data.amount / 100,
+          orderIds: orders.map((o: any) => o.id),
+        });
+        return NextResponse.json({ received: true });
+      }
+
       if (Math.abs(paidAmountKes - expectedTotal) > 0.01) {
         console.error('Amount mismatch for reference', reference, { paidAmountKes, expectedTotal });
+        await alertAdmins('Payment amount does not match order', {
+          reference,
+          paidKes: paidAmountKes,
+          expectedKes: expectedTotal,
+          orderIds: orders.map((o: any) => o.id),
+        });
         return NextResponse.json({ received: true });
       }
 
