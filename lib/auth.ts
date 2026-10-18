@@ -1,6 +1,8 @@
 import { SignJWT, jwtVerify } from 'jose';
 import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
+import { cache } from 'react';
+import { sql } from '@/lib/db';
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 const COOKIE_NAME = 'session';
@@ -71,11 +73,33 @@ export async function setSessionCookie(payload: SessionPayload, options: Session
   cookieStore.set(COOKIE_NAME, token, cookie);
 }
 
+/**
+ * Sessions are stateless JWTs that live up to 12 hours (30 days with "remember
+ * me"), so on their own they'd keep working after an admin suspends, demotes
+ * or deletes the account. Re-check the user row on every getSession(): a
+ * suspended or deleted user is treated as logged out, and the role always
+ * comes from the database, never from the (possibly stale) token.
+ * Fails closed: if the lookup errors, the request is treated as logged out.
+ * cache() de-duplicates the lookup within one server render.
+ */
+export const loadActiveSession = cache(async (userId: string): Promise<SessionPayload | null> => {
+  try {
+    const [user] = await sql`SELECT email, role, status FROM users WHERE id = ${userId}`;
+    if (!user || user.status === 'suspended') return null;
+    return { userId, email: String(user.email), role: user.role as UserRole };
+  } catch (err) {
+    console.error('Session revalidation failed', err);
+    return null;
+  }
+});
+
 export async function getSession(): Promise<SessionPayload | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get(COOKIE_NAME)?.value;
   if (!token) return null;
-  return verifySession(token);
+  const payload = await verifySession(token);
+  if (!payload || typeof payload.userId !== 'string') return null;
+  return loadActiveSession(payload.userId);
 }
 
 export async function clearSessionCookie() {

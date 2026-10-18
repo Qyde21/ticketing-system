@@ -343,7 +343,9 @@ export async function listAutoPayoutCandidates(limit = 50) {
     LEFT JOIN orders o ON o.event_id = e.id
     LEFT JOIN organizer_payouts op ON op.event_id = e.id
     JOIN organizer_profiles pr ON pr.user_id = e.organizer_id
-    WHERE e.status IN ('published', 'completed', 'cancelled')
+    JOIN users org ON org.id = e.organizer_id
+    WHERE COALESCE(org.status, 'active') <> 'suspended'
+      AND e.status IN ('published', 'completed', 'cancelled')
       AND COALESCE(e.end_at, e.start_at) < ${cutoff}
       AND pr.paystack_recipient_code IS NOT NULL
       AND (op.id IS NULL OR op.status IN ('pending', 'failed'))

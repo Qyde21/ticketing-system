@@ -51,6 +51,13 @@ export async function GET(req: NextRequest) {
       return NextResponse.redirect(new URL('/login?oauthError=profile_fetch_failed', req.url));
     }
 
+    // Never link or log in on an email Google hasn't verified: the callback
+    // matches existing accounts by email, so an unverified address could be
+    // used to sign in as someone else (including organizers and admins).
+    if (profile.email_verified !== true && profile.email_verified !== 'true') {
+      return NextResponse.redirect(new URL('/login?oauthError=email_not_verified', req.url));
+    }
+
     const normalizedEmail = String(profile.email).trim().toLowerCase();
 
     // 1. Already linked before? Just log them in.

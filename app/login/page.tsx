@@ -34,6 +34,15 @@ function Shell({
   );
 }
 
+const OAUTH_ERROR_MESSAGES: Record<string, string> = {
+  invalid_state: 'Google sign-in expired or was interrupted. Please try again.',
+  not_configured: 'Google sign-in is not available right now.',
+  suspended: 'This account has been suspended. Contact support for help.',
+  email_not_verified:
+    "Your Google account's email address isn't verified, so we can't sign you in with it. Verify it with Google, or sign in with your password.",
+  default: 'Google sign-in failed. Please try again.',
+};
+
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -51,9 +60,11 @@ export default function LoginPage() {
     if (typeof window === 'undefined') return;
     const params = new URLSearchParams(window.location.search);
     const err = params.get('error');
+    const oauthErr = params.get('oauthError');
     const pending = params.get('pending');
     const otpPending = params.get('email_otp');
     if (err) setError(err);
+    else if (oauthErr) setError(OAUTH_ERROR_MESSAGES[oauthErr] || OAUTH_ERROR_MESSAGES.default);
     if (otpPending) {
       setPendingToken(otpPending);
       setStep('email_otp');
@@ -62,7 +73,7 @@ export default function LoginPage() {
       setPendingToken(pending);
       setStep('totp');
     }
-    if (err || pending || otpPending) {
+    if (err || oauthErr || pending || otpPending) {
       window.history.replaceState({}, '', '/login');
     }
   }, []);
