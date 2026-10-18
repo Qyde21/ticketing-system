@@ -36,6 +36,10 @@ export function getTicketDisplayStatus(
 
 type LatePaymentOutcome = 'claimed' | 'lost' | 'refund';
 
+function newTicketCodes(quantity: number): string[] {
+  return Array.from({ length: Math.max(0, Number(quantity) || 0) }, () => nanoid(10).toUpperCase());
+}
+
 /**
  * A payment arrived for an order the expiry cron already marked 'expired'
  * (it releases the seats after 30 minutes, but Paystack pages and M-Pesa
@@ -48,18 +52,21 @@ type LatePaymentOutcome = 'claimed' | 'lost' | 'refund';
  *  - 'refund':  seats are gone (sold out), the event was cancelled/ended, or
  *               the ticket type no longer exists - the buyer must be refunded
  */
-async function reclaimExpiredOrder(order: any): Promise<LatePaymentOutcome> {
+async function reclaimExpiredOrder(
+  order: any
+): Promise<{ outcome: LatePaymentOutcome; codes: string[] }> {
   const qty = Number(order.quantity) || 0;
+  const codes = newTicketCodes(qty);
   const [tt] = await sql`
     SELECT flash_sale_price_kes FROM ticket_types WHERE id = ${order.ticket_type_id}
   `;
   const [ev] = await sql`
     SELECT status, start_at, end_at FROM events WHERE id = ${order.event_id}
   `;
-  if (!tt || !ev || qty < 1) return 'refund';
-  if (ev.status === 'cancelled' || ev.status === 'completed') return 'refund';
+  if (!tt || !ev || qty < 1) return { outcome: 'refund', codes: [] };
+  if (ev.status === 'cancelled' || ev.status === 'completed') return { outcome: 'refund', codes: [] };
   const endsAt = ev.end_at ? new Date(ev.end_at) : ev.start_at ? new Date(ev.start_at) : null;
-  if (endsAt && endsAt < new Date()) return 'refund';
+  if (endsAt && endsAt < new Date()) return { outcome: 'refund', codes: [] };
 
   // Same flash-sale detection the expiry cron used when it released the seats,
   // so the flash counter is restored symmetrically.
@@ -83,16 +90,22 @@ async function reclaimExpiredOrder(order: any): Promise<LatePaymentOutcome> {
         AND EXISTS (SELECT 1 FROM locked)
         AND quantity_sold + ${qty} <= quantity_total
       RETURNING id
+    ),
+    issue AS (
+      INSERT INTO tickets (order_id, ticket_type_id, ticket_code, holder_name, holder_email, status)
+      SELECT ${order.id}::uuid, ${order.ticket_type_id}::uuid, c, ${order.buyer_name}, ${order.buyer_email}, 'valid'
+      FROM unnest(${codes}::text[]) AS c
+      WHERE EXISTS (SELECT 1 FROM locked) AND EXISTS (SELECT 1 FROM reserve)
     )
     UPDATE orders SET payment_status = 'paid'
     WHERE id IN (SELECT id FROM locked) AND EXISTS (SELECT 1 FROM reserve)
     RETURNING id
   `;
-  if (reserved.length > 0) return 'claimed';
+  if (reserved.length > 0) return { outcome: 'claimed', codes };
 
   // No row: either someone else got there first, or there are no seats left.
   const [current] = await sql`SELECT payment_status FROM orders WHERE id = ${order.id}`;
-  return current?.payment_status === 'expired' ? 'refund' : 'lost';
+  return { outcome: current?.payment_status === 'expired' ? 'refund' : 'lost', codes: [] };
 }
 
 /**
@@ -160,36 +173,53 @@ export async function finalizePaidOrder(orderId: string, baseUrl: string): Promi
     return existing.map((t) => String(t.ticket_code));
   }
 
-  // Atomically claim this order for finalizing before generating tickets,
-  // sending the confirmation email/SMS, awarding loyalty points, or
-  // incrementing promo usage. finalizePaidOrder is called from both the
-  // Paystack webhook and the browser verify-redirect route for the same
-  // payment, sometimes within milliseconds of each other. Without this
-  // claim, both calls could pass the "no tickets yet" check above before
-  // either has inserted anything, and both would generate a duplicate set
-  // of real tickets. Postgres serializes concurrent updates to the same
-  // row, so only one call ever wins this claim - the same pattern used to
-  // fix the payout and refund race conditions.
-  let claimed = false;
-  if (order.payment_status === 'expired') {
+  // Atomically claim this order AND create its tickets in a single statement.
+  // finalizePaidOrder is called from both the Paystack webhook and the browser
+  // verify-redirect route for the same payment, sometimes within milliseconds
+  // of each other: Postgres serializes concurrent updates to the same row, so
+  // only one call wins the claim, and only the winner inserts tickets.
+  // Doing the claim and the ticket insert as ONE statement (one transaction)
+  // also means a crash or error can never leave an order marked 'paid' with
+  // zero or only some of its tickets - the buyer would have been charged with
+  // nothing to show for it, and no retry could repair it.
+  let generatedCodes: string[] | null = null;
+
+  if (order.payment_status !== 'expired') {
+    const codes = newTicketCodes(order.quantity);
+    const issued = await sql`
+      WITH claim AS (
+        UPDATE orders SET payment_status = 'paid'
+        WHERE id = ${order.id} AND payment_status NOT IN ('paid', 'refunded', 'expired')
+        RETURNING id
+      )
+      INSERT INTO tickets (order_id, ticket_type_id, ticket_code, holder_name, holder_email, status)
+      SELECT ${order.id}::uuid, ${order.ticket_type_id}::uuid, c, ${order.buyer_name}, ${order.buyer_email}, 'valid'
+      FROM unnest(${codes}::text[]) AS c
+      WHERE EXISTS (SELECT 1 FROM claim)
+      RETURNING ticket_code
+    `;
+    if (issued.length > 0) {
+      generatedCodes = issued.map((t) => String(t.ticket_code));
+    } else {
+      // Lost the claim - unless the expiry cron expired this order in the
+      // instant before the payment landed, in which case it's a late payment.
+      const [cur] = await sql`SELECT payment_status FROM orders WHERE id = ${order.id}`;
+      if (cur?.payment_status === 'expired') order.payment_status = 'expired';
+    }
+  }
+
+  if (!generatedCodes && order.payment_status === 'expired') {
     // Late payment: the expiry cron already released this order's seats.
     // Re-reserve them atomically, or refund the buyer if they're gone.
-    const outcome = await reclaimExpiredOrder(order);
-    if (outcome === 'refund') {
+    const late = await reclaimExpiredOrder(order);
+    if (late.outcome === 'refund') {
       await refundLatePayment(order);
       return [];
     }
-    claimed = outcome === 'claimed';
-  } else {
-    const [row] = await sql`
-      UPDATE orders SET payment_status = 'paid'
-      WHERE id = ${order.id} AND payment_status != 'paid' AND payment_status != 'refunded'
-      RETURNING id
-    `;
-    claimed = !!row;
+    if (late.outcome === 'claimed') generatedCodes = late.codes;
   }
 
-  if (!claimed) {
+  if (!generatedCodes) {
     // Another call already claimed (or already finished finalizing) this
     // order. Return whatever tickets exist right now rather than risking
     // a duplicate set - the winning call's tickets are what the buyer
@@ -215,16 +245,6 @@ export async function finalizePaidOrder(orderId: string, baseUrl: string): Promi
 
   // Non-blocking: a loyalty-points failure should never stop ticket issuance.
   awardPointsForOrder(order.id, order.buyer_email, Number(order.total_amount_kes || 0));
-
-  const generatedCodes: string[] = [];
-  for (let i = 0; i < order.quantity; i++) {
-    const ticketCode = nanoid(10).toUpperCase();
-    await sql`
-      INSERT INTO tickets (order_id, ticket_type_id, ticket_code, holder_name, holder_email, status)
-      VALUES (${order.id}, ${order.ticket_type_id}, ${ticketCode}, ${order.buyer_name}, ${order.buyer_email}, 'valid')
-    `;
-    generatedCodes.push(ticketCode);
-  }
 
   // quantity_sold is reserved atomically at order creation - do not increment here.
 
