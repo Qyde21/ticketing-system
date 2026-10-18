@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
-import { verifyTotpToken, generateBackupCodes, hashBackupCode } from '@/lib/totp';
+import { findTotpStep, revealTotpSecret, generateBackupCodes, hashBackupCode } from '@/lib/totp';
 
 export async function POST(req: NextRequest) {
   const session = await getSession();
@@ -23,11 +23,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Two-factor authentication is already enabled.' }, { status: 400 });
     }
 
-    if (!verifyTotpToken(user.totp_secret, String(token))) {
+    const step = findTotpStep(revealTotpSecret(user.totp_secret), String(token));
+    if (step === null) {
       return NextResponse.json({ error: 'Invalid code. Please check your authenticator app and try again.' }, { status: 400 });
     }
 
-    await sql`UPDATE users SET totp_enabled = true WHERE id = ${session.userId}`;
+    // Record the step used for setup so this same code can't then be replayed to log in.
+    await sql`UPDATE users SET totp_enabled = true, totp_last_step = ${step} WHERE id = ${session.userId}`;
 
     // Clear out any old backup codes (e.g. from a previous setup attempt) and issue fresh ones.
     await sql`DELETE FROM totp_backup_codes WHERE user_id = ${session.userId}`;

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
-import { generateTotpSecret, buildOtpAuthUrl } from '@/lib/totp';
+import { generateTotpSecret, buildOtpAuthUrl, protectTotpSecret } from '@/lib/totp';
 
 export async function GET() {
   const session = await getSession();
@@ -21,7 +21,7 @@ export async function GET() {
 
   // Save the pending secret now (enabled=false) so verify-setup always checks
   // against a server-held value, never one supplied by the client.
-  await sql`UPDATE users SET totp_secret = ${secret} WHERE id = ${session.userId}`;
+  await sql`UPDATE users SET totp_secret = ${protectTotpSecret(secret)}, totp_last_step = NULL WHERE id = ${session.userId}`;
 
   const otpauthUrl = buildOtpAuthUrl(secret, session.email);
 

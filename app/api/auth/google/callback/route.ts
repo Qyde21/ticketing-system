@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
-import { setSessionCookie } from '@/lib/auth';
+import { setSessionCookie, signPendingLoginToken } from '@/lib/auth';
 
 export async function GET(req: NextRequest) {
   const code = req.nextUrl.searchParams.get('code');
@@ -62,7 +62,7 @@ export async function GET(req: NextRequest) {
 
     // 1. Already linked before? Just log them in.
     const [existingLink] = await sql`
-      SELECT u.id, u.email, u.role, u.status
+      SELECT u.id, u.email, u.role, u.status, u.totp_enabled
       FROM oauth_accounts oa
       JOIN users u ON u.id = oa.user_id
       WHERE oa.provider = 'google' AND oa.provider_user_id = ${profile.sub}
@@ -74,7 +74,7 @@ export async function GET(req: NextRequest) {
       // 2. No link yet — does a user with this email already exist
       // (e.g. they originally signed up with email/password)? Link accounts
       // rather than creating a duplicate.
-      const [existingByEmail] = await sql`SELECT id, email, role, status FROM users WHERE email = ${normalizedEmail}`;
+      const [existingByEmail] = await sql`SELECT id, email, role, status, totp_enabled FROM users WHERE email = ${normalizedEmail}`;
 
       if (existingByEmail) {
         await sql`
@@ -104,6 +104,18 @@ export async function GET(req: NextRequest) {
 
     if (user.status === 'suspended') {
       return NextResponse.redirect(new URL('/login?oauthError=suspended', req.url));
+    }
+
+    // Accounts with two-factor enabled must still pass it: signing in with
+    // Google proves the password-equivalent factor only, not the second one.
+    // Hand off to the login page's existing authenticator-code step.
+    if (user.totp_enabled) {
+      const pendingToken = await signPendingLoginToken(user.id, '2fa_pending', false);
+      const pendingRes = NextResponse.redirect(
+        new URL(`/login?pending=${encodeURIComponent(pendingToken)}`, req.url)
+      );
+      pendingRes.cookies.delete('google_oauth_state');
+      return pendingRes;
     }
 
     await setSessionCookie({ userId: user.id, email: user.email, role: user.role });

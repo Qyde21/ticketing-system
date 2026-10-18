@@ -68,16 +68,72 @@ export function generateTotpToken(base32Secret: string, forTime: number = Date.n
  * either direction (90 seconds total window) to tolerate clock skew.
  */
 export function verifyTotpToken(base32Secret: string, token: string, forTime: number = Date.now()): boolean {
+  return findTotpStep(base32Secret, token, forTime) !== null;
+}
+
+/**
+ * Like verifyTotpToken, but returns the 30-second step number the code
+ * matched (or null). Callers that authenticate with the code store the step
+ * and refuse anything not strictly newer, so a code can only be used once.
+ */
+export function findTotpStep(base32Secret: string, token: string, forTime: number = Date.now()): number | null {
   const cleanToken = token.replace(/\s/g, '');
-  if (!/^\d{6}$/.test(cleanToken)) return false;
+  if (!/^\d{6}$/.test(cleanToken)) return null;
 
   for (let errorWindow = -1; errorWindow <= 1; errorWindow++) {
-    const candidate = generateTotpToken(base32Secret, forTime + errorWindow * STEP_SECONDS * 1000);
+    const at = forTime + errorWindow * STEP_SECONDS * 1000;
+    const candidate = generateTotpToken(base32Secret, at);
     if (crypto.timingSafeEqual(Buffer.from(candidate), Buffer.from(cleanToken))) {
-      return true;
+      return Math.floor(at / 1000 / STEP_SECONDS);
     }
   }
-  return false;
+  return null;
+}
+
+// ---- Encryption at rest -------------------------------------------------
+// A database leak should not hand out everyone's 2FA secrets. When
+// TOTP_ENCRYPTION_KEY (32 bytes, base64) is set, secrets are stored as
+// AES-256-GCM: "enc:v1:<iv>:<tag>:<ciphertext>" (all base64). Without the key
+// they are stored in plaintext as before, and plaintext rows always keep
+// working, so this can be rolled out gradually.
+const ENC_PREFIX = 'enc:v1:';
+
+function getEncryptionKey(): Buffer | null {
+  const raw = process.env.TOTP_ENCRYPTION_KEY;
+  if (!raw) return null;
+  const key = Buffer.from(raw, 'base64');
+  if (key.length !== 32) {
+    throw new Error('TOTP_ENCRYPTION_KEY must be 32 bytes, base64-encoded');
+  }
+  return key;
+}
+
+export function isProtectedTotpSecret(stored: string): boolean {
+  return stored.startsWith(ENC_PREFIX);
+}
+
+/** Encrypt a secret for storage (no-op when no key is configured). */
+export function protectTotpSecret(plain: string): string {
+  const key = getEncryptionKey();
+  if (!key || isProtectedTotpSecret(plain)) return plain;
+  const iv = crypto.randomBytes(12);
+  const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
+  const ct = Buffer.concat([cipher.update(plain, 'utf8'), cipher.final()]);
+  const tag = cipher.getAuthTag();
+  return ENC_PREFIX + [iv, tag, ct].map((b) => b.toString('base64')).join(':');
+}
+
+/** Turn a stored secret (encrypted or legacy plaintext) back into base32. */
+export function revealTotpSecret(stored: string): string {
+  if (!isProtectedTotpSecret(stored)) return stored;
+  const key = getEncryptionKey();
+  if (!key) {
+    throw new Error('A TOTP secret is encrypted but TOTP_ENCRYPTION_KEY is not set');
+  }
+  const [ivB64, tagB64, ctB64] = stored.slice(ENC_PREFIX.length).split(':');
+  const decipher = crypto.createDecipheriv('aes-256-gcm', key, Buffer.from(ivB64, 'base64'));
+  decipher.setAuthTag(Buffer.from(tagB64, 'base64'));
+  return Buffer.concat([decipher.update(Buffer.from(ctB64, 'base64')), decipher.final()]).toString('utf8');
 }
 
 /** Builds the otpauth:// URI that authenticator apps use to render the QR code. */

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { setSessionCookie, verifyPendingTwoFactorToken } from '@/lib/auth';
-import { verifyTotpToken, hashBackupCode } from '@/lib/totp';
+import { findTotpStep, revealTotpSecret, hashBackupCode } from '@/lib/totp';
 import { consumeAttempt, releaseAttempt, getClientIp } from '@/lib/rateLimit';
 
 const MAX_ATTEMPTS = 10;
@@ -47,7 +47,18 @@ export async function POST(req: NextRequest) {
     let verified = false;
 
     if (/^\d{6}$/.test(cleanCode)) {
-      verified = verifyTotpToken(user.totp_secret, cleanCode);
+      const step = findTotpStep(revealTotpSecret(user.totp_secret), cleanCode);
+      if (step !== null) {
+        // Atomic one-time use: only accept a step newer than the last one
+        // accepted, so a code that was shoulder-surfed, phished or replayed
+        // inside its ~90s validity window is rejected.
+        const [claimed] = await sql`
+          UPDATE users SET totp_last_step = ${step}
+          WHERE id = ${user.id} AND (totp_last_step IS NULL OR totp_last_step < ${step})
+          RETURNING id
+        `;
+        verified = !!claimed;
+      }
     } else {
       const codeHash = hashBackupCode(cleanCode);
       const [backupCode] = await sql`

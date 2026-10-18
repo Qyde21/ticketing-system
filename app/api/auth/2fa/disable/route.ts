@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Incorrect password' }, { status: 401 });
     }
 
-    await sql`UPDATE users SET totp_enabled = false, totp_secret = NULL WHERE id = ${session.userId}`;
+    await sql`UPDATE users SET totp_enabled = false, totp_secret = NULL, totp_last_step = NULL WHERE id = ${session.userId}`;
     await sql`DELETE FROM totp_backup_codes WHERE user_id = ${session.userId}`;
 
     return NextResponse.json({ success: true });

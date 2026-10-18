@@ -3,6 +3,12 @@ import { sql } from '@/lib/db';
 import { verifyPassword, setSessionCookie, signPendingLoginToken } from '@/lib/auth';
 import { consumeAttempt, releaseAttempt, getClientIp } from '@/lib/rateLimit';
 
+// A real bcrypt hash of a throwaway string. Compared against when the account
+// doesn't exist (or has no password) so those requests take as long as a real
+// wrong-password attempt, and response time can't reveal which emails are registered.
+const DUMMY_PASSWORD_HASH =
+  '$2b$10$KmxX7Vfbh.519.pfJjisSu2QMbbDy99iq5Rof2ujeRAZY5e0L7x9W';
+
 const MAX_ATTEMPTS = 10;
 const WINDOW_MINUTES = 15;
 
@@ -37,7 +43,8 @@ export async function POST(req: NextRequest) {
     }
 
     const [user] = await sql`SELECT * FROM users WHERE email = ${normalizedEmail}`;
-    if (!user || !user.password_hash || !(await verifyPassword(password, user.password_hash))) {
+    const passwordOk = await verifyPassword(password, user?.password_hash || DUMMY_PASSWORD_HASH);
+    if (!user || !user.password_hash || !passwordOk) {
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
 
