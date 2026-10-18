@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { verifyPassword, setSessionCookie, signPendingLoginToken } from '@/lib/auth';
-import { checkRateLimit, recordAttempt, getClientIp } from '@/lib/rateLimit';
+import { consumeAttempt, releaseAttempt, getClientIp } from '@/lib/rateLimit';
 
 const MAX_ATTEMPTS = 10;
 const WINDOW_MINUTES = 15;
@@ -20,7 +20,9 @@ export async function POST(req: NextRequest) {
     const ip = getClientIp(req);
     const normalizedEmail = String(email).trim().toLowerCase();
 
-    const allowed = await checkRateLimit({
+    // Take a slot BEFORE checking the password (atomic), so a burst of
+    // parallel guesses can't all slip under the limit. Released on success.
+    const allowed = await consumeAttempt({
       type: 'login',
       email: normalizedEmail,
       ip,
@@ -36,9 +38,10 @@ export async function POST(req: NextRequest) {
 
     const [user] = await sql`SELECT * FROM users WHERE email = ${normalizedEmail}`;
     if (!user || !user.password_hash || !(await verifyPassword(password, user.password_hash))) {
-      await recordAttempt('login', normalizedEmail, ip);
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
+
+    await releaseAttempt('login', normalizedEmail, ip);
 
     if (user.status === 'suspended') {
       return NextResponse.json(

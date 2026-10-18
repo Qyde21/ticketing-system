@@ -26,7 +26,14 @@ export async function POST(req: NextRequest) {
 
     const passwordHash = await hashPassword(password);
 
-    await sql`UPDATE users SET password_hash = ${passwordHash} WHERE id = ${resetToken.user_id}`;
+    // sessions_valid_after revokes every session issued before the reset, so
+    // someone who already had access (the reason people reset a password)
+    // is signed out instead of staying logged in for up to 30 days.
+    await sql`
+      UPDATE users
+      SET password_hash = ${passwordHash}, sessions_valid_after = now()
+      WHERE id = ${resetToken.user_id}
+    `;
     await sql`DELETE FROM password_reset_tokens WHERE user_id = ${resetToken.user_id}`;
 
     return NextResponse.json({ success: true });

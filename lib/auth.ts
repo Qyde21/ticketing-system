@@ -82,10 +82,19 @@ export async function setSessionCookie(payload: SessionPayload, options: Session
  * Fails closed: if the lookup errors, the request is treated as logged out.
  * cache() de-duplicates the lookup within one server render.
  */
-export const loadActiveSession = cache(async (userId: string): Promise<SessionPayload | null> => {
+export const loadActiveSession = cache(async (userId: string, issuedAt?: number): Promise<SessionPayload | null> => {
   try {
-    const [user] = await sql`SELECT email, role, status FROM users WHERE id = ${userId}`;
+    const [user] = await sql`
+      SELECT email, role, status, EXTRACT(EPOCH FROM sessions_valid_after) AS valid_after
+      FROM users WHERE id = ${userId}
+    `;
     if (!user || user.status === 'suspended') return null;
+    // Tokens issued before the last password reset are revoked. Compared in
+    // whole seconds (JWT iat is in seconds) so a session created right after
+    // the reset is never rejected.
+    if (user.valid_after != null && (issuedAt == null || issuedAt < Math.floor(Number(user.valid_after)))) {
+      return null;
+    }
     return { userId, email: String(user.email), role: user.role as UserRole };
   } catch (err) {
     console.error('Session revalidation failed', err);
@@ -99,7 +108,7 @@ export async function getSession(): Promise<SessionPayload | null> {
   if (!token) return null;
   const payload = await verifySession(token);
   if (!payload || typeof payload.userId !== 'string') return null;
-  return loadActiveSession(payload.userId);
+  return loadActiveSession(payload.userId, (payload as unknown as { iat?: number }).iat);
 }
 
 export async function clearSessionCookie() {

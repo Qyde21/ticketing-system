@@ -23,6 +23,7 @@ CREATE TABLE users (
   email_verified BOOLEAN NOT NULL DEFAULT false,
   totp_secret   TEXT, -- base32 TOTP secret, only set once 2FA setup begins
   totp_enabled  BOOLEAN NOT NULL DEFAULT false,
+  sessions_valid_after TIMESTAMPTZ, -- session tokens issued before this are rejected (set on password reset)
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -195,6 +196,14 @@ CREATE TABLE login_attempts (
   email      TEXT NOT NULL,
   ip         TEXT NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Atomic counters for credential-guessing endpoints (login, 2FA, email OTP).
+-- See migrations/014. One row per key such as 'login:e:<email>' / 'login:i:<ip>'.
+CREATE TABLE rate_limit_buckets (
+  key          TEXT PRIMARY KEY,
+  count        INTEGER NOT NULL,
+  window_start TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 -- Stores hashed, single-use password reset tokens. The raw token is only

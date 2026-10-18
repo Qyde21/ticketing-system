@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { setSessionCookie, verifyPendingTwoFactorToken } from '@/lib/auth';
 import { verifyTotpToken, hashBackupCode } from '@/lib/totp';
-import { checkRateLimit, recordAttempt, getClientIp } from '@/lib/rateLimit';
+import { consumeAttempt, releaseAttempt, getClientIp } from '@/lib/rateLimit';
 
 const MAX_ATTEMPTS = 10;
 const WINDOW_MINUTES = 15;
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const allowed = await checkRateLimit({
+    const allowed = await consumeAttempt({
       type: 'login',
       email: user.email,
       ip,
@@ -61,9 +61,10 @@ export async function POST(req: NextRequest) {
     }
 
     if (!verified) {
-      await recordAttempt('login', user.email, ip);
       return NextResponse.json({ error: 'Invalid code. Please try again.' }, { status: 401 });
     }
+
+    await releaseAttempt('login', user.email, ip);
 
     if (user.status === 'suspended') {
       return NextResponse.json(

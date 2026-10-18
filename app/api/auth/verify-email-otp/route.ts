@@ -6,7 +6,7 @@ import {
   verifyPendingLoginToken,
 } from '@/lib/auth';
 import { verifyLoginEmailOtp } from '@/lib/loginOtp';
-import { checkRateLimit, recordAttempt, getClientIp } from '@/lib/rateLimit';
+import { consumeAttempt, releaseAttempt, getClientIp } from '@/lib/rateLimit';
 
 export async function POST(req: NextRequest) {
   try {
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     }
 
     const ip = getClientIp(req);
-    const allowed = await checkRateLimit({
+    const allowed = await consumeAttempt({
       type: 'login_otp',
       email: user.email,
       ip,
@@ -45,9 +45,10 @@ export async function POST(req: NextRequest) {
 
     const ok = await verifyLoginEmailOtp(user.id, code);
     if (!ok) {
-      await recordAttempt('login_otp', user.email, ip);
       return NextResponse.json({ error: 'Invalid or expired code. Try again.' }, { status: 401 });
     }
+
+    await releaseAttempt('login_otp', user.email, ip);
 
     if (user.status === 'suspended') {
       return NextResponse.json(
