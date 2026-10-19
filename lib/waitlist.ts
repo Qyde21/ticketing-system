@@ -13,23 +13,40 @@ export async function notifyWaitlistIfSpotsFreed(
 ): Promise<void> {
   if (spotsFreed <= 0) return;
 
-  const entries = await sql`
-    SELECT id, name, email FROM waitlist_entries
-    WHERE ticket_type_id = ${ticketTypeId} AND notified_at IS NULL
-    ORDER BY created_at ASC
-    LIMIT ${spotsFreed}
-  `;
-
-  if (entries.length === 0) return;
-
   const [ticketType] = await sql`
-    SELECT tt.id, tt.name AS ticket_type_name, e.title AS event_title, e.slug, e.id AS event_id
+    SELECT tt.id, tt.name AS ticket_type_name, e.title AS event_title, e.slug, e.id AS event_id,
+           e.status AS event_status, e.start_at, e.end_at
     FROM ticket_types tt
     JOIN events e ON e.id = tt.event_id
     WHERE tt.id = ${ticketTypeId}
   `;
 
   if (!ticketType) return;
+
+  // Only tell people a spot is open if the event can still be bought. Cancelling
+  // an event refunds every order and so "frees" every seat - without this check
+  // the whole waitlist was emailed "a spot just opened" for a cancelled event
+  // (and for events that already took place, via the expiry cron).
+  if (ticketType.event_status !== 'published') return;
+  const eventEnd = ticketType.end_at || ticketType.start_at;
+  if (eventEnd && new Date(eventEnd) < new Date()) return;
+
+  // Claim the entries atomically BEFORE emailing. Two overlapping runs (e.g.
+  // the expiry cron and a refund) used to read the same un-notified rows and
+  // email the same people twice; SKIP LOCKED makes each run take different ones.
+  const entries = await sql`
+    UPDATE waitlist_entries SET notified_at = now()
+    WHERE id IN (
+      SELECT id FROM waitlist_entries
+      WHERE ticket_type_id = ${ticketTypeId} AND notified_at IS NULL
+      ORDER BY created_at ASC
+      LIMIT ${spotsFreed}
+      FOR UPDATE SKIP LOCKED
+    )
+    RETURNING id, name, email
+  `;
+
+  if (entries.length === 0) return;
 
   const checkoutUrl = `${baseUrl}/checkout/${ticketTypeId}`;
 
@@ -42,9 +59,14 @@ export async function notifyWaitlistIfSpotsFreed(
         ticketTypeName: ticketType.ticket_type_name,
         checkoutUrl,
       });
-      await sql`UPDATE waitlist_entries SET notified_at = now() WHERE id = ${entry.id}`;
     } catch (err) {
       console.error('Failed to notify waitlist entry', entry.id, err);
+      // Not emailed after all: release the claim so a later run can retry.
+      try {
+        await sql`UPDATE waitlist_entries SET notified_at = NULL WHERE id = ${entry.id}`;
+      } catch (releaseErr) {
+        console.error('Could not release waitlist claim', entry.id, releaseErr);
+      }
     }
   }
 }

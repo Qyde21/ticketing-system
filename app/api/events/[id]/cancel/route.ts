@@ -6,6 +6,7 @@ import { writeAuditLog } from '@/lib/audit';
 import { refundTransaction } from '@/lib/paystack';
 import { sendCancellationEmail } from '@/lib/email';
 import { notifyWaitlistIfSpotsFreed } from '@/lib/waitlist';
+import { reverseLoyaltyPointsForOrder } from '@/lib/loyalty';
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
@@ -66,6 +67,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   // function does not touch orders.payment_status itself.
   async function settleClaimedOrder(order: any) {
     await sql`UPDATE tickets SET status = 'cancelled' WHERE order_id = ${order.id}`;
+    await reverseLoyaltyPointsForOrder(order.id);
     await sql`
       UPDATE ticket_types
       SET quantity_sold = GREATEST(0, quantity_sold - ${order.quantity}),

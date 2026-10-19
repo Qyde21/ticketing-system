@@ -1,11 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import { redeemPointsForEvent, MIN_REDEMPTION_POINTS } from '@/lib/loyalty';
+import { consumeAttempt } from '@/lib/rateLimit';
 
 export async function POST(req: NextRequest) {
   const session = await getSession();
   if (!session?.email) {
     return NextResponse.json({ error: 'Please log in to redeem points' }, { status: 401 });
+  }
+
+  // Redemption writes to the ledger and issues discount codes: cap it per account.
+  const allowed = await consumeAttempt({
+    type: 'loyalty_redeem',
+    email: session.email.toLowerCase(),
+    ip: `user:${session.userId}`,
+    maxAttempts: 20,
+    windowMinutes: 60,
+  });
+  if (!allowed) {
+    return NextResponse.json({ error: 'Too many redemption attempts. Please try again later.' }, { status: 429 });
   }
 
   const body = await req.json().catch(() => ({}));

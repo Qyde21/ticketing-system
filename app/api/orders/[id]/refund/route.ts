@@ -4,6 +4,7 @@ import { getSession } from '@/lib/auth';
 import { refundTransaction } from '@/lib/paystack';
 import { sendCancellationEmail } from '@/lib/email';
 import { notifyWaitlistIfSpotsFreed } from '@/lib/waitlist';
+import { reverseLoyaltyPointsForOrder } from '@/lib/loyalty';
 import { writeAuditLog } from '@/lib/audit';
 import { isEventEnded } from '@/lib/eventStatus';
 
@@ -78,6 +79,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   }
 
   await sql`UPDATE tickets SET status = 'cancelled' WHERE order_id = ${order.id}`;
+  await reverseLoyaltyPointsForOrder(order.id);
   await sql`
     UPDATE ticket_types
     SET quantity_sold = GREATEST(0, quantity_sold - ${order.quantity}),

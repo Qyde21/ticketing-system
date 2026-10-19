@@ -1,18 +1,43 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { sendWaitlistConfirmationEmail } from '@/lib/email';
+import { consumeAttempt, getClientIp } from '@/lib/rateLimit';
+
+// Anonymous endpoint that emails whatever address it is given, so it must not
+// be usable as a spam relay: per-IP and per-address caps, strict validation.
+const EMAIL_RE = /^[^\s@<>"',;]+@[^\s@<>"',;]+\.[^\s@<>"',;]{2,}$/;
+const MAX_SIGNUPS_PER_HOUR = 20;
+
+function cleanText(value: unknown): string {
+  return String(value ?? '').replace(/[\u0000-\u001f\u007f]/g, ' ').trim();
+}
 
 export async function POST(req: NextRequest) {
   try {
-    const { ticketTypeId, name, email } = await req.json();
+    const body = await req.json();
+    const ticketTypeId = body?.ticketTypeId;
+    const name = cleanText(body?.name);
+    const normalizedEmail = cleanText(body?.email).toLowerCase();
 
-    if (!ticketTypeId || !name || !email) {
+    if (!ticketTypeId || !name || !normalizedEmail) {
       return NextResponse.json({ error: 'Name and email are required' }, { status: 400 });
     }
-
-    const normalizedEmail = String(email).trim().toLowerCase();
-    if (!normalizedEmail.includes('@')) {
+    if (name.length > 100) {
+      return NextResponse.json({ error: 'Name is too long (100 characters max)' }, { status: 400 });
+    }
+    if (normalizedEmail.length > 254 || !EMAIL_RE.test(normalizedEmail)) {
       return NextResponse.json({ error: 'Please enter a valid email address' }, { status: 400 });
+    }
+
+    const allowed = await consumeAttempt({
+      type: 'waitlist',
+      email: normalizedEmail,
+      ip: getClientIp(req),
+      maxAttempts: MAX_SIGNUPS_PER_HOUR,
+      windowMinutes: 60,
+    });
+    if (!allowed) {
+      return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
     }
 
     const [ticketType] = await sql`
