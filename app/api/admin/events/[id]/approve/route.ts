@@ -25,7 +25,16 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json({ error: 'Only events pending review can be approved' }, { status: 400 });
   }
 
-  await sql`UPDATE events SET status = 'published', updated_at = now() WHERE id = ${id}`;
+  // Claim atomically: a double-click or two admins at once must not both
+  // approve (and email the organizer) twice.
+  const [claimed] = await sql`
+    UPDATE events SET status = 'published', updated_at = now()
+    WHERE id = ${id} AND status = 'pending_review'
+    RETURNING id
+  `;
+  if (!claimed) {
+    return NextResponse.json({ error: 'Only events pending review can be approved' }, { status: 400 });
+  }
 
   try {
     await sendEventApprovedEmail({

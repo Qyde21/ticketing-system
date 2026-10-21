@@ -3,6 +3,7 @@ import { revalidateTag } from 'next/cache';
 import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { sendEventRejectedEmail } from '@/lib/email';
+import { writeAuditLog } from '@/lib/audit';
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
@@ -15,7 +16,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   let reason: string | undefined;
   try {
     const body = await req.json();
-    reason = body?.reason;
+    reason = typeof body?.reason === 'string' ? body.reason.trim().slice(0, 1000) || undefined : undefined;
   } catch {
     // No body sent is fine - reason is optional
   }
@@ -34,7 +35,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json({ error: 'Only events pending review can be rejected' }, { status: 400 });
   }
 
-  await sql`UPDATE events SET status = 'draft', updated_at = now() WHERE id = ${id}`;
+  const [claimed] = await sql`
+    UPDATE events SET status = 'draft', updated_at = now()
+    WHERE id = ${id} AND status = 'pending_review'
+    RETURNING id
+  `;
+  if (!claimed) {
+    return NextResponse.json({ error: 'Only events pending review can be rejected' }, { status: 400 });
+  }
 
   try {
     await sendEventRejectedEmail({
@@ -48,5 +56,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   }
 
   revalidateTag('events', 'max');
+
+  await writeAuditLog({
+    actorId: session.userId,
+    action: 'event.reject',
+    entityType: 'event',
+    entityId: id,
+    meta: { reason: reason ?? null },
+  });
+
   return NextResponse.json({ success: true });
 }
