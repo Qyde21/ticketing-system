@@ -79,8 +79,8 @@ export default async function EventShiftsPage({ params }: { params: Promise<{ id
         &larr; Back to dashboard
       </Link>
       <h1 className="text-2xl font-extrabold mt-2 mb-1">Shifts</h1>
-      <p className="text-gray-400 text-sm mb-2">{event.title}</p>
-      <p className="text-gray-500 text-xs mb-6">
+      <p className="text-neutral-400 text-sm mb-2">{event.title}</p>
+      <p className="text-neutral-500 text-xs mb-6">
         <Link href={`/organizer/events/${id}/staff`} className="text-indigo-400 hover:underline">
           Door staff
         </Link>

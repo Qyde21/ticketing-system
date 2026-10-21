@@ -133,7 +133,7 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
       <div className="flex flex-wrap items-start justify-between gap-3 mt-2">
         <div>
           <h1 className="text-2xl font-extrabold">{event.title}</h1>
-          <p className="text-gray-400 text-sm">
+          <p className="text-neutral-400 text-sm">
             {event.venue_name || 'No Venue'} &middot;{' '}
             {event.start_at ? new Date(event.start_at).toLocaleString() : 'No Date'}
           </p>
@@ -141,13 +141,13 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
         <div className="flex flex-wrap items-center gap-2">
           <Link
             href={`/organizer/events/${eventId}/staff`}
-            className="inline-flex items-center gap-1.5 bg-gray-800 hover:bg-gray-700 text-white text-xs font-semibold px-3 py-2 rounded-lg border border-gray-700 transition"
+            className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-semibold px-3 py-2 rounded-lg border border-white/15 transition"
           >
             Door staff
           </Link>
           <a
             href={`/api/events/${eventId}/door-list`}
-            className="inline-flex items-center gap-1.5 bg-gray-800 hover:bg-gray-700 text-white text-xs font-semibold px-3 py-2 rounded-lg border border-gray-700 transition"
+            className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-semibold px-3 py-2 rounded-lg border border-white/15 transition"
           >
             Download door list (CSV)
           </a>
@@ -158,7 +158,7 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
       {shiftRows.length > 0 && (
         <div className="mt-8">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-gray-400">Shifts</h2>
+            <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-400">Shifts</h2>
             <Link href={`/organizer/events/${eventId}/shifts`} className="text-xs text-indigo-400 hover:underline">
               Manage shifts
             </Link>
@@ -177,7 +177,7 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
                     'rounded-xl border px-3 py-3 text-sm ' +
                     (onDuty
                       ? 'border-emerald-700 bg-emerald-950/30'
-                      : 'border-gray-800 bg-gray-900/80')
+                      : 'border-white/10 bg-neutral-950/80')
                   }
                 >
                   <div className="flex flex-wrap justify-between gap-2">
@@ -190,15 +190,15 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
                         </span>
                       )}
                     </span>
-                    <span className={under ? 'text-amber-400 text-xs' : 'text-gray-400 text-xs'}>
+                    <span className={under ? 'text-amber-400 text-xs' : 'text-neutral-400 text-xs'}>
                       {names.length}/{s.slots_needed}
                       {under ? ' understaffed' : ''}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-neutral-400 mt-1">
                     {start.toLocaleString()} → {end.toLocaleString()}
                   </p>
-                  <p className="text-xs text-gray-300 mt-1">
+                  <p className="text-xs text-neutral-300 mt-1">
                     {names.length ? names.join(', ') : 'No one assigned'}
                   </p>
                 </li>

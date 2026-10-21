@@ -70,11 +70,11 @@ export default function LoyaltyPanel({
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+    <div className="bg-neutral-950 border border-white/10 rounded-2xl p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-gray-400">Loyalty points</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-neutral-400">Loyalty points</p>
             <p className="text-2xl font-extrabold text-white">{summary.balance.toLocaleString()}</p>
           </div>
           <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${tierStyle.bg} ${tierStyle.text} ${tierStyle.ring}`}>
@@ -93,44 +93,44 @@ export default function LoyaltyPanel({
       </div>
 
       {summary.lifetimeEarned > 0 && (
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-xs text-neutral-500 mt-1">
           {summary.lifetimeEarned.toLocaleString()} points earned lifetime. Earn 1 point per KES 100 spent.
         </p>
       )}
 
       {open && (
-        <form onSubmit={handleRedeem} className="mt-4 pt-4 border-t border-gray-800 space-y-3">
+        <form onSubmit={handleRedeem} className="mt-4 pt-4 border-t border-white/10 space-y-3">
           {result ? (
             <div className="bg-emerald-950/40 border border-emerald-800 rounded-xl p-4">
               <p className="text-emerald-300 text-sm font-semibold mb-2">
                 Redeemed! KES {result.discountKes.toLocaleString()} off your next order.
               </p>
               <div className="flex items-center gap-2">
-                <code className="bg-gray-950 border border-gray-800 rounded-lg px-3 py-2 text-sm text-white flex-1">
+                <code className="bg-black border border-white/10 rounded-lg px-3 py-2 text-sm text-white flex-1">
                   {result.code}
                 </code>
                 <button
                   type="button"
                   onClick={copyCode}
-                  className="text-xs font-bold px-3 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-200 whitespace-nowrap"
+                  className="text-xs font-bold px-3 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-200 whitespace-nowrap"
                 >
                   {copied ? 'Copied!' : 'Copy'}
                 </button>
               </div>
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-neutral-500 mt-2">
                 Apply this code at checkout for the event you picked. Expires in 30 days, single use.
               </p>
             </div>
           ) : (
             <>
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-1">
                   Redeem toward
                 </label>
                 <select
                   value={eventId}
                   onChange={(e) => setEventId(e.target.value)}
-                  className="w-full bg-gray-950 border border-gray-800 rounded-lg px-3 py-2 text-sm text-white"
+                  className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-sm text-white"
                 >
                   {events.map((ev) => (
                     <option key={ev.id} value={ev.id}>
@@ -140,7 +140,7 @@ export default function LoyaltyPanel({
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-1">
                   Points to redeem (min 100, 1 point = KES 1 off)
                 </label>
                 <input
@@ -150,7 +150,7 @@ export default function LoyaltyPanel({
                   max={summary.balance}
                   value={points}
                   onChange={(e) => setPoints(Number(e.target.value))}
-                  className="w-full bg-gray-950 border border-gray-800 rounded-lg px-3 py-2 text-sm text-white"
+                  className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-sm text-white"
                 />
               </div>
               {error && <p className="text-xs text-red-400">{error}</p>}

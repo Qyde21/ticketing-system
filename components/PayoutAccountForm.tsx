@@ -52,38 +52,38 @@ export default function PayoutAccountForm() {
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 mb-8">
+    <div className="bg-neutral-950 border border-white/10 rounded-2xl p-5 mb-8">
       <h2 className="text-lg font-bold text-white mb-1">Payout destination</h2>
-      <p className="text-sm text-gray-400 mb-4">
+      <p className="text-sm text-neutral-400 mb-4">
         Net earnings (after 10% fee) are paid via Paystack, usually ~48h after the event ends.
         {ready && <span className="text-emerald-400 font-semibold"> · Account ready</span>}
       </p>
       <form onSubmit={save} className="space-y-3">
         <div className="flex gap-2">
           <button type="button" onClick={() => setMethod('mpesa')}
-            className={`flex-1 py-2 rounded-lg text-sm font-semibold ${method === 'mpesa' ? 'bg-indigo-600 text-white' : 'bg-gray-800 text-gray-400'}`}>
+            className={`flex-1 py-2 rounded-lg text-sm font-semibold ${method === 'mpesa' ? 'bg-indigo-600 text-white' : 'bg-neutral-900 text-neutral-400'}`}>
             M-Pesa
           </button>
           <button type="button" onClick={() => setMethod('bank')}
-            className={`flex-1 py-2 rounded-lg text-sm font-semibold ${method === 'bank' ? 'bg-indigo-600 text-white' : 'bg-gray-800 text-gray-400'}`}>
+            className={`flex-1 py-2 rounded-lg text-sm font-semibold ${method === 'bank' ? 'bg-indigo-600 text-white' : 'bg-neutral-900 text-neutral-400'}`}>
             Bank
           </button>
         </div>
         <input required value={payoutName} onChange={(e) => setPayoutName(e.target.value)}
           placeholder="Account name (as registered)"
-          className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white text-sm" />
+          className="w-full bg-neutral-900 border border-white/15 rounded-xl px-4 py-3 text-white text-sm" />
         {method === 'mpesa' ? (
           <input required value={payoutPhone} onChange={(e) => setPayoutPhone(e.target.value)}
             placeholder="M-Pesa number e.g. 0712 345 678"
-            className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white text-sm" />
+            className="w-full bg-neutral-900 border border-white/15 rounded-xl px-4 py-3 text-white text-sm" />
         ) : (
           <>
             <input required value={bankCode} onChange={(e) => setBankCode(e.target.value)}
               placeholder="Bank code (Paystack Kenya)"
-              className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white text-sm" />
+              className="w-full bg-neutral-900 border border-white/15 rounded-xl px-4 py-3 text-white text-sm" />
             <input required value={bankAccountNumber} onChange={(e) => setBankAccountNumber(e.target.value)}
               placeholder="Account number"
-              className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white text-sm" />
+              className="w-full bg-neutral-900 border border-white/15 rounded-xl px-4 py-3 text-white text-sm" />
           </>
         )}
         {err && <p className="text-red-400 text-sm">{err}</p>}

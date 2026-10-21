@@ -76,29 +76,29 @@ export default function LiveOverview({
         ].map((stat) => (
           <div
             key={stat.label}
-            className="bg-gray-900 border border-gray-800 rounded-xl px-5 py-3 text-center"
+            className="bg-neutral-950 border border-white/10 rounded-xl px-5 py-3 text-center"
             style={{ minWidth: 120 }}
           >
             <div className={'text-2xl font-bold ' + stat.color}>{stat.value}</div>
-            <div className="text-xs text-gray-400 mt-0.5">{stat.label}</div>
+            <div className="text-xs text-neutral-400 mt-0.5">{stat.label}</div>
           </div>
         ))}
       </div>
 
-      <div className="mt-4 bg-gray-800 rounded-full overflow-hidden" style={{ height: 8 }}>
+      <div className="mt-4 bg-neutral-900 rounded-full overflow-hidden" style={{ height: 8 }}>
         <div className="bg-emerald-500 h-full transition-all duration-300" style={{ width: `${percent}%` }} />
       </div>
-      <p className="text-xs text-gray-400 mt-1 flex justify-between">
+      <p className="text-xs text-neutral-400 mt-1 flex justify-between">
         <span>{percent}% checked in</span>
         <button type="button" onClick={() => void refresh()} className="text-indigo-400 hover:underline">
           Refresh now
-          {updatedAt && <span className="text-gray-600 ml-1">({updatedAt.toLocaleTimeString()})</span>}
+          {updatedAt && <span className="text-neutral-600 ml-1">({updatedAt.toLocaleTimeString()})</span>}
         </button>
       </p>
 
       {eventEnded ? (
         <span
-          className="inline-block mt-3 bg-gray-800 text-gray-500 px-5 py-2 rounded-lg font-semibold text-sm cursor-not-allowed border border-gray-700"
+          className="inline-block mt-3 bg-neutral-900 text-neutral-500 px-5 py-2 rounded-lg font-semibold text-sm cursor-not-allowed border border-white/15"
           title="Scanning is closed because this event has ended"
         >
           Open Scanner (closed)
@@ -114,17 +114,17 @@ export default function LiveOverview({
 
       <h2 className="text-xl font-bold mt-6 mb-3">Staff attendance</h2>
       {byStaff.length === 0 ? (
-        <p className="text-gray-500 text-sm mb-4">No check-ins recorded yet.</p>
+        <p className="text-neutral-500 text-sm mb-4">No check-ins recorded yet.</p>
       ) : (
         <ul className="space-y-2 mb-6">
           {byStaff.map((s) => (
             <li
               key={(s.email || s.name) + String(s.count)}
-              className="flex items-center justify-between gap-3 bg-gray-900 border border-gray-800 rounded-xl px-4 py-3"
+              className="flex items-center justify-between gap-3 bg-neutral-950 border border-white/10 rounded-xl px-4 py-3"
             >
               <div>
                 <p className="font-semibold text-white text-sm">{s.name}</p>
-                {s.email && <p className="text-xs text-gray-400">{s.email}</p>}
+                {s.email && <p className="text-xs text-neutral-400">{s.email}</p>}
               </div>
               <span className="text-sm font-bold text-emerald-400">
                 {s.count} scan{s.count === 1 ? '' : 's'}
@@ -136,17 +136,17 @@ export default function LiveOverview({
 
       <h2 className="text-xl font-bold mt-2 mb-3">Attendance log</h2>
       {stats.recent.length === 0 ? (
-        <p className="text-gray-500 text-sm">No check-ins yet.</p>
+        <p className="text-neutral-500 text-sm">No check-ins yet.</p>
       ) : (
         <ul className="list-none p-0 space-y-2">
           {stats.recent.map((t) => (
             <li
               key={t.ticketCode + (t.checkedInAt || '')}
-              className="flex justify-between items-start gap-3 px-3 py-2.5 bg-gray-900 border border-gray-800 rounded-xl"
+              className="flex justify-between items-start gap-3 px-3 py-2.5 bg-neutral-950 border border-white/10 rounded-xl"
             >
               <div>
                 <strong className="text-sm text-white font-mono">{t.ticketCode}</strong>
-                <div className="text-xs text-gray-400">
+                <div className="text-xs text-neutral-400">
                   {t.holderName || 'Guest'}
                   {t.ticketType ? ` · ${t.ticketType}` : ''}
                 </div>

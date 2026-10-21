@@ -46,7 +46,7 @@ export default function InboxReply({ eventId, recipientId, senderName }: { event
             onChange={(e) => setBody(e.target.value)}
             placeholder={`Reply to ${senderName}...`}
             rows={3}
-            className="w-full bg-gray-950 border border-gray-800 rounded-lg p-3 text-white text-sm resize-y focus:outline-none focus:border-indigo-500 placeholder:text-gray-500"
+            className="w-full bg-black border border-white/10 rounded-lg p-3 text-white text-sm resize-y focus:outline-none focus:border-indigo-500 placeholder:text-neutral-500"
           />
           {error && <p className="text-red-400 text-sm mt-1">{error}</p>}
           <div className="flex gap-2 mt-2">
@@ -59,7 +59,7 @@ export default function InboxReply({ eventId, recipientId, senderName }: { event
             </button>
             <button
               onClick={() => setOpen(false)}
-              className="bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2 rounded-lg text-sm transition"
+              className="bg-neutral-900 hover:bg-neutral-800 text-neutral-300 px-4 py-2 rounded-lg text-sm transition"
             >
               Cancel
             </button>

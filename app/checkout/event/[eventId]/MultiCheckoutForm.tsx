@@ -117,12 +117,12 @@ export default function MultiCheckoutForm({
   };
 
   return (
-    <form onSubmit={handleCheckout} className="space-y-6 bg-gray-950 border border-gray-800 p-6 rounded-2xl">
+    <form onSubmit={handleCheckout} className="space-y-6 bg-black border border-white/10 p-6 rounded-2xl">
       <div>
-        <h2 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-3">Your tickets</h2>
+        <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-400 mb-3">Your tickets</h2>
         <ul className="space-y-2">
           {lines.map((l) => (
-            <li key={l.id} className="flex justify-between text-sm bg-gray-900 border border-gray-800 rounded-xl px-3 py-2">
+            <li key={l.id} className="flex justify-between text-sm bg-neutral-950 border border-white/10 rounded-xl px-3 py-2">
               <span className="text-white">
                 {l.quantity}× {l.name}
                 {l.flashActive ? <span className="text-amber-400 text-xs ml-1">Flash</span> : null}
@@ -134,20 +134,20 @@ export default function MultiCheckoutForm({
       </div>
 
       <div>
-        <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Full Name</label>
-        <input required value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full bg-gray-900 border border-gray-800 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500" />
+        <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Full Name</label>
+        <input required value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full bg-neutral-950 border border-white/10 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500" />
       </div>
       <div>
-        <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Email Address</label>
-        <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="w-full bg-gray-900 border border-gray-800 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500" />
+        <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Email Address</label>
+        <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="w-full bg-neutral-950 border border-white/10 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500" />
       </div>
       <div>
-        <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Phone Number</label>
-        <input required value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full bg-gray-900 border border-gray-800 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500" />
+        <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Phone Number</label>
+        <input required value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full bg-neutral-950 border border-white/10 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500" />
       </div>
 
       <div>
-        <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Promo Code</label>
+        <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Promo Code</label>
         {appliedPromo ? (
           <div className="flex items-center justify-between bg-emerald-950/40 border border-emerald-800/50 rounded-xl p-3">
             <div>
@@ -166,9 +166,9 @@ export default function MultiCheckoutForm({
               value={promoInput}
               onChange={(e) => setPromoInput(e.target.value)}
               placeholder="Optional"
-              className="flex-1 bg-gray-900 border border-gray-800 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500"
+              className="flex-1 bg-neutral-950 border border-white/10 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500"
             />
-            <button type="button" onClick={handleApplyPromo} disabled={promoStatus === 'checking'} className="px-4 rounded-xl bg-gray-800 border border-gray-700 text-sm font-semibold text-white hover:bg-gray-700">
+            <button type="button" onClick={handleApplyPromo} disabled={promoStatus === 'checking'} className="px-4 rounded-xl bg-neutral-900 border border-white/15 text-sm font-semibold text-white hover:bg-neutral-800">
               {promoStatus === 'checking' ? '…' : 'Apply'}
             </button>
           </div>
@@ -176,8 +176,8 @@ export default function MultiCheckoutForm({
         {promoStatus === 'error' && <p className="text-red-400 text-xs mt-1">{promoError}</p>}
       </div>
 
-      <div className="border-t border-gray-800 pt-4 space-y-1">
-        <div className="flex justify-between text-sm text-gray-400">
+      <div className="border-t border-white/10 pt-4 space-y-1">
+        <div className="flex justify-between text-sm text-neutral-400">
           <span>Subtotal ({totalQty} tickets)</span>
           <span>KES {subtotal.toLocaleString()}</span>
         </div>

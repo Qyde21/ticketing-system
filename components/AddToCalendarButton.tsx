@@ -37,14 +37,14 @@ export default function AddToCalendarButton({ title, description, location, star
         href={googleUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 bg-gray-800 hover:bg-gray-700 text-white text-xs font-semibold px-3 py-2 rounded-lg transition"
+        className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-semibold px-3 py-2 rounded-lg transition"
       >
         Add to Google Calendar
       </a>
       <button
         type="button"
         onClick={handleDownloadIcs}
-        className="inline-flex items-center gap-1.5 bg-gray-800 hover:bg-gray-700 text-white text-xs font-semibold px-3 py-2 rounded-lg transition"
+        className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-semibold px-3 py-2 rounded-lg transition"
       >
         Download .ics (Apple / Outlook)
       </button>

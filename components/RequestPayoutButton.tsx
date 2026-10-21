@@ -43,7 +43,7 @@ export default function RequestPayoutButton({
         className="text-xs font-bold px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white">
         {loading ? '…' : 'Request payout'}
       </button>
-      {disabledReason && <div className="text-[10px] text-gray-500 mt-1">{disabledReason}</div>}
+      {disabledReason && <div className="text-[10px] text-neutral-500 mt-1">{disabledReason}</div>}
       {msg && <div className="text-[10px] text-emerald-400 mt-1">{msg}</div>}
       {err && <div className="text-[10px] text-red-400 mt-1">{err}</div>}
     </div>

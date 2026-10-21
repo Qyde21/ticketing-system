@@ -152,7 +152,7 @@ export default function EventTicket({
 
   return (
     <div className="w-full flex flex-col items-center gap-3">
-      <p className="text-[11px] text-gray-500 sm:hidden text-center px-2">
+      <p className="text-[11px] text-neutral-500 sm:hidden text-center px-2">
         Tip: rotate your phone for the largest view
       </p>
 
@@ -195,7 +195,7 @@ export default function EventTicket({
                   className="font-serif font-bold uppercase tracking-[0.15em]"
                   style={{ fontSize: 'clamp(9px, 1.6vw, 11px)' }}
                 >
-                  <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent font-bold">TicketHub</span>
+                  <span className="font-bold text-white">TicketHub</span>
                 </span>
                 <span className="text-slate-500" style={{ fontSize: 'clamp(9px, 1.6vw, 11px)' }}>
                   · Official ticket
@@ -323,7 +323,7 @@ export default function EventTicket({
               <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'rgba(28,34,51,0.88)' }}>
                 <div className="text-center px-2">
                   <p className="text-white font-extrabold text-sm sm:text-base">Expired</p>
-                  <p className="text-gray-200 text-[10px] sm:text-xs mt-1">Event has ended</p>
+                  <p className="text-neutral-200 text-[10px] sm:text-xs mt-1">Event has ended</p>
                 </div>
               </div>
             )}

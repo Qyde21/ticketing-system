@@ -32,19 +32,19 @@ export default async function AdminOrganizersPage() {
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-8 text-white">
-      <div className="flex justify-between items-center mb-8 pb-4 border-b border-gray-800">
+      <div className="flex justify-between items-center mb-8 pb-4 border-b border-white/10">
         <div>
-          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Organizer Management</h1>
-      <p className="text-sm text-gray-400 mb-4">Open an organizer → add <code className="text-amber-400">/support</code> to the URL for read-only support view, or use Support links on event rows once listed.</p>
-          <p className="text-gray-400 text-sm mt-1">Monitor event creators and manage their hosting status</p>
+          <h1 className="text-3xl font-extrabold text-white">Organizer Management</h1>
+      <p className="text-sm text-neutral-400 mb-4">Open an organizer → add <code className="text-amber-400">/support</code> to the URL for read-only support view, or use Support links on event rows once listed.</p>
+          <p className="text-neutral-400 text-sm mt-1">Monitor event creators and manage their hosting status</p>
         </div>
-        <div className="bg-gray-900 border border-gray-800 px-4 py-2 rounded-xl text-sm text-gray-300 shadow">
+        <div className="bg-neutral-950 border border-white/10 px-4 py-2 rounded-xl text-sm text-neutral-300 shadow">
           Total Organizers: <strong className="text-cyan-400">{organizers.length}</strong>
         </div>
       </div>
 
       {organizers.length === 0 ? (
-        <div className="text-center py-16 bg-gray-900 border border-gray-800 rounded-2xl shadow-xl text-gray-400">
+        <div className="text-center py-16 bg-neutral-950 border border-white/10 rounded-2xl shadow-xl text-neutral-400">
           No organizers found.
         </div>
       ) : (
@@ -52,7 +52,7 @@ export default async function AdminOrganizersPage() {
           {organizers.map((org: any) => (
             <div
               key={org.id}
-              className="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between space-y-6 transition hover:border-gray-700"
+              className="bg-neutral-950 border border-white/10 rounded-2xl p-6 shadow-xl flex flex-col justify-between space-y-6 transition hover:border-white/15"
             >
               <div className="space-y-3">
                 <div className="flex justify-between items-start">
@@ -74,14 +74,14 @@ export default async function AdminOrganizersPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4 text-xs text-gray-400 pt-2 border-t border-gray-800/80">
-                  <span>Joined: <strong className="text-gray-300">{org.created_at ? new Date(org.created_at).toLocaleDateString() : 'N/A'}</strong></span>
+                <div className="flex items-center gap-4 text-xs text-neutral-400 pt-2 border-t border-neutral-800/80">
+                  <span>Joined: <strong className="text-neutral-300">{org.created_at ? new Date(org.created_at).toLocaleDateString() : 'N/A'}</strong></span>
                   <span>•</span>
                   <span>Events: <strong className="text-cyan-400">{org.total_events || 0}</strong> ({org.published_events || 0} published)</span>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pt-4 border-t border-gray-800">
+              <div className="flex items-center justify-between pt-4 border-t border-white/10">
                 <Link
                   href={`/admin/events?organizer_id=${org.id}`}
                   className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-4 py-2 rounded-xl text-xs transition shadow-lg shadow-indigo-950/50"

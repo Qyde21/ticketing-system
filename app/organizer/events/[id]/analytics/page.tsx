@@ -92,50 +92,50 @@ export default async function OrganizerEventAnalyticsPage({
     <main className="max-w-5xl mx-auto px-4 py-8 text-white">
       <div className="mb-6">
         <Link href="/organizer/dashboard" className="text-indigo-400 hover:underline text-sm">&larr; Back to dashboard</Link>
-        <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400 mt-2">
+        <h1 className="text-3xl font-extrabold mt-2 text-white">
           Analytics: {event.title}
         </h1>
-        <p className="text-gray-400 text-sm mt-1">
+        <p className="text-neutral-400 text-sm mt-1">
           {event.venue_name}
           {event.start_at && ` · ${new Date(event.start_at).toLocaleString('en-KE', { dateStyle: 'medium', timeStyle: 'short' })}`}
         </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-gray-900 p-5 rounded-xl border border-gray-800">
+        <div className="bg-neutral-950 p-5 rounded-xl border border-white/10">
           <p className="text-indigo-300 font-medium text-xs uppercase tracking-wider">Gross sales</p>
           <p className="text-2xl font-bold text-cyan-400 mt-2">KES {displayGross.toLocaleString()}</p>
         </div>
-        <div className="bg-gray-900 p-5 rounded-xl border border-gray-800">
+        <div className="bg-neutral-950 p-5 rounded-xl border border-white/10">
           <p className="text-indigo-300 font-medium text-xs uppercase tracking-wider">Net (after 4%)</p>
           <p className="text-2xl font-bold text-emerald-400 mt-2">KES {netToOrganizer.toLocaleString()}</p>
-          <p className="text-xs text-gray-500 mt-1">Platform fee KES {platformFee.toLocaleString()}</p>
+          <p className="text-xs text-neutral-500 mt-1">Platform fee KES {platformFee.toLocaleString()}</p>
         </div>
-        <div className="bg-gray-900 p-5 rounded-xl border border-gray-800">
+        <div className="bg-neutral-950 p-5 rounded-xl border border-white/10">
           <p className="text-indigo-300 font-medium text-xs uppercase tracking-wider">Tickets sold</p>
           <p className="text-2xl font-bold text-white mt-2">
-            {totalSold} <span className="text-gray-500 text-lg">/ {totalCapacity || '∞'}</span>
+            {totalSold} <span className="text-neutral-500 text-lg">/ {totalCapacity || '∞'}</span>
           </p>
           <p className="text-xs text-amber-400 mt-1">{sellThrough}% sell-through</p>
         </div>
-        <div className="bg-gray-900 p-5 rounded-xl border border-gray-800">
+        <div className="bg-neutral-950 p-5 rounded-xl border border-white/10">
           <p className="text-indigo-300 font-medium text-xs uppercase tracking-wider">Check-ins</p>
           <p className="text-2xl font-bold text-white mt-2">
-            {checkedIn} <span className="text-gray-500 text-lg">/ {totalTicketsIssued}</span>
+            {checkedIn} <span className="text-neutral-500 text-lg">/ {totalTicketsIssued}</span>
           </p>
-          <p className="text-xs text-gray-400 mt-1">{checkinRate}% of issued tickets</p>
+          <p className="text-xs text-neutral-400 mt-1">{checkinRate}% of issued tickets</p>
         </div>
       </div>
 
       <SalesTrendChart orders={paidOrders as any} />
 
-      <div className="bg-gray-900 p-6 rounded-xl border border-gray-800 shadow-lg mt-8">
+      <div className="bg-neutral-950 p-6 rounded-xl border border-white/10 shadow-lg mt-8">
         <h2 className="text-xl font-bold mb-4 text-indigo-300">Ticket tier breakdown</h2>
         {processedTiers.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-gray-800 text-gray-400 text-sm">
+                <tr className="border-b border-white/10 text-neutral-400 text-sm">
                   <th className="py-3 px-4">Tier</th>
                   <th className="py-3 px-4">Price</th>
                   <th className="py-3 px-4">Capacity</th>
@@ -145,21 +145,21 @@ export default async function OrganizerEventAnalyticsPage({
                   <th className="py-3 px-4">Progress</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-800 text-sm">
+              <tbody className="divide-y divide-neutral-800 text-sm">
                 {processedTiers.map((tier: any) => (
-                  <tr key={tier.id} className="hover:bg-gray-800/50">
+                  <tr key={tier.id} className="hover:bg-neutral-900/50">
                     <td className="py-3 px-4 font-semibold text-white">{tier.name}</td>
                     <td className="py-3 px-4 text-cyan-400">KES {tier.tierPrice.toLocaleString()}</td>
-                    <td className="py-3 px-4 text-gray-300">{tier.total}</td>
+                    <td className="py-3 px-4 text-neutral-300">{tier.total}</td>
                     <td className="py-3 px-4 text-emerald-400 font-semibold">{tier.sold}</td>
                     <td className="py-3 px-4 text-amber-400 font-semibold">{tier.remaining}</td>
                     <td className="py-3 px-4 text-white">KES {tier.tierRevenue.toLocaleString()}</td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
-                        <div className="w-24 bg-gray-800 h-2 rounded-full overflow-hidden border border-gray-700">
+                        <div className="w-24 bg-neutral-900 h-2 rounded-full overflow-hidden border border-white/15">
                           <div className="bg-indigo-500 h-full" style={{ width: `${tier.percentageSold}%` }} />
                         </div>
-                        <span className="text-xs text-gray-400">{tier.percentageSold}%</span>
+                        <span className="text-xs text-neutral-400">{tier.percentageSold}%</span>
                       </div>
                     </td>
                   </tr>
@@ -168,13 +168,13 @@ export default async function OrganizerEventAnalyticsPage({
             </table>
           </div>
         ) : (
-          <p className="text-gray-400">No ticket types for this event.</p>
+          <p className="text-neutral-400">No ticket types for this event.</p>
         )}
       </div>
 
       <div className="mt-8 flex flex-wrap gap-3">
-        <Link href={`/organizer/events/${event.id}/orders`} className="bg-gray-800 hover:bg-gray-700 text-white text-sm font-semibold px-4 py-2 rounded-lg border border-gray-700">Orders</Link>
-        <Link href={`/organizer/events/${event.id}/scan-overview`} className="bg-gray-800 hover:bg-gray-700 text-white text-sm font-semibold px-4 py-2 rounded-lg border border-gray-700">Live check-in</Link>
+        <Link href={`/organizer/events/${event.id}/orders`} className="bg-neutral-900 hover:bg-neutral-800 text-white text-sm font-semibold px-4 py-2 rounded-lg border border-white/15">Orders</Link>
+        <Link href={`/organizer/events/${event.id}/scan-overview`} className="bg-neutral-900 hover:bg-neutral-800 text-white text-sm font-semibold px-4 py-2 rounded-lg border border-white/15">Live check-in</Link>
         <Link href="/organizer/analytics" className="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-4 py-2 rounded-lg">All events analytics</Link>
       </div>
     </main>

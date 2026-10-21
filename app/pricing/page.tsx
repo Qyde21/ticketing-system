@@ -5,17 +5,17 @@ export default function PricingPage() {
     <div className="max-w-3xl mx-auto px-6 py-16 text-white">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-extrabold mb-2">Simple, Transparent Pricing</h1>
-        <p className="text-gray-400 text-lg">No hidden fees. Only pay when you sell tickets.</p>
+        <p className="text-neutral-400 text-lg">No hidden fees. Only pay when you sell tickets.</p>
       </div>
 
       {/* Pricing cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-12">
 
         {/* Attendee */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8">
+        <div className="bg-neutral-950 border border-white/10 rounded-2xl p-8">
           <div className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-3">Attendee</div>
           <div className="text-5xl font-extrabold text-white mb-1">Free</div>
-          <p className="text-gray-400 text-sm mb-6">Sign up and buy tickets at no extra cost</p>
+          <p className="text-neutral-400 text-sm mb-6">Sign up and buy tickets at no extra cost</p>
           <ul className="flex flex-col gap-2.5 mb-6 list-none p-0">
             {[
               'Free account creation',
@@ -24,18 +24,18 @@ export default function PricingPage() {
               'Instant QR-code ticket by email',
               'WhatsApp support',
             ].map((item) => (
-              <li key={item} className="flex gap-2 text-sm text-gray-300">
+              <li key={item} className="flex gap-2 text-sm text-neutral-300">
                 <span className="text-emerald-400 font-bold">&#10003;</span> {item}
               </li>
             ))}
           </ul>
-          <Link href="/signup" className="block text-center bg-gray-800 hover:bg-gray-700 text-white py-2.5 rounded-lg font-semibold text-sm transition">
+          <Link href="/signup" className="block text-center bg-neutral-900 hover:bg-neutral-800 text-white py-2.5 rounded-lg font-semibold text-sm transition">
             Sign up free
           </Link>
         </div>
 
         {/* Organizer */}
-        <div className="relative bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-2xl p-8 shadow-lg shadow-indigo-950/50">
+        <div className="relative rounded-2xl p-8 bg-white text-black hover:bg-neutral-200">
           <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-400 text-black text-xs font-extrabold px-3 py-1 rounded-full whitespace-nowrap">
             MOST POPULAR
           </div>
@@ -66,7 +66,7 @@ export default function PricingPage() {
       </div>
 
       {/* FAQ section */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8">
+      <div className="bg-neutral-950 border border-white/10 rounded-2xl p-8">
         <h2 className="text-xl font-bold text-white mb-6">Pricing FAQ</h2>
         <div className="flex flex-col gap-5">
           {[
@@ -91,9 +91,9 @@ export default function PricingPage() {
               a: 'No minimum. You can sell as few or as many tickets as you like.',
             },
           ].map((item) => (
-            <div key={item.q} className="border-b border-gray-800 pb-5 last:border-0 last:pb-0">
+            <div key={item.q} className="border-b border-white/10 pb-5 last:border-0 last:pb-0">
               <h3 className="text-sm font-bold text-white mb-1.5">{item.q}</h3>
-              <p className="text-sm text-gray-400" style={{ lineHeight: 1.7 }}>{item.a}</p>
+              <p className="text-sm text-neutral-400" style={{ lineHeight: 1.7 }}>{item.a}</p>
             </div>
           ))}
         </div>
@@ -101,7 +101,7 @@ export default function PricingPage() {
 
       {/* CTA */}
       <div className="text-center mt-12">
-        <p className="text-gray-400 mb-4">Ready to start selling tickets?</p>
+        <p className="text-neutral-400 mb-4">Ready to start selling tickets?</p>
         <Link href="/signup?role=organizer" className="inline-block bg-indigo-600 hover:bg-indigo-500 text-white py-3 px-8 rounded-lg font-bold text-base transition shadow-lg shadow-indigo-950/50">
           Create your organizer account
         </Link>

@@ -48,7 +48,7 @@ export default function TransferTicketButton({ code }: { code: string }) {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="text-xs px-2 py-1 rounded border border-gray-700 bg-gray-800 hover:bg-gray-700 text-gray-300 whitespace-nowrap transition"
+        className="text-xs px-2 py-1 rounded border border-white/15 bg-neutral-900 hover:bg-neutral-800 text-neutral-300 whitespace-nowrap transition"
       >
         Transfer
       </button>
@@ -56,21 +56,21 @@ export default function TransferTicketButton({ code }: { code: string }) {
   }
 
   return (
-    <div className="w-full bg-gray-950 border border-gray-800 rounded-lg p-3 mt-2 flex flex-col gap-2">
-      <p className="text-xs font-semibold text-gray-300">Transfer this ticket to:</p>
+    <div className="w-full bg-black border border-white/10 rounded-lg p-3 mt-2 flex flex-col gap-2">
+      <p className="text-xs font-semibold text-neutral-300">Transfer this ticket to:</p>
       <input
         type="text"
         value={name}
         onChange={(e) => setName(e.target.value)}
         placeholder="Recipient's full name"
-        className="w-full bg-gray-900 border border-gray-800 rounded-md px-2.5 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
+        className="w-full bg-neutral-950 border border-white/10 rounded-md px-2.5 py-1.5 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-indigo-500"
       />
       <input
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="Recipient's email"
-        className="w-full bg-gray-900 border border-gray-800 rounded-md px-2.5 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
+        className="w-full bg-neutral-950 border border-white/10 rounded-md px-2.5 py-1.5 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-indigo-500"
       />
       {error && <p className="text-red-400 text-xs">{error}</p>}
       <div className="flex gap-2">
@@ -83,7 +83,7 @@ export default function TransferTicketButton({ code }: { code: string }) {
         </button>
         <button
           onClick={() => { setOpen(false); setError(''); }}
-          className="bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs px-3 py-1.5 rounded-md transition"
+          className="bg-neutral-900 hover:bg-neutral-800 text-neutral-300 text-xs px-3 py-1.5 rounded-md transition"
         >
           Cancel
         </button>

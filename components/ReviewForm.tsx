@@ -47,7 +47,7 @@ export default function ReviewForm({ eventId }: { eventId: string }) {
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+    <div className="bg-neutral-950 border border-white/10 rounded-xl p-4">
       <p className="text-sm font-bold text-white mb-2">Leave a review</p>
       <div className="flex gap-1 mb-3">
         {[1, 2, 3, 4, 5].map((star) => (
@@ -79,7 +79,7 @@ export default function ReviewForm({ eventId }: { eventId: string }) {
         placeholder="Optional — share what you thought (max 2000 characters)"
         maxLength={2000}
         rows={3}
-        className="w-full bg-gray-950 border border-gray-700 rounded-lg p-2.5 text-sm text-white mb-3 resize-none"
+        className="w-full bg-black border border-white/15 rounded-lg p-2.5 text-sm text-white mb-3 resize-none"
       />
       {error && <p className="text-red-400 text-xs mb-2">{error}</p>}
       <button

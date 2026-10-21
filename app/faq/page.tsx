@@ -45,13 +45,13 @@ export default function FAQPage() {
   return (
     <div className="max-w-2xl mx-auto px-6 py-16 text-white">
       <h1 className="text-3xl font-extrabold mb-2">Frequently Asked Questions</h1>
-      <p className="text-gray-400 text-base mb-8">Everything you need to know about TicketHub</p>
+      <p className="text-neutral-400 text-base mb-8">Everything you need to know about TicketHub</p>
 
       <div className="flex flex-col gap-4">
         {faqs.map((faq, i) => (
-          <div key={i} className="bg-gray-900 border-l-4 border-indigo-500 rounded-xl p-5">
+          <div key={i} className="bg-neutral-950 border-l-4 border-indigo-500 rounded-xl p-5">
             <h3 className="text-base font-bold text-white mb-2">{faq.q}</h3>
-            <p className="text-sm text-gray-300" style={{ lineHeight: 1.7 }}>{faq.a}</p>
+            <p className="text-sm text-neutral-300" style={{ lineHeight: 1.7 }}>{faq.a}</p>
           </div>
         ))}
       </div>

@@ -39,7 +39,7 @@ export default function ShareTicket({ code, eventTitle }: { code: string; eventT
   }
 
   if (shared) {
-    return <span className="text-xs text-gray-500 whitespace-nowrap">Shared</span>;
+    return <span className="text-xs text-neutral-500 whitespace-nowrap">Shared</span>;
   }
 
   return (
@@ -49,7 +49,7 @@ export default function ShareTicket({ code, eventTitle }: { code: string; eventT
         className={`text-xs px-2 py-1 rounded border whitespace-nowrap transition ${
           copied
             ? 'bg-emerald-950/60 border-emerald-800 text-emerald-400'
-            : 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700'
+            : 'bg-neutral-900 border-white/15 text-neutral-300 hover:bg-neutral-800'
         }`}
       >
         {copied ? 'Copied!' : 'Copy link'}

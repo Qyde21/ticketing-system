@@ -4,7 +4,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import PasswordInput from '@/components/PasswordInput';
 
-const inputClass = 'w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition';
+const inputClass = 'w-full bg-neutral-900 border border-white/15 rounded-lg px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:border-indigo-500 transition';
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams();
@@ -105,7 +105,7 @@ function ResetPasswordForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-bold py-3 px-4 rounded-lg transition shadow-lg disabled:opacity-50"
+        className="w-full font-bold py-3 px-4 rounded-full transition disabled:opacity-50 bg-white text-black hover:bg-neutral-200"
       >
         {loading ? 'Resetting...' : 'Reset Password'}
       </button>
@@ -116,12 +116,12 @@ function ResetPasswordForm() {
 export default function ResetPasswordPage() {
   return (
     <main className="max-w-md mx-auto px-4 py-16 text-white">
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 shadow-2xl">
+      <div className="bg-neutral-950 border border-white/10 rounded-2xl p-8 shadow-2xl">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Reset Password</h1>
-          <p className="text-gray-400 text-sm mt-2">Choose a new password for your account</p>
+          <h1 className="text-3xl font-extrabold text-white">Reset Password</h1>
+          <p className="text-neutral-400 text-sm mt-2">Choose a new password for your account</p>
         </div>
-        <Suspense fallback={<div className="text-center text-gray-400">Loading...</div>}>
+        <Suspense fallback={<div className="text-center text-neutral-400">Loading...</div>}>
           <ResetPasswordForm />
         </Suspense>
       </div>

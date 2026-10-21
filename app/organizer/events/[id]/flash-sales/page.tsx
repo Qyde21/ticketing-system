@@ -26,7 +26,7 @@ export default async function FlashSalesPage({ params }: { params: Promise<{ id:
       <div className="max-w-2xl mx-auto py-12 px-4 text-white">
         <Link href="/organizer/dashboard" className="text-sm text-indigo-400 hover:underline">&larr; Back to dashboard</Link>
         <h1 className="text-2xl font-extrabold mt-4 mb-2">Flash Sales</h1>
-        <p className="text-gray-400">This event has ended. Flash sales can no longer be created or edited.</p>
+        <p className="text-neutral-400">This event has ended. Flash sales can no longer be created or edited.</p>
       </div>
     );
   }
@@ -46,7 +46,7 @@ export default async function FlashSalesPage({ params }: { params: Promise<{ id:
         &larr; Back to dashboard
       </Link>
       <h1 className="text-2xl font-extrabold mt-2 mb-1">Flash Sales</h1>
-      <p className="text-gray-400 text-sm mb-6">{event.title} &middot; Discount a ticket tier for a limited time and/or limited quantity — no code needed at checkout.</p>
+      <p className="text-neutral-400 text-sm mb-6">{event.title} &middot; Discount a ticket tier for a limited time and/or limited quantity — no code needed at checkout.</p>
 
       <FlashSaleManager ticketTypes={ticketTypes as any} />
     </div>

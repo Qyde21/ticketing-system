@@ -55,7 +55,7 @@ export default async function AdminScanPage({ params }: { params: Promise<{ even
         &larr; Back to events
       </Link>
       <h1 className="text-2xl font-extrabold mt-2">{event.title}</h1>
-      <p className="text-gray-400 text-sm">
+      <p className="text-neutral-400 text-sm">
         {event.venue_name || 'No Venue'} &middot; {event.start_at ? new Date(event.start_at).toLocaleString() : 'No Date'}
       </p>
       <LiveOverview eventId={eventId} initial={initial} />

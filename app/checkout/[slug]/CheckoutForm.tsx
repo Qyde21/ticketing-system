@@ -123,13 +123,13 @@ export default function CheckoutForm({ event, ticketTypes }: { event: any, ticke
   };
 
   return (
-    <form onSubmit={handleCheckout} className="space-y-6 bg-gray-950 border border-gray-800 p-6 rounded-2xl">
+    <form onSubmit={handleCheckout} className="space-y-6 bg-black border border-white/10 p-6 rounded-2xl">
       <div>
-        <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Select Ticket Tier</label>
+        <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Select Ticket Tier</label>
         <select
           value={selectedTicketId}
           onChange={(e) => setSelectedTicketId(e.target.value)}
-          className="w-full bg-gray-900 border border-gray-800 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500"
+          className="w-full bg-neutral-950 border border-white/10 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500"
         >
           {safeTickets.map((t) => t && t.id ? (
             <option key={t.id} value={t.id}>
@@ -140,55 +140,55 @@ export default function CheckoutForm({ event, ticketTypes }: { event: any, ticke
       </div>
 
       <div>
-        <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Ticket Quantity</label>
+        <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Ticket Quantity</label>
         <input
           type="number"
           min="1"
           max="10"
           value={quantity}
           onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-          className="w-full bg-gray-900 border border-gray-800 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500"
+          className="w-full bg-neutral-950 border border-white/10 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500"
         />
       </div>
 
       <div>
-        <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Full Name</label>
+        <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Full Name</label>
         <input
           type="text"
           required
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
           placeholder="Kirui Gideon"
-          className="w-full bg-gray-900 border border-gray-800 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500"
+          className="w-full bg-neutral-950 border border-white/10 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500"
         />
       </div>
 
       <div>
-        <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Email Address</label>
+        <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Email Address</label>
         <input
           type="email"
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="kiruiqyde@gmail.com"
-          className="w-full bg-gray-900 border border-gray-800 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500"
+          className="w-full bg-neutral-950 border border-white/10 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500"
         />
       </div>
 
       <div>
-        <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Phone Number</label>
+        <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Phone Number</label>
         <input
           type="text"
           required
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           placeholder="0114525941"
-          className="w-full bg-gray-900 border border-gray-800 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500"
+          className="w-full bg-neutral-950 border border-white/10 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500"
         />
       </div>
 
       <div>
-        <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Promo Code</label>
+        <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Promo Code</label>
         {appliedPromo ? (
           <div className="flex items-center justify-between bg-emerald-950/40 border border-emerald-800/50 rounded-xl p-3">
             <div>
@@ -200,7 +200,7 @@ export default function CheckoutForm({ event, ticketTypes }: { event: any, ticke
             <button
               type="button"
               onClick={handleRemovePromo}
-              className="text-xs text-gray-400 hover:text-red-400 font-semibold"
+              className="text-xs text-neutral-400 hover:text-red-400 font-semibold"
             >
               Remove
             </button>
@@ -212,13 +212,13 @@ export default function CheckoutForm({ event, ticketTypes }: { event: any, ticke
               value={promoInput}
               onChange={(e) => setPromoInput(e.target.value)}
               placeholder="Enter code"
-              className="flex-1 bg-gray-900 border border-gray-800 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500 uppercase"
+              className="flex-1 bg-neutral-950 border border-white/10 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500 uppercase"
             />
             <button
               type="button"
               onClick={handleApplyPromo}
               disabled={promoStatus === 'checking' || !promoInput.trim()}
-              className="px-5 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 text-white rounded-xl font-bold text-sm transition"
+              className="px-5 bg-neutral-900 hover:bg-neutral-800 disabled:opacity-50 text-white rounded-xl font-bold text-sm transition"
             >
               {promoStatus === 'checking' ? '...' : 'Apply'}
             </button>
@@ -229,9 +229,9 @@ export default function CheckoutForm({ event, ticketTypes }: { event: any, ticke
         )}
       </div>
 
-      <div className="bg-gray-900 border border-gray-800 p-4 rounded-xl">
+      <div className="bg-neutral-950 border border-white/10 p-4 rounded-xl">
         {appliedPromo && (
-          <div className="flex justify-between items-center text-xs text-gray-400 mb-2 pb-2 border-b border-gray-800">
+          <div className="flex justify-between items-center text-xs text-neutral-400 mb-2 pb-2 border-b border-white/10">
             <span>Subtotal</span>
             <span>KES {subtotal.toLocaleString()}</span>
           </div>
@@ -243,7 +243,7 @@ export default function CheckoutForm({ event, ticketTypes }: { event: any, ticke
           </div>
         )}
         <div className="flex justify-between items-center">
-          <span className="text-gray-400 text-sm font-bold">Total Amount:</span>
+          <span className="text-neutral-400 text-sm font-bold">Total Amount:</span>
           <span className="text-cyan-400 font-extrabold text-xl">{totalAmount > 0 ? `KES ${totalAmount.toLocaleString()}` : 'FREE'}</span>
         </div>
       </div>

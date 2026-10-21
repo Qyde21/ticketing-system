@@ -78,7 +78,7 @@ export default function MessageOrganizerWidget({
       {open && (
         <div
           style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 1001 }}
-          className="w-80 max-w-[calc(100vw-48px)] bg-gray-900 border border-gray-800 rounded-2xl shadow-2xl overflow-hidden"
+          className="w-80 max-w-[calc(100vw-48px)] bg-neutral-950 border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
         >
           <div className="flex items-center justify-between px-4 py-3 bg-indigo-600">
             <p className="text-white font-semibold text-sm truncate pr-2">Message organizer</p>
@@ -91,22 +91,22 @@ export default function MessageOrganizerWidget({
             {sent ? (
               <div className="text-center py-4">
                 <p className="text-emerald-400 font-semibold mb-1">Message sent!</p>
-                <p className="text-gray-400 text-sm">
+                <p className="text-neutral-400 text-sm">
                   The organizer will see it in their inbox and get an email. Check your{' '}
                   <a href="/inbox" className="text-indigo-400 hover:underline">TicketHub inbox</a> for their reply.
                 </p>
               </div>
             ) : (
               <>
-                <p className="text-gray-400 text-xs mb-3">
-                  Ask a question about <span className="text-gray-300 font-medium">{eventTitle}</span> — parking, entry, anything.
+                <p className="text-neutral-400 text-xs mb-3">
+                  Ask a question about <span className="text-neutral-300 font-medium">{eventTitle}</span> — parking, entry, anything.
                 </p>
                 <textarea
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
                   rows={4}
                   placeholder="Type your message..."
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                  className="w-full bg-neutral-900 border border-white/15 rounded-lg p-3 text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
                 />
                 {error && <p className="text-red-400 text-xs mt-2">{error}</p>}
                 <button

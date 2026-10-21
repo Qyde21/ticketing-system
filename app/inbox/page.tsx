@@ -23,7 +23,7 @@ export default async function InboxPage() {
 
   return (
     <div className="max-w-2xl mx-auto py-12 px-4 text-white">
-      <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Your Inbox</h1>
+      <h1 className="text-3xl font-extrabold text-white">Your Inbox</h1>
       <InboxMessageList initialMessages={messages as any} />
     </div>
   );

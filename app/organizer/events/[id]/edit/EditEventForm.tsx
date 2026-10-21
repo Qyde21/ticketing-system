@@ -25,8 +25,8 @@ interface EventInput {
 }
 
 const inputClass =
-  'w-full bg-gray-900 border border-gray-800 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500 placeholder:text-gray-500';
-const labelClass = 'block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2';
+  'w-full bg-neutral-950 border border-white/10 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500 placeholder:text-neutral-500';
+const labelClass = 'block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2';
 
 export default function EditEventForm({
   event,
@@ -131,7 +131,7 @@ export default function EditEventForm({
   return (
     <form onSubmit={handleSubmit} className="max-w-xl mx-auto py-12 px-4 text-white space-y-6">
       <div>
-        <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">
+        <h1 className="text-3xl font-extrabold text-white">
           Edit Event
         </h1>
         <a href="/organizer/dashboard" className="text-indigo-400 hover:text-cyan-400 text-sm">
@@ -150,7 +150,7 @@ export default function EditEventForm({
         <input className={inputClass} placeholder="Event title" value={title} onChange={(e) => setTitle(e.target.value)} required />
       </div>
 
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+      <div className="bg-neutral-950 border border-white/10 rounded-xl p-4">
         {coverImageUrl && (
           <img src={coverImageUrl} alt="Current cover" className="w-full max-h-52 object-cover rounded-xl mb-4" />
         )}
@@ -192,7 +192,7 @@ export default function EditEventForm({
         <h2 className="text-xl font-bold text-white mb-3">Ticket Types</h2>
         <div className="space-y-3">
           {ticketTypes.map((tt, i) => (
-            <div key={tt.id || i} className="bg-gray-900 border border-gray-800 rounded-xl p-3">
+            <div key={tt.id || i} className="bg-neutral-950 border border-white/10 rounded-xl p-3">
               <div className="flex flex-col sm:flex-row gap-2">
                 <input className={inputClass} placeholder="Name (e.g. Regular)" value={tt.name} onChange={(e) => updateTicketType(i, 'name', e.target.value)} required />
                 <input className={inputClass} placeholder="Price (KES)" type="number" min="0" value={tt.priceKes} onChange={(e) => updateTicketType(i, 'priceKes', e.target.value)} required />
@@ -216,7 +216,7 @@ export default function EditEventForm({
                 )}
               </div>
               {!!tt.quantitySold && (
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs text-neutral-500 mt-2">
                   {tt.quantitySold} already sold — quantity can&apos;t go below this, and this tier can&apos;t be removed.
                 </p>
               )}
@@ -226,7 +226,7 @@ export default function EditEventForm({
         <button
           type="button"
           onClick={addTicketType}
-          className="mt-3 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition"
+          className="mt-3 px-4 py-2 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition"
         >
           + Add ticket type
         </button>

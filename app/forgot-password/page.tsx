@@ -31,10 +31,10 @@ export default function ForgotPasswordPage() {
 
   return (
     <main className="max-w-md mx-auto px-4 py-16 text-white">
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 shadow-2xl">
+      <div className="bg-neutral-950 border border-white/10 rounded-2xl p-8 shadow-2xl">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Forgot Password</h1>
-          <p className="text-gray-400 text-sm mt-2">Enter your email and we will send you a reset link</p>
+          <h1 className="text-3xl font-extrabold text-white">Forgot Password</h1>
+          <p className="text-neutral-400 text-sm mt-2">Enter your email and we will send you a reset link</p>
         </div>
 
         {submitted ? (
@@ -51,21 +51,21 @@ export default function ForgotPasswordPage() {
                 placeholder="name@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition"
+                className="w-full bg-neutral-900 border border-white/15 rounded-lg px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:border-indigo-500 transition"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-bold py-3 px-4 rounded-lg transition shadow-lg disabled:opacity-50"
+              className="w-full font-bold py-3 px-4 rounded-full transition disabled:opacity-50 bg-white text-black hover:bg-neutral-200"
             >
               {loading ? 'Sending...' : 'Send Reset Link'}
             </button>
           </form>
         )}
 
-        <div className="mt-6 text-center text-sm text-gray-400">
+        <div className="mt-6 text-center text-sm text-neutral-400">
           Remembered your password?{' '}
           <Link href="/login" className="text-indigo-400 hover:underline font-semibold">
             Log in
