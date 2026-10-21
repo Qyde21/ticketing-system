@@ -1,4 +1,5 @@
 import { sql } from '@/lib/db';
+import { waitlistUnsubscribeUrl } from '@/lib/waitlistUnsubscribe';
 import { sendWaitlistSpotAvailableEmail } from '@/lib/email';
 
 /**
@@ -15,9 +16,10 @@ export async function notifyWaitlistIfSpotsFreed(
 
   const [ticketType] = await sql`
     SELECT tt.id, tt.name AS ticket_type_name, e.title AS event_title, e.slug, e.id AS event_id,
-           e.status AS event_status, e.start_at, e.end_at
+           e.status AS event_status, e.start_at, e.end_at, u.status AS organizer_status
     FROM ticket_types tt
     JOIN events e ON e.id = tt.event_id
+    JOIN users u ON u.id = e.organizer_id
     WHERE tt.id = ${ticketTypeId}
   `;
 
@@ -28,6 +30,8 @@ export async function notifyWaitlistIfSpotsFreed(
   // the whole waitlist was emailed "a spot just opened" for a cancelled event
   // (and for events that already took place, via the expiry cron).
   if (ticketType.event_status !== 'published') return;
+  // Checkout refuses suspended organizers, so "a spot opened - buy now" would lead nowhere.
+  if (ticketType.organizer_status === 'suspended') return;
   const eventEnd = ticketType.end_at || ticketType.start_at;
   if (eventEnd && new Date(eventEnd) < new Date()) return;
 
@@ -58,6 +62,7 @@ export async function notifyWaitlistIfSpotsFreed(
         eventTitle: ticketType.event_title,
         ticketTypeName: ticketType.ticket_type_name,
         checkoutUrl,
+        unsubscribeUrl: waitlistUnsubscribeUrl(baseUrl, entry.id),
       });
     } catch (err) {
       console.error('Failed to notify waitlist entry', entry.id, err);

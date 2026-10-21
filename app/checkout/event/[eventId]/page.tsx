@@ -19,10 +19,13 @@ export default async function EventCheckoutPage({
   const itemsRaw = sp?.items || '';
 
   const [event] = await sql`
-    SELECT id, title, slug, venue_name, start_at, end_at, status, cover_image_url
-    FROM events WHERE id = ${eventId}
+    SELECT e.id, e.title, e.slug, e.venue_name, e.start_at, e.end_at, e.status, e.cover_image_url,
+           u.status AS organizer_status
+    FROM events e
+    JOIN users u ON u.id = e.organizer_id
+    WHERE e.id = ${eventId}
   `;
-  if (!event) notFound();
+  if (!event || event.organizer_status === 'suspended') notFound();
 
   const requested = itemsRaw
     .split(',')

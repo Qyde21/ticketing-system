@@ -18,9 +18,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   try {
     const events = await sql`
-      SELECT slug, id, updated_at, created_at
-      FROM events
-      WHERE status IN ('published', 'completed')
+      SELECT e.slug, e.id, e.updated_at, e.created_at
+      FROM events e
+      JOIN users u ON u.id = e.organizer_id
+      WHERE e.status IN ('published', 'completed') AND u.status != 'suspended'
     `;
 
     eventPages = events.map((e: any) => ({

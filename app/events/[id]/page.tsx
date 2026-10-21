@@ -106,20 +106,22 @@ export default async function EventDetailPage({
   `;
 
   const [organizerProfile] = await sql`
-    SELECT COALESCE(op.business_name, u.full_name) AS organizer_name, COALESCE(op.is_verified, false) AS is_verified
+    SELECT COALESCE(op.business_name, u.full_name) AS organizer_name, COALESCE(op.is_verified, false) AS is_verified, u.status AS organizer_status
     FROM users u
     LEFT JOIN organizer_profiles op ON op.user_id = u.id
     WHERE u.id = ${event.organizer_id}
   `;
   const organizerVerified = organizerProfile?.is_verified === true;
   const organizerName = organizerProfile?.organizer_name as string | undefined;
+  // Checkout already refuses suspended organizers; say so here instead of offering a buy flow that fails.
+  const organizerSuspended = organizerProfile?.organizer_status === 'suspended';
 
   const eventDate = event.start_at || event.start_date || event.date;
   const eventEndDate = event.end_at || eventDate;
   const isCancelled = event.status === 'cancelled';
   const isEnded = eventEndDate ? new Date(eventEndDate) < new Date() : false;
   const notYetPublished = event.status === 'draft' || event.status === 'pending_review';
-  const salesClosed = isCancelled || isEnded || notYetPublished;
+  const salesClosed = isCancelled || isEnded || notYetPublished || organizerSuspended;
 
   const eventUrl = `https://www.mytickethub.co.ke/events/${event.slug || event.id}`;
 
@@ -252,6 +254,12 @@ export default async function EventDetailPage({
         </div>
       )}
       
+      {!isCancelled && !isEnded && !notYetPublished && organizerSuspended && (
+        <div className="bg-amber-950/40 border border-amber-800/60 text-amber-300 font-semibold px-4 py-3 rounded-xl mb-6">
+          Ticket sales for this event are currently unavailable.
+        </div>
+      )}
+
       <div className="bg-gray-900 border border-gray-800 p-6 rounded-2xl mb-8 space-y-3">
         <p><strong className="text-gray-400">Date:</strong> {eventDate ? new Date(eventDate).toLocaleString() : 'TBA'}</p>
         <p><strong className="text-gray-400">Location:</strong> {event.venue_name || event.location || 'Online / Venue TBA'}</p>
@@ -281,7 +289,9 @@ export default async function EventDetailPage({
               ? 'Ticket sales are closed because this event was cancelled.'
               : isEnded
               ? 'Ticket sales are closed because this event has ended.'
-              : 'Ticket sales will open once this event has been approved.'}
+              : notYetPublished
+              ? 'Ticket sales will open once this event has been approved.'
+              : 'Ticket sales for this event are currently unavailable.'}
           </p>
         ) : ticketTypes.length === 0 ? (
           <p className="text-gray-400">No tickets are available for this event yet.</p>

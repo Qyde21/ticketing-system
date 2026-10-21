@@ -2,6 +2,7 @@ import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { writeAuditLog } from '@/lib/audit';
 import { NextResponse } from 'next/server';
+import { revalidateTag } from 'next/cache';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -40,6 +41,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       }
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
+
+    // The public event list is cached for 30s; refresh it so the change is immediate.
+    revalidateTag('events', 'max');
 
     await writeAuditLog({
       actorId: session.userId,

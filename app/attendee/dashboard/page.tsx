@@ -62,10 +62,11 @@ export default async function AttendeeDashboard() {
   }
 
   const redeemableEvents = await sql`
-    SELECT id, title, slug
-    FROM events
-    WHERE status = 'published' AND start_at > NOW()
-    ORDER BY start_at ASC
+    SELECT e.id, e.title, e.slug
+    FROM events e
+    JOIN users u ON u.id = e.organizer_id
+    WHERE e.status = 'published' AND u.status != 'suspended' AND e.start_at > NOW()
+    ORDER BY e.start_at ASC
     LIMIT 50
   `;
 
