@@ -8,7 +8,7 @@ export default async function AdminOrganizerEventsPage({ params }: { params: Pro
   const session = await getSession();
 
   if (!session || session.role !== 'admin') {
-    return <div className="max-w-2xl mx-auto py-12 px-4 text-white">Unauthorized access.</div>;
+    return <div className="max-w-2xl mx-auto py-12 px-4 text-black">Unauthorized access.</div>;
   }
 
   const { id: organizerId } = await params;
@@ -19,7 +19,7 @@ export default async function AdminOrganizerEventsPage({ params }: { params: Pro
   `;
 
   if (!organizer) {
-    return <div className="max-w-2xl mx-auto py-12 px-4 text-white">Organizer not found.</div>;
+    return <div className="max-w-2xl mx-auto py-12 px-4 text-black">Organizer not found.</div>;
   }
 
   // Fetch events for this specific organizer
@@ -31,7 +31,7 @@ export default async function AdminOrganizerEventsPage({ params }: { params: Pro
   `;
 
   return (
-    <div className="max-w-2xl mx-auto py-10 px-4 text-white">
+    <div className="max-w-2xl mx-auto py-10 px-4 text-black">
       <div className="mb-5">
         <Link href="/admin/organizers" className="text-indigo-400 hover:underline text-sm">
           &larr; Back to Organizers
@@ -39,30 +39,30 @@ export default async function AdminOrganizerEventsPage({ params }: { params: Pro
       </div>
 
       <h1 className="text-2xl font-extrabold mb-1">Events by {organizer.full_name}</h1>
-      <p className="text-neutral-400 text-sm mb-6">{organizer.email}</p>
+      <p className="text-neutral-500 text-sm mb-6">{organizer.email}</p>
 
       {events.length === 0 ? (
-        <p className="text-neutral-400">No events found for this organizer.</p>
+        <p className="text-neutral-500">No events found for this organizer.</p>
       ) : (
         <ul className="list-none p-0 m-0">
           {events.map((e: any) => (
             <li
               key={e.id}
-              className="flex gap-4 mb-4 items-center bg-neutral-950 border border-white/10 rounded-xl p-3"
+              className="flex gap-4 mb-4 items-center bg-white border border-black/10 rounded-xl p-3"
             >
               {/* Thumbnail */}
               <div className="w-20 h-15 rounded-lg overflow-hidden flex-shrink-0 bg-indigo-600 flex items-center justify-center" style={{ width: 80, height: 60 }}>
                 {e.cover_image_url ? (
                   <img src={e.cover_image_url} alt={e.title} className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-white text-xs text-center p-1">{e.title}</span>
+                  <span className="text-black text-xs text-center p-1">{e.title}</span>
                 )}
               </div>
 
               {/* Event Info & Action Buttons */}
               <div className="flex-1">
-                <strong className="text-white">{e.title}</strong>
-                <div className="text-xs text-neutral-400 mt-0.5">
+                <strong className="text-black">{e.title}</strong>
+                <div className="text-xs text-neutral-500 mt-0.5">
                   {e.status} &middot; {new Date(e.start_at).toLocaleDateString()}
                 </div>
 

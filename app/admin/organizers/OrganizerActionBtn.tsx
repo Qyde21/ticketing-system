@@ -65,18 +65,18 @@ export default function OrganizerActionBtn({
       <div className="relative">
         <button
           onClick={() => setOpen(!open)}
-          className="bg-neutral-900 hover:bg-neutral-800 text-neutral-300 border border-white/15 font-semibold px-3 py-2 rounded-xl text-xs transition"
+          className="bg-neutral-100 hover:bg-neutral-200 text-neutral-700 border border-black/15 font-semibold px-3 py-2 rounded-xl text-xs transition"
         >
           Manage ?
         </button>
 
         {open && (
-          <div className="absolute right-0 mt-2 w-40 bg-black border border-white/10 rounded-xl shadow-2xl py-1 z-20">
+          <div className="absolute right-0 mt-2 w-40 bg-neutral-50 border border-black/10 rounded-xl shadow-2xl py-1 z-20">
             <button
               onClick={handleToggleStatus}
               disabled={loading}
               className={`w-full text-left px-4 py-2 text-xs font-semibold transition ${
-                isSuspended ? 'text-green-400 hover:bg-green-950/40' : 'text-red-400 hover:bg-red-950/40'
+                isSuspended ? 'text-green-600 hover:bg-green-50' : 'text-red-600 hover:bg-red-50'
               }`}
             >
               {loading ? 'Processing...' : isSuspended ? 'Activate Account' : 'Suspend Organizer'}

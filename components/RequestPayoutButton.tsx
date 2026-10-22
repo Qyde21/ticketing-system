@@ -44,8 +44,8 @@ export default function RequestPayoutButton({
         {loading ? '…' : 'Request payout'}
       </button>
       {disabledReason && <div className="text-[10px] text-neutral-500 mt-1">{disabledReason}</div>}
-      {msg && <div className="text-[10px] text-emerald-400 mt-1">{msg}</div>}
-      {err && <div className="text-[10px] text-red-400 mt-1">{err}</div>}
+      {msg && <div className="text-[10px] text-emerald-600 mt-1">{msg}</div>}
+      {err && <div className="text-[10px] text-red-600 mt-1">{err}</div>}
     </div>
   );
 }

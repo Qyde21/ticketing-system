@@ -30,11 +30,11 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <main className="max-w-md mx-auto px-4 py-16 text-white">
-      <div className="bg-neutral-950 border border-white/10 rounded-2xl p-8 shadow-2xl">
+    <main className="max-w-md mx-auto px-4 py-16 text-black">
+      <div className="bg-white border border-black/10 rounded-2xl p-8 shadow-2xl">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-extrabold text-white">Forgot Password</h1>
-          <p className="text-neutral-400 text-sm mt-2">Enter your email and we will send you a reset link</p>
+          <h1 className="text-3xl font-extrabold text-black">Forgot Password</h1>
+          <p className="text-neutral-500 text-sm mt-2">Enter your email and we will send you a reset link</p>
         </div>
 
         {submitted ? (
@@ -51,21 +51,21 @@ export default function ForgotPasswordPage() {
                 placeholder="name@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-neutral-900 border border-white/15 rounded-lg px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:border-indigo-500 transition"
+                className="w-full bg-neutral-100 border border-black/15 rounded-lg px-4 py-3 text-black placeholder-neutral-500 focus:outline-none focus:border-indigo-500 transition"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full font-bold py-3 px-4 rounded-full transition disabled:opacity-50 bg-white text-black hover:bg-neutral-200"
+              className="w-full font-bold py-3 px-4 rounded-full transition disabled:opacity-50 bg-black text-white hover:bg-neutral-800"
             >
               {loading ? 'Sending...' : 'Send Reset Link'}
             </button>
           </form>
         )}
 
-        <div className="mt-6 text-center text-sm text-neutral-400">
+        <div className="mt-6 text-center text-sm text-neutral-500">
           Remembered your password?{' '}
           <Link href="/login" className="text-indigo-400 hover:underline font-semibold">
             Log in

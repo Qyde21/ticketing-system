@@ -18,8 +18,8 @@ interface CompEntry {
 }
 
 const inputClass =
-  'w-full bg-neutral-950 border border-white/10 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500 placeholder:text-neutral-500';
-const labelClass = 'block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2';
+  'w-full bg-white border border-black/10 rounded-xl p-3 text-black text-sm focus:outline-none focus:border-indigo-500 placeholder:text-neutral-500';
+const labelClass = 'block text-xs font-bold uppercase tracking-wider text-neutral-500 mb-2';
 
 export default function CompTicketForm({
   eventId,
@@ -103,32 +103,32 @@ export default function CompTicketForm({
 
   if (eventStatus === 'cancelled') {
     return (
-      <div className="max-w-lg mx-auto py-12 px-4 text-white">
-        <p className="text-red-400">This event has been cancelled — complimentary tickets can&apos;t be issued.</p>
+      <div className="max-w-lg mx-auto py-12 px-4 text-black">
+        <p className="text-red-600">This event has been cancelled — complimentary tickets can&apos;t be issued.</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-xl mx-auto py-12 px-4 text-white space-y-6">
+    <div className="max-w-xl mx-auto py-12 px-4 text-black space-y-6">
       <div>
-        <h1 className="text-3xl font-extrabold text-white">
+        <h1 className="text-3xl font-extrabold text-black">
           Complimentary Tickets
         </h1>
-        <p className="text-neutral-400 text-sm mt-1">{eventTitle}</p>
+        <p className="text-neutral-500 text-sm mt-1">{eventTitle}</p>
         <a href={`/organizer/events/${eventId}/edit`} className="text-indigo-400 hover:text-cyan-400 text-sm">
           &larr; Back to event
         </a>
       </div>
 
       {isAdminEditingOther && (
-        <p className="text-amber-400 text-sm bg-amber-950/30 border border-amber-800/40 rounded-xl px-4 py-3">
+        <p className="text-amber-600 text-sm bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
           You&apos;re issuing tickets as admin on behalf of <strong>{organizerLabel}</strong>. This will be recorded in the audit log.
         </p>
       )}
 
       {ticketTypes.length === 0 ? (
-        <p className="text-neutral-400 text-sm">This event has no ticket types yet — add one from the event editor first.</p>
+        <p className="text-neutral-500 text-sm">This event has no ticket types yet — add one from the event editor first.</p>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
@@ -179,8 +179,8 @@ export default function CompTicketForm({
             <input className={inputClass} placeholder="e.g. Press pass, sponsor, staff" value={note} onChange={(e) => setNote(e.target.value)} />
           </div>
 
-          {error && <p className="text-red-400 text-sm font-medium">{error}</p>}
-          {success && <p className="text-emerald-400 text-sm font-medium">{success}</p>}
+          {error && <p className="text-red-600 text-sm font-medium">{error}</p>}
+          {success && <p className="text-emerald-600 text-sm font-medium">{success}</p>}
 
           <button
             type="submit"
@@ -194,15 +194,15 @@ export default function CompTicketForm({
 
       {recentComps.length > 0 && (
         <div>
-          <h2 className="text-lg font-bold text-white mb-3">Recently Issued</h2>
+          <h2 className="text-lg font-bold text-black mb-3">Recently Issued</h2>
           <div className="space-y-2">
             {recentComps.map((c) => (
-              <div key={c.id} className="bg-neutral-950 border border-white/10 rounded-xl p-3 text-sm">
+              <div key={c.id} className="bg-white border border-black/10 rounded-xl p-3 text-sm">
                 <div className="flex justify-between items-start gap-3">
                   <div className="min-w-0">
-                    <p className="text-white font-semibold truncate">{c.name} · {c.quantity} ticket{c.quantity > 1 ? 's' : ''}</p>
+                    <p className="text-black font-semibold truncate">{c.name} · {c.quantity} ticket{c.quantity > 1 ? 's' : ''}</p>
                     <p className="text-neutral-500 text-xs truncate">{c.email}</p>
-                    {c.note && <p className="text-neutral-400 text-xs mt-1">{c.note}</p>}
+                    {c.note && <p className="text-neutral-500 text-xs mt-1">{c.note}</p>}
                   </div>
                   <span className="text-neutral-500 text-xs flex-shrink-0">
                     {new Date(c.createdAt).toLocaleDateString()}

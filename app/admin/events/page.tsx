@@ -11,7 +11,7 @@ export default async function AdminEventsPage({ searchParams }: { searchParams: 
   const organizerId = resolvedParams?.organizer_id;
 
   if (!session || session.role !== 'admin') {
-    return <div className="max-w-6xl mx-auto px-4 py-8 text-white">Unauthorized access.</div>;
+    return <div className="max-w-6xl mx-auto px-4 py-8 text-black">Unauthorized access.</div>;
   }
 
   let events: any[] = [];
@@ -49,13 +49,13 @@ export default async function AdminEventsPage({ searchParams }: { searchParams: 
   }
 
   return (
-    <main className="max-w-6xl mx-auto px-4 py-8 text-white">
-      <div className="flex justify-between items-center mb-8 pb-4 border-b border-white/10">
+    <main className="max-w-6xl mx-auto px-4 py-8 text-black">
+      <div className="flex justify-between items-center mb-8 pb-4 border-b border-black/10">
         <div>
-          <h1 className="text-3xl font-extrabold text-white">
+          <h1 className="text-3xl font-extrabold text-black">
             {organizerName ? `Events Hosted by ${organizerName}` : 'All System Events'}
           </h1>
-          <p className="text-neutral-400 text-sm mt-1">
+          <p className="text-neutral-500 text-sm mt-1">
             {organizerId ? 'Showing filtered events for this specific organizer.' : 'Manage and review all platform events'}
           </p>
         </div>
@@ -63,19 +63,19 @@ export default async function AdminEventsPage({ searchParams }: { searchParams: 
           {organizerId && (
             <Link
               href="/admin/organizers"
-              className="bg-neutral-900 hover:bg-neutral-800 text-neutral-300 font-semibold px-4 py-2 rounded-xl text-xs transition"
+              className="bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-semibold px-4 py-2 rounded-xl text-xs transition"
             >
               ← Back to Organizers
             </Link>
           )}
-          <div className="bg-neutral-950 border border-white/10 px-4 py-2 rounded-xl text-sm text-neutral-300 shadow">
+          <div className="bg-white border border-black/10 px-4 py-2 rounded-xl text-sm text-neutral-700 shadow">
             Total Events: <strong className="text-cyan-400">{events.length}</strong>
           </div>
         </div>
       </div>
 
       {events.length === 0 ? (
-        <div className="text-center py-16 bg-neutral-950 border border-white/10 rounded-2xl shadow-xl text-neutral-400">
+        <div className="text-center py-16 bg-white border border-black/10 rounded-2xl shadow-xl text-neutral-500">
           No events found for this organizer.
         </div>
       ) : (
@@ -91,31 +91,31 @@ export default async function AdminEventsPage({ searchParams }: { searchParams: 
                 ? 'Pending Review'
                 : (ev.status || 'draft');
             const badgeClass = isCompleted
-              ? 'bg-neutral-900 text-neutral-300 border border-neutral-600'
+              ? 'bg-neutral-100 text-neutral-700 border border-black/20'
               : ev.status === 'published'
-                ? 'bg-green-950 text-green-400 border border-green-800'
+                ? 'bg-green-50 text-green-600 border border-green-200'
                 : ev.status === 'pending_review'
-                  ? 'bg-amber-950 text-amber-400 border border-amber-800'
+                  ? 'bg-amber-50 text-amber-600 border border-amber-200'
                   : ev.status === 'cancelled'
-                    ? 'bg-red-950 text-red-400 border border-red-800'
-                    : 'bg-neutral-900 text-neutral-400 border border-white/15';
+                    ? 'bg-red-50 text-red-600 border border-red-200'
+                    : 'bg-neutral-100 text-neutral-500 border border-black/15';
 
             return (
-              <div key={ev.id} className="bg-neutral-950 border border-white/10 rounded-2xl p-5 shadow-xl flex flex-col justify-between space-y-4">
+              <div key={ev.id} className="bg-white border border-black/10 rounded-2xl p-5 shadow-xl flex flex-col justify-between space-y-4">
                 <div>
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-lg font-bold text-white line-clamp-1">{ev.title}</h3>
+                    <h3 className="text-lg font-bold text-black line-clamp-1">{ev.title}</h3>
                     <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${badgeClass}`}>
                       {displayStatus}
                     </span>
                   </div>
                   <p className="text-xs text-indigo-300 mb-2">Organizer: {ev.organizer_name || ev.organizer_email || 'Unknown'}</p>
-                  <p className="text-xs text-neutral-400 line-clamp-2">{ev.description}</p>
+                  <p className="text-xs text-neutral-500 line-clamp-2">{ev.description}</p>
                 </div>
 
-                <div className="pt-3 border-t border-white/10 space-y-3">
-                  <p className="text-xs text-neutral-400">{ev.start_at ? new Date(ev.start_at).toLocaleDateString() : 'Date TBD'}</p>
-                  <div className="flex justify-between items-center text-xs text-neutral-400">
+                <div className="pt-3 border-t border-black/10 space-y-3">
+                  <p className="text-xs text-neutral-500">{ev.start_at ? new Date(ev.start_at).toLocaleDateString() : 'Date TBD'}</p>
+                  <div className="flex justify-between items-center text-xs text-neutral-500">
                     <Link
                       href={`/organizer/events/${ev.id}/edit`}
                       className="text-indigo-300 hover:underline font-semibold"
@@ -124,7 +124,7 @@ export default async function AdminEventsPage({ searchParams }: { searchParams: 
                     </Link>
                     <Link
                       href={`/organizer/events/${ev.id}/comp-tickets`}
-                      className="text-purple-300 hover:underline font-semibold"
+                      className="text-purple-700 hover:underline font-semibold"
                     >
                       Comp Tickets
                     </Link>

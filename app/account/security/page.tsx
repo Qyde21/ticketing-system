@@ -8,11 +8,11 @@ export default async function SecuritySettingsPage() {
   const session = await getSession();
 
   if (!session) {
-    return <div className="max-w-md mx-auto py-16 px-4 text-white text-center">Please log in.</div>;
+    return <div className="max-w-md mx-auto py-16 px-4 text-black text-center">Please log in.</div>;
   }
   if (session.role !== 'organizer' && session.role !== 'admin') {
     return (
-      <div className="max-w-md mx-auto py-16 px-4 text-white text-center">
+      <div className="max-w-md mx-auto py-16 px-4 text-black text-center">
         Two-factor authentication is available for organizer and admin accounts.
       </div>
     );
@@ -21,9 +21,9 @@ export default async function SecuritySettingsPage() {
   const [user] = await sql`SELECT totp_enabled FROM users WHERE id = ${session.userId}`;
 
   return (
-    <div className="max-w-md mx-auto py-12 px-4 text-white">
+    <div className="max-w-md mx-auto py-12 px-4 text-black">
       <h1 className="text-2xl font-extrabold mb-1">Security Settings</h1>
-      <p className="text-neutral-400 text-sm mb-6">Manage two-factor authentication for your account</p>
+      <p className="text-neutral-500 text-sm mb-6">Manage two-factor authentication for your account</p>
 
       <TwoFactorSettings initialEnabled={!!user?.totp_enabled} />
     </div>

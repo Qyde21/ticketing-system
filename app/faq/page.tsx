@@ -43,23 +43,23 @@ const faqs = [
 
 export default function FAQPage() {
   return (
-    <div className="max-w-2xl mx-auto px-6 py-16 text-white">
+    <div className="max-w-2xl mx-auto px-6 py-16 text-black">
       <h1 className="text-3xl font-extrabold mb-2">Frequently Asked Questions</h1>
-      <p className="text-neutral-400 text-base mb-8">Everything you need to know about TicketHub</p>
+      <p className="text-neutral-500 text-base mb-8">Everything you need to know about TicketHub</p>
 
       <div className="flex flex-col gap-4">
         {faqs.map((faq, i) => (
-          <div key={i} className="bg-neutral-950 border-l-4 border-indigo-500 rounded-xl p-5">
-            <h3 className="text-base font-bold text-white mb-2">{faq.q}</h3>
-            <p className="text-sm text-neutral-300" style={{ lineHeight: 1.7 }}>{faq.a}</p>
+          <div key={i} className="bg-white border-l-4 border-indigo-500 rounded-xl p-5">
+            <h3 className="text-base font-bold text-black mb-2">{faq.q}</h3>
+            <p className="text-sm text-neutral-700" style={{ lineHeight: 1.7 }}>{faq.a}</p>
           </div>
         ))}
       </div>
 
-      <div className="mt-10 p-5 bg-green-950/30 border border-green-800/40 rounded-xl">
-        <p className="text-sm text-green-300">
+      <div className="mt-10 p-5 bg-green-50 border border-green-200 rounded-xl">
+        <p className="text-sm text-green-700">
           Still have questions?{' '}
-          <a href="https://wa.me/254114525941" target="_blank" rel="noopener noreferrer" className="text-green-400 font-semibold hover:underline">
+          <a href="https://wa.me/254114525941" target="_blank" rel="noopener noreferrer" className="text-green-600 font-semibold hover:underline">
             Chat with us on WhatsApp
           </a>
         </p>

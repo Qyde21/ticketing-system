@@ -111,18 +111,18 @@ export default function SuccessContent() {
 
   if (loading) {
     return (
-      <div className="max-w-2xl mx-auto py-20 px-4 text-center text-white">
+      <div className="max-w-2xl mx-auto py-20 px-4 text-center text-black">
         <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-yellow-400 border-t-transparent mb-4"></div>
-        <p className="text-neutral-400">Confirming your payment...</p>
+        <p className="text-neutral-500">Confirming your payment...</p>
       </div>
     );
   }
 
   if (error && tickets.length === 0) {
     return (
-      <div className="max-w-2xl mx-auto py-16 px-4 text-center text-white">
-        <p className="text-amber-300 mb-2">{status === 'paid' ? 'Payment successful' : 'Order'}</p>
-        <p className="text-neutral-300 mb-4">{error}</p>
+      <div className="max-w-2xl mx-auto py-16 px-4 text-center text-black">
+        <p className="text-amber-700 mb-2">{status === 'paid' ? 'Payment successful' : 'Order'}</p>
+        <p className="text-neutral-700 mb-4">{error}</p>
         <Link href="/attendee/dashboard" className="text-indigo-400 hover:underline mr-4">
           My Tickets
         </Link>
@@ -134,9 +134,9 @@ export default function SuccessContent() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto py-10 px-4 text-white">
+    <div className="max-w-3xl mx-auto py-10 px-4 text-black">
       <h1 className="text-2xl font-extrabold mb-2">Payment successful</h1>
-      <p className="text-neutral-400 mb-6">{eventTitle || 'Your tickets are ready'}</p>
+      <p className="text-neutral-500 mb-6">{eventTitle || 'Your tickets are ready'}</p>
 
       <div className="space-y-8">
         {tickets.map((t) => (

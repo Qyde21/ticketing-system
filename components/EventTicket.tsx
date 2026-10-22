@@ -195,14 +195,14 @@ export default function EventTicket({
                   className="font-serif font-bold uppercase tracking-[0.15em]"
                   style={{ fontSize: 'clamp(9px, 1.6vw, 11px)' }}
                 >
-                  <span className="font-bold text-white">TicketHub</span>
+                  <span className="font-bold text-black">TicketHub</span>
                 </span>
                 <span className="text-slate-500" style={{ fontSize: 'clamp(9px, 1.6vw, 11px)' }}>
                   · Official ticket
                 </span>
               </div>
               <h2
-                className="font-serif font-black leading-[1.08] text-white line-clamp-2"
+                className="font-serif font-black leading-[1.08] text-black line-clamp-2"
                 style={{
                   fontSize: 'clamp(1rem, 3.8vw, 1.85rem)',
                   letterSpacing: '-0.01em',
@@ -229,14 +229,14 @@ export default function EventTicket({
 
             <div className="relative z-10 mt-2 space-y-1.5 min-w-0">
               <p
-                className="text-white/95 font-medium truncate flex items-center gap-1.5"
+                className="text-black/95 font-medium truncate flex items-center gap-1.5"
                 style={{ fontSize: 'clamp(0.65rem, 1.8vw, 0.85rem)' }}
               >
                 <CalendarGlyph />
                 {formatWhen(startAt)}
               </p>
               <p
-                className="text-white/90 truncate flex items-center gap-1.5"
+                className="text-black/90 truncate flex items-center gap-1.5"
                 style={{ fontSize: 'clamp(0.65rem, 1.8vw, 0.85rem)' }}
               >
                 <PinGlyph />
@@ -245,7 +245,7 @@ export default function EventTicket({
 
               <div className="flex items-center gap-2 flex-wrap pt-1.5" style={{ borderTop: '1px solid rgba(34,211,238,0.18)' }}>
                 {holderName && (
-                  <span className="text-white/70 truncate" style={{ fontSize: 'clamp(0.6rem, 1.6vw, 0.78rem)' }}>
+                  <span className="text-black/70 truncate" style={{ fontSize: 'clamp(0.6rem, 1.6vw, 0.78rem)' }}>
                     {holderName}
                   </span>
                 )}
@@ -312,9 +312,9 @@ export default function EventTicket({
             {isUsed && (
               <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'rgba(127,29,29,0.85)' }}>
                 <div className="text-center px-2">
-                  <p className="text-white font-extrabold text-sm sm:text-base">Already scanned</p>
+                  <p className="text-black font-extrabold text-sm sm:text-base">Already scanned</p>
                   {checkedInAt && (
-                    <p className="text-red-100 text-[10px] sm:text-xs mt-1">{new Date(checkedInAt).toLocaleString()}</p>
+                    <p className="text-red-900 text-[10px] sm:text-xs mt-1">{new Date(checkedInAt).toLocaleString()}</p>
                   )}
                 </div>
               </div>
@@ -322,8 +322,8 @@ export default function EventTicket({
             {!isUsed && isExpired && (
               <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'rgba(28,34,51,0.88)' }}>
                 <div className="text-center px-2">
-                  <p className="text-white font-extrabold text-sm sm:text-base">Expired</p>
-                  <p className="text-neutral-200 text-[10px] sm:text-xs mt-1">Event has ended</p>
+                  <p className="text-black font-extrabold text-sm sm:text-base">Expired</p>
+                  <p className="text-neutral-800 text-[10px] sm:text-xs mt-1">Event has ended</p>
                 </div>
               </div>
             )}

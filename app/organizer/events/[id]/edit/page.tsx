@@ -23,17 +23,17 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
   `;
 
   if (!event) {
-    return <div className="max-w-lg mx-auto py-12 px-4 text-white">Event not found.</div>;
+    return <div className="max-w-lg mx-auto py-12 px-4 text-black">Event not found.</div>;
   }
 
   const isOwner = session.userId === event.organizer_id;
   const isAdmin = session.role === 'admin';
   if (!isOwner && !isAdmin) {
     return (
-      <div className="max-w-lg mx-auto py-12 px-4 text-white">
-        <div className="bg-neutral-950 border border-white/10 rounded-2xl p-8 text-center">
-          <p className="text-lg font-bold text-white mb-1">Access Denied</p>
-          <p className="text-sm text-neutral-400">You don&apos;t have permission to edit this event.</p>
+      <div className="max-w-lg mx-auto py-12 px-4 text-black">
+        <div className="bg-white border border-black/10 rounded-2xl p-8 text-center">
+          <p className="text-lg font-bold text-black mb-1">Access Denied</p>
+          <p className="text-sm text-neutral-500">You don&apos;t have permission to edit this event.</p>
         </div>
       </div>
     );

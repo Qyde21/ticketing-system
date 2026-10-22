@@ -1,4 +1,4 @@
-﻿import { sql } from '@/lib/db';
+import { sql } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import Link from 'next/link';
 import ShareTicket from './ShareTicket';
@@ -15,7 +15,7 @@ function mapsUrl(lat: number, lng: number) {
 export default async function AttendeeDashboard() {
   const session = await getSession();
   if (!session) {
-    return <div className="max-w-2xl mx-auto py-12 px-4 text-white">Please log in to view your dashboard.</div>;
+    return <div className="max-w-2xl mx-auto py-12 px-4 text-black">Please log in to view your dashboard.</div>;
   }
 
   const lowerEmail = session.email.toLowerCase();
@@ -81,12 +81,12 @@ export default async function AttendeeDashboard() {
   `;
 
   return (
-    <div className="max-w-2xl mx-auto py-10 px-4 text-white">
+    <div className="max-w-2xl mx-auto py-10 px-4 text-black">
       <div className="flex items-start justify-between gap-4 mb-1">
         <h1 className="text-3xl font-extrabold">My Tickets</h1>
         <Link
           href="/inbox"
-          className="flex items-center gap-2 bg-neutral-950 hover:bg-neutral-900 border border-white/10 rounded-lg px-4 py-2 text-sm font-semibold text-white transition shrink-0"
+          className="flex items-center gap-2 bg-white hover:bg-neutral-100 border border-black/10 rounded-lg px-4 py-2 text-sm font-semibold text-black transition shrink-0"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -99,7 +99,7 @@ export default async function AttendeeDashboard() {
           )}
         </Link>
       </div>
-      <p className="text-neutral-400 text-sm mb-6">{orders.length} paid order(s)</p>
+      <p className="text-neutral-500 text-sm mb-6">{orders.length} paid order(s)</p>
 
       <div className="mb-8">
         <LoyaltyPanel
@@ -110,7 +110,7 @@ export default async function AttendeeDashboard() {
 
       {staffEvents.length > 0 && (
         <div className="mb-8">
-          <p className="text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Door Staff Access</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-neutral-500 mb-2">Door Staff Access</p>
           <ul className="space-y-2">
             {staffEvents.map((e: any) => {
               const ended =
@@ -119,10 +119,10 @@ export default async function AttendeeDashboard() {
               return (
                 <li
                   key={e.id}
-                  className="flex items-center justify-between gap-3 bg-neutral-950 border border-white/10 rounded-xl px-4 py-3"
+                  className="flex items-center justify-between gap-3 bg-white border border-black/10 rounded-xl px-4 py-3"
                 >
                   <div>
-                    <p className="font-semibold text-white text-sm">{e.title}</p>
+                    <p className="font-semibold text-black text-sm">{e.title}</p>
                     <p className="text-neutral-500 text-xs">
                       {e.venue_name}
                       {e.start_at && ` Â· ${new Date(e.start_at).toLocaleDateString('en-KE', { dateStyle: 'medium' })}`}
@@ -146,7 +146,7 @@ export default async function AttendeeDashboard() {
       )}
 
       {orders.length === 0 && (
-        <div className="bg-neutral-950 border border-white/10 rounded-2xl p-8 text-center text-neutral-400">
+        <div className="bg-white border border-black/10 rounded-2xl p-8 text-center text-neutral-500">
           No tickets yet. <Link href="/" className="text-indigo-400 hover:text-cyan-400">Browse events</Link>
         </div>
       )}
@@ -155,29 +155,29 @@ export default async function AttendeeDashboard() {
         {orders.map((o: any) => {
           const eventEnded = (o.end_at || o.start_at) ? new Date(o.end_at || o.start_at) < new Date() : false;
           return (
-            <li key={o.id} className="bg-neutral-950 border border-white/10 rounded-2xl overflow-hidden">
+            <li key={o.id} className="bg-white border border-black/10 rounded-2xl overflow-hidden">
               {o.cover_image_url && (
                 <img src={o.cover_image_url} alt={o.title} className="w-full h-40 object-cover" />
               )}
               <div className="p-5">
-                <h2 className="text-lg font-bold text-white mb-1">{o.title}</h2>
-                <p className="text-neutral-400 text-sm mb-1">{o.venue_name}</p>
+                <h2 className="text-lg font-bold text-black mb-1">{o.title}</h2>
+                <p className="text-neutral-500 text-sm mb-1">{o.venue_name}</p>
                 <p className="text-indigo-400 font-semibold text-sm mb-4">
                   {new Date(o.start_at).toLocaleString('en-KE', { dateStyle: 'full', timeStyle: 'short' })}
                 </p>
 
                 <div className="mb-3">
-                  <p className="text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">
+                  <p className="text-xs font-bold uppercase tracking-wider text-neutral-500 mb-2">
                     Your tickets ({o.tickets.length}):
                   </p>
                   {o.tickets.length === 0 ? (
-                    <p className="text-neutral-500 text-sm bg-black border border-white/10 rounded-lg px-3 py-2">
+                    <p className="text-neutral-500 text-sm bg-neutral-50 border border-black/10 rounded-lg px-3 py-2">
                       All tickets from this order have been shared or transferred.
                     </p>
                   ) : (
                   <div className="flex flex-col gap-2">
                     {o.tickets.map((t: any, index: number) => (
-                      <div key={t.code} className="flex flex-wrap items-center gap-2 bg-black border border-white/10 rounded-lg px-3 py-2">
+                      <div key={t.code} className="flex flex-wrap items-center gap-2 bg-neutral-50 border border-black/10 rounded-lg px-3 py-2">
                         <span className="text-xs text-neutral-500 min-w-[20px]">#{index + 1}</span>
                         <Link href={'/tickets/' + t.code} className="text-indigo-400 hover:text-cyan-400 font-semibold text-sm flex-1">
                           View Ticket
@@ -201,14 +201,14 @@ export default async function AttendeeDashboard() {
                 </div>
 
                 {o.latitude && o.longitude ? (
-                  <a href={mapsUrl(o.latitude, o.longitude)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm text-emerald-400 hover:text-emerald-300 font-semibold">
+                  <a href={mapsUrl(o.latitude, o.longitude)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm text-emerald-600 hover:text-emerald-700 font-semibold">
                     View on Google Maps
                   </a>
                 ) : (
                   <p className="text-sm text-neutral-500">{o.venue_name}</p>
                 )}
 
-                <div className="mt-3 pt-3 border-t border-white/10 flex justify-between text-sm text-neutral-400">
+                <div className="mt-3 pt-3 border-t border-black/10 flex justify-between text-sm text-neutral-500">
                   <span>KES {Number(o.total_amount_kes).toLocaleString()} &middot; {o.quantity} ticket(s)</span>
                   <span>{new Date(o.created_at).toLocaleDateString()}</span>
                 </div>

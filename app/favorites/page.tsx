@@ -56,19 +56,19 @@ export default async function FavoritesPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10 text-white">
+    <div className="max-w-3xl mx-auto px-4 py-10 text-black">
       <h1 className="text-2xl font-extrabold mb-1">Saved events</h1>
-      <p className="text-neutral-400 text-sm mb-6">Your wishlist — events you have hearted for later.</p>
+      <p className="text-neutral-500 text-sm mb-6">Your wishlist — events you have hearted for later.</p>
 
       {loadError && (
-        <div className="bg-amber-950/40 border border-amber-800/60 text-amber-200 text-sm rounded-xl px-4 py-3 mb-4">
+        <div className="bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-xl px-4 py-3 mb-4">
           {loadError}
         </div>
       )}
 
       {!loadError && events.length === 0 && (
-        <div className="bg-neutral-950 border border-white/10 rounded-2xl p-8 text-center">
-          <p className="text-neutral-400 mb-4">No saved events yet.</p>
+        <div className="bg-white border border-black/10 rounded-2xl p-8 text-center">
+          <p className="text-neutral-500 mb-4">No saved events yet.</p>
           <Link href="/" className="text-indigo-400 hover:underline font-semibold text-sm">
             Browse events →
           </Link>
@@ -83,9 +83,9 @@ export default async function FavoritesPage() {
           return (
             <li
               key={e.id}
-              className="flex gap-3 bg-neutral-950 border border-white/10 rounded-2xl overflow-hidden"
+              className="flex gap-3 bg-white border border-black/10 rounded-2xl overflow-hidden"
             >
-              <Link href={`/events/${e.slug || e.id}`} className="w-28 h-24 shrink-0 bg-neutral-900 block">
+              <Link href={`/events/${e.slug || e.id}`} className="w-28 h-24 shrink-0 bg-neutral-100 block">
                 {e.cover_image_url ? (
                   <img src={e.cover_image_url} alt="" className="w-full h-full object-cover" />
                 ) : null}
@@ -95,16 +95,16 @@ export default async function FavoritesPage() {
                   <div className="min-w-0">
                     <Link
                       href={`/events/${e.slug || e.id}`}
-                      className="font-semibold text-white hover:text-indigo-300 line-clamp-2"
+                      className="font-semibold text-black hover:text-indigo-300 line-clamp-2"
                     >
                       {e.title}
                     </Link>
-                    <p className="text-xs text-neutral-400 mt-0.5">
+                    <p className="text-xs text-neutral-500 mt-0.5">
                       {e.start_at ? new Date(e.start_at).toLocaleString() : 'Date TBA'}
                       {e.venue_name ? ` · ${e.venue_name}` : ''}
                     </p>
                     {ended && (
-                      <p className="text-xs text-amber-400 mt-1">
+                      <p className="text-xs text-amber-600 mt-1">
                         {e.status === 'cancelled' ? 'Cancelled' : 'Event ended'}
                       </p>
                     )}

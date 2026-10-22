@@ -117,15 +117,15 @@ export default function MultiCheckoutForm({
   };
 
   return (
-    <form onSubmit={handleCheckout} className="space-y-6 bg-black border border-white/10 p-6 rounded-2xl">
+    <form onSubmit={handleCheckout} className="space-y-6 bg-neutral-50 border border-black/10 p-6 rounded-2xl">
       <div>
-        <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-400 mb-3">Your tickets</h2>
+        <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-500 mb-3">Your tickets</h2>
         <ul className="space-y-2">
           {lines.map((l) => (
-            <li key={l.id} className="flex justify-between text-sm bg-neutral-950 border border-white/10 rounded-xl px-3 py-2">
-              <span className="text-white">
+            <li key={l.id} className="flex justify-between text-sm bg-white border border-black/10 rounded-xl px-3 py-2">
+              <span className="text-black">
                 {l.quantity}× {l.name}
-                {l.flashActive ? <span className="text-amber-400 text-xs ml-1">Flash</span> : null}
+                {l.flashActive ? <span className="text-amber-600 text-xs ml-1">Flash</span> : null}
               </span>
               <span className="text-cyan-400 font-semibold">KES {l.lineTotal.toLocaleString()}</span>
             </li>
@@ -134,29 +134,29 @@ export default function MultiCheckoutForm({
       </div>
 
       <div>
-        <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Full Name</label>
-        <input required value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full bg-neutral-950 border border-white/10 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500" />
+        <label className="block text-xs font-bold uppercase tracking-wider text-neutral-500 mb-2">Full Name</label>
+        <input required value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full bg-white border border-black/10 rounded-xl p-3 text-black text-sm focus:outline-none focus:border-indigo-500" />
       </div>
       <div>
-        <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Email Address</label>
-        <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="w-full bg-neutral-950 border border-white/10 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500" />
+        <label className="block text-xs font-bold uppercase tracking-wider text-neutral-500 mb-2">Email Address</label>
+        <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="w-full bg-white border border-black/10 rounded-xl p-3 text-black text-sm focus:outline-none focus:border-indigo-500" />
       </div>
       <div>
-        <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Phone Number</label>
-        <input required value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full bg-neutral-950 border border-white/10 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500" />
+        <label className="block text-xs font-bold uppercase tracking-wider text-neutral-500 mb-2">Phone Number</label>
+        <input required value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full bg-white border border-black/10 rounded-xl p-3 text-black text-sm focus:outline-none focus:border-indigo-500" />
       </div>
 
       <div>
-        <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Promo Code</label>
+        <label className="block text-xs font-bold uppercase tracking-wider text-neutral-500 mb-2">Promo Code</label>
         {appliedPromo ? (
-          <div className="flex items-center justify-between bg-emerald-950/40 border border-emerald-800/50 rounded-xl p-3">
+          <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-xl p-3">
             <div>
-              <span className="text-emerald-300 font-bold text-sm">{appliedPromo.code}</span>
-              <span className="text-emerald-400 text-xs ml-2">
+              <span className="text-emerald-700 font-bold text-sm">{appliedPromo.code}</span>
+              <span className="text-emerald-600 text-xs ml-2">
                 (−KES {appliedPromo.discountAmount.toLocaleString()})
               </span>
             </div>
-            <button type="button" onClick={() => { setAppliedPromo(null); setPromoStatus('idle'); setPromoInput(''); }} className="text-xs text-red-400 hover:underline">
+            <button type="button" onClick={() => { setAppliedPromo(null); setPromoStatus('idle'); setPromoInput(''); }} className="text-xs text-red-600 hover:underline">
               Remove
             </button>
           </div>
@@ -166,28 +166,28 @@ export default function MultiCheckoutForm({
               value={promoInput}
               onChange={(e) => setPromoInput(e.target.value)}
               placeholder="Optional"
-              className="flex-1 bg-neutral-950 border border-white/10 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500"
+              className="flex-1 bg-white border border-black/10 rounded-xl p-3 text-black text-sm focus:outline-none focus:border-indigo-500"
             />
-            <button type="button" onClick={handleApplyPromo} disabled={promoStatus === 'checking'} className="px-4 rounded-xl bg-neutral-900 border border-white/15 text-sm font-semibold text-white hover:bg-neutral-800">
+            <button type="button" onClick={handleApplyPromo} disabled={promoStatus === 'checking'} className="px-4 rounded-xl bg-neutral-100 border border-black/15 text-sm font-semibold text-black hover:bg-neutral-200">
               {promoStatus === 'checking' ? '…' : 'Apply'}
             </button>
           </div>
         )}
-        {promoStatus === 'error' && <p className="text-red-400 text-xs mt-1">{promoError}</p>}
+        {promoStatus === 'error' && <p className="text-red-600 text-xs mt-1">{promoError}</p>}
       </div>
 
-      <div className="border-t border-white/10 pt-4 space-y-1">
-        <div className="flex justify-between text-sm text-neutral-400">
+      <div className="border-t border-black/10 pt-4 space-y-1">
+        <div className="flex justify-between text-sm text-neutral-500">
           <span>Subtotal ({totalQty} tickets)</span>
           <span>KES {subtotal.toLocaleString()}</span>
         </div>
         {appliedPromo && (
-          <div className="flex justify-between text-sm text-emerald-400">
+          <div className="flex justify-between text-sm text-emerald-600">
             <span>Discount</span>
             <span>−KES {appliedPromo.discountAmount.toLocaleString()}</span>
           </div>
         )}
-        <div className="flex justify-between text-lg font-extrabold text-white">
+        <div className="flex justify-between text-lg font-extrabold text-black">
           <span>Total</span>
           <span className="text-cyan-400">KES {totalAmount.toLocaleString()}</span>
         </div>

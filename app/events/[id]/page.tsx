@@ -183,11 +183,11 @@ export default async function EventDetailPage({
   const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(eventUrl)}`;
 
   return (
-    <div className="text-white">
+    <div className="min-h-screen bg-white text-black">
       {event.cover_image_url && (
-        <div className="relative w-full h-[300px] sm:h-[440px] overflow-hidden border-b border-white/10 bg-neutral-950">
+        <div className="relative w-full h-[300px] sm:h-[440px] overflow-hidden bg-neutral-200">
           <img src={event.cover_image_url} alt={event.title} className="absolute inset-0 h-full w-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-white via-white/10 to-transparent" />
         </div>
       )}
       <div className="max-w-4xl mx-auto px-4 pb-16 pt-8">
@@ -198,12 +198,12 @@ export default async function EventDetailPage({
       {organizerName && (
         <Link
           href={`/organizers/${event.organizer_id}`}
-          className="inline-flex items-center gap-1.5 text-neutral-300 hover:text-cyan-400 text-sm mb-6"
+          className="inline-flex items-center gap-1.5 text-neutral-600 hover:text-black text-sm mb-6"
           style={{ textDecoration: 'none' }}
         >
           by {organizerName}
           {organizerVerified && (
-            <span className="inline-flex items-center gap-1 bg-cyan-950/50 border border-cyan-800/50 text-cyan-300 text-xs font-bold px-2.5 py-1 rounded-full">
+            <span className="inline-flex items-center gap-1 bg-neutral-100 border border-black/15 text-black text-xs font-bold px-2.5 py-1 rounded-full">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style={{ width: 14, height: 14 }}>
                 <path fillRule="evenodd" d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
               </svg>
@@ -212,7 +212,7 @@ export default async function EventDetailPage({
           )}
         </Link>
       )}
-      <p className="text-neutral-300 text-lg mb-6 leading-relaxed">{event.description}</p>
+      <p className="text-neutral-700 text-lg mb-6 leading-relaxed">{event.description}</p>
 
       {!isCancelled && !isEnded && (
         <div className="flex gap-2 mb-8 flex-wrap">
@@ -220,7 +220,7 @@ export default async function EventDetailPage({
             href={whatsappShareUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 border border-white/15 hover:bg-white hover:text-black text-white text-xs font-semibold px-4 py-2 rounded-full transition"
+            className="inline-flex items-center gap-1.5 border border-black/20 hover:bg-black hover:text-white text-black text-xs font-semibold px-4 py-2 rounded-full transition"
           >
             Share on WhatsApp
           </a>
@@ -228,7 +228,7 @@ export default async function EventDetailPage({
             href={twitterShareUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 border border-white/15 hover:bg-white hover:text-black text-white text-xs font-semibold px-4 py-2 rounded-full transition"
+            className="inline-flex items-center gap-1.5 border border-black/20 hover:bg-black hover:text-white text-black text-xs font-semibold px-4 py-2 rounded-full transition"
           >
             Share on X
           </a>
@@ -236,7 +236,7 @@ export default async function EventDetailPage({
             href={facebookShareUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 border border-white/15 hover:bg-white hover:text-black text-white text-xs font-semibold px-4 py-2 rounded-full transition"
+            className="inline-flex items-center gap-1.5 border border-black/20 hover:bg-black hover:text-white text-black text-xs font-semibold px-4 py-2 rounded-full transition"
           >
             Share on Facebook
           </a>
@@ -244,28 +244,22 @@ export default async function EventDetailPage({
       )}
 
       {isCancelled && (
-        <div className="bg-red-950/40 border border-red-800/60 text-red-300 font-semibold px-4 py-3 rounded-xl mb-6">
+        <div className="bg-red-50 border border-red-200 text-red-700 font-semibold px-4 py-3 rounded-xl mb-6">
           This event has been cancelled.
         </div>
       )}
       {!isCancelled && isEnded && (
-        <div className="bg-neutral-900/60 border border-white/15 text-neutral-300 font-semibold px-4 py-3 rounded-xl mb-6">
+        <div className="bg-neutral-100 border border-black/10 text-neutral-700 font-semibold px-4 py-3 rounded-xl mb-6">
           This event has already ended.
         </div>
       )}
       {!isCancelled && !isEnded && notYetPublished && (
-        <div className="bg-amber-950/40 border border-amber-800/60 text-amber-300 font-semibold px-4 py-3 rounded-xl mb-6">
+        <div className="bg-amber-50 border border-amber-300 text-amber-800 font-semibold px-4 py-3 rounded-xl mb-6">
           This event is not yet live. Ticket sales will open once it has been approved.
         </div>
       )}
       
-      {!isCancelled && !isEnded && !notYetPublished && organizerSuspended && (
-        <div className="bg-amber-950/40 border border-amber-800/60 text-amber-300 font-semibold px-4 py-3 rounded-xl mb-6">
-          Ticket sales for this event are currently unavailable.
-        </div>
-      )}
-
-      <div className="grid gap-5 sm:grid-cols-2 bg-neutral-950 border border-white/10 p-6 rounded-[20px] mb-8">
+      <div className="grid gap-5 sm:grid-cols-2 bg-neutral-100 border border-black/10 p-6 rounded-[20px] mb-8">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-widest text-neutral-500 mb-1">Date &amp; time</p>
           <p className="text-base font-semibold">
@@ -281,7 +275,7 @@ export default async function EventDetailPage({
       </div>
 
       {event.venue_name && !isEnded && !isCancelled && (
-            <div className="mb-8 rounded-[20px] overflow-hidden border border-white/10">
+            <div className="mb-8 rounded-[20px] overflow-hidden border border-black/10">
               <iframe
                 title={`Map showing ${event.venue_name}`}
                 width="100%"
@@ -297,9 +291,9 @@ export default async function EventDetailPage({
             )}
 
       <div className="space-y-3">
-        <h2 className="font-display text-3xl font-extrabold uppercase tracking-tight text-white mb-3">Tickets</h2>
+        <h2 className="font-display text-3xl font-extrabold uppercase tracking-tight text-black mb-3">Tickets</h2>
         {salesClosed ? (
-          <p className="text-neutral-400">
+          <p className="text-neutral-500">
             {isCancelled
               ? 'Ticket sales are closed because this event was cancelled.'
               : isEnded
@@ -309,7 +303,7 @@ export default async function EventDetailPage({
               : 'Ticket sales for this event are currently unavailable.'}
           </p>
         ) : ticketTypes.length === 0 ? (
-          <p className="text-neutral-400">No tickets are available for this event yet.</p>
+          <p className="text-neutral-500">No tickets are available for this event yet.</p>
         ) : (
           <EventTicketPicker
             eventId={String(event.id)}

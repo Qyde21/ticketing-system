@@ -45,22 +45,22 @@ export default async function PayoutsPage() {
   const totalFees = Math.round((totalGross - totalRefunded) * PLATFORM_FEE_RATE * 100) / 100;
 
   return (
-    <div className="max-w-2xl mx-auto py-10 px-4 text-white">
+    <div className="max-w-2xl mx-auto py-10 px-4 text-black">
       <Link href="/organizer/dashboard" className="text-sm text-indigo-400 hover:underline">&larr; Dashboard</Link>
       <h1 className="text-2xl font-extrabold mt-2 mb-6">Payouts</h1>
       <PayoutAccountForm />
       <div className="flex gap-3 flex-wrap mb-6">
         {[
           { label: 'Gross (paid)', value: totalGross, color: 'text-indigo-400' },
-          { label: 'Fee (4%)', value: totalFees, color: 'text-amber-400' },
-          { label: 'Refunded', value: totalRefunded, color: 'text-red-400' },
-          { label: 'Net earnings', value: totalNet, color: 'text-emerald-400' },
+          { label: 'Fee (4%)', value: totalFees, color: 'text-amber-600' },
+          { label: 'Refunded', value: totalRefunded, color: 'text-red-600' },
+          { label: 'Net earnings', value: totalNet, color: 'text-emerald-600' },
         ].map((s) => (
-          <div key={s.label} className="flex-1 min-w-[120px] bg-neutral-950 border border-white/10 rounded-xl px-4 py-3">
+          <div key={s.label} className="flex-1 min-w-[120px] bg-white border border-black/10 rounded-xl px-4 py-3">
             <div className={`text-xl font-bold ${s.color}`}>
               KES {s.value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
             </div>
-            <div className="text-xs text-neutral-400 mt-0.5">{s.label}</div>
+            <div className="text-xs text-neutral-500 mt-0.5">{s.label}</div>
           </div>
         ))}
       </div>
@@ -76,7 +76,7 @@ export default async function PayoutsPage() {
           else if (!ended) disabledReason = 'Available after event ends';
           else if (c.net < 50) disabledReason = 'Below minimum';
           return (
-            <li key={e.id as string} className="flex justify-between gap-3 items-center bg-neutral-950 border border-white/10 rounded-xl px-4 py-3">
+            <li key={e.id as string} className="flex justify-between gap-3 items-center bg-white border border-black/10 rounded-xl px-4 py-3">
               <div>
                 <div className="font-semibold text-sm">{e.title as string}</div>
                 <div className="text-xs text-neutral-500">
@@ -86,7 +86,7 @@ export default async function PayoutsPage() {
               </div>
               <div className="flex items-center gap-3">
                 <div className="text-right">
-                  <div className="font-bold text-emerald-400 text-sm">
+                  <div className="font-bold text-emerald-600 text-sm">
                     KES {c.net.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                   </div>
                   <div className="text-[10px] text-neutral-500">

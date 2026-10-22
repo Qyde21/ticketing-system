@@ -52,42 +52,42 @@ export default function PayoutAccountForm() {
   }
 
   return (
-    <div className="bg-neutral-950 border border-white/10 rounded-2xl p-5 mb-8">
-      <h2 className="text-lg font-bold text-white mb-1">Payout destination</h2>
-      <p className="text-sm text-neutral-400 mb-4">
+    <div className="bg-white border border-black/10 rounded-2xl p-5 mb-8">
+      <h2 className="text-lg font-bold text-black mb-1">Payout destination</h2>
+      <p className="text-sm text-neutral-500 mb-4">
         Net earnings (after 10% fee) are paid via Paystack, usually ~48h after the event ends.
-        {ready && <span className="text-emerald-400 font-semibold"> · Account ready</span>}
+        {ready && <span className="text-emerald-600 font-semibold"> · Account ready</span>}
       </p>
       <form onSubmit={save} className="space-y-3">
         <div className="flex gap-2">
           <button type="button" onClick={() => setMethod('mpesa')}
-            className={`flex-1 py-2 rounded-lg text-sm font-semibold ${method === 'mpesa' ? 'bg-indigo-600 text-white' : 'bg-neutral-900 text-neutral-400'}`}>
+            className={`flex-1 py-2 rounded-lg text-sm font-semibold ${method === 'mpesa' ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-600'}`}>
             M-Pesa
           </button>
           <button type="button" onClick={() => setMethod('bank')}
-            className={`flex-1 py-2 rounded-lg text-sm font-semibold ${method === 'bank' ? 'bg-indigo-600 text-white' : 'bg-neutral-900 text-neutral-400'}`}>
+            className={`flex-1 py-2 rounded-lg text-sm font-semibold ${method === 'bank' ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-600'}`}>
             Bank
           </button>
         </div>
         <input required value={payoutName} onChange={(e) => setPayoutName(e.target.value)}
           placeholder="Account name (as registered)"
-          className="w-full bg-neutral-900 border border-white/15 rounded-xl px-4 py-3 text-white text-sm" />
+          className="w-full bg-neutral-100 border border-black/15 rounded-xl px-4 py-3 text-black text-sm" />
         {method === 'mpesa' ? (
           <input required value={payoutPhone} onChange={(e) => setPayoutPhone(e.target.value)}
             placeholder="M-Pesa number e.g. 0712 345 678"
-            className="w-full bg-neutral-900 border border-white/15 rounded-xl px-4 py-3 text-white text-sm" />
+            className="w-full bg-neutral-100 border border-black/15 rounded-xl px-4 py-3 text-black text-sm" />
         ) : (
           <>
             <input required value={bankCode} onChange={(e) => setBankCode(e.target.value)}
               placeholder="Bank code (Paystack Kenya)"
-              className="w-full bg-neutral-900 border border-white/15 rounded-xl px-4 py-3 text-white text-sm" />
+              className="w-full bg-neutral-100 border border-black/15 rounded-xl px-4 py-3 text-black text-sm" />
             <input required value={bankAccountNumber} onChange={(e) => setBankAccountNumber(e.target.value)}
               placeholder="Account number"
-              className="w-full bg-neutral-900 border border-white/15 rounded-xl px-4 py-3 text-white text-sm" />
+              className="w-full bg-neutral-100 border border-black/15 rounded-xl px-4 py-3 text-black text-sm" />
           </>
         )}
-        {err && <p className="text-red-400 text-sm">{err}</p>}
-        {msg && <p className="text-emerald-400 text-sm">{msg}</p>}
+        {err && <p className="text-red-600 text-sm">{err}</p>}
+        {msg && <p className="text-emerald-600 text-sm">{msg}</p>}
         <button type="submit" disabled={loading}
           className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold py-3 rounded-xl text-sm">
           {loading ? 'Saving…' : ready ? 'Update payout account' : 'Save payout account'}

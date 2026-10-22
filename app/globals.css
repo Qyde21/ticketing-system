@@ -7,8 +7,8 @@
    verifiable from its public pages.
 ------------------------------------------------------------------- */
 :root {
-  --background: #000000;
-  --foreground: #ffffff;
+  --background: #ffffff;
+  --foreground: #000000;
 }
 
 @theme inline {
@@ -27,27 +27,27 @@
 
   /*
     Palette bridge: the legacy indigo/cyan accent used across ~30 files is
-    re-tinted to neutrals here so every existing screen joins the new
-    monochrome look without per-file edits. Primary CTAs are set to white
-    pills explicitly in the components.
+    re-tinted to black/neutral here so every existing screen joins the
+    black-on-white look without per-file edits (links = black, solid
+    buttons = black, hover = dark gray).
   */
-  --color-indigo-100: #ffffff;
-  --color-indigo-200: #f5f5f5;
-  --color-indigo-300: #e5e5e5;
-  --color-indigo-400: #ffffff;
-  --color-indigo-500: #404040;
-  --color-indigo-600: #262626;
-  --color-indigo-700: #333333;
+  --color-indigo-100: #000000;
+  --color-indigo-200: #171717;
+  --color-indigo-300: #404040;
+  --color-indigo-400: #000000;
+  --color-indigo-500: #262626;
+  --color-indigo-600: #000000;
+  --color-indigo-700: #262626;
   --color-indigo-800: #404040;
-  --color-indigo-900: #171717;
-  --color-indigo-950: #0a0a0a;
-  --color-cyan-300: #e5e5e5;
-  --color-cyan-400: #ffffff;
-  --color-cyan-500: #404040;
-  --color-cyan-600: #262626;
-  --color-cyan-700: #333333;
+  --color-indigo-900: #e5e5e5;
+  --color-indigo-950: #f5f5f5;
+  --color-cyan-300: #404040;
+  --color-cyan-400: #525252;
+  --color-cyan-500: #262626;
+  --color-cyan-600: #000000;
+  --color-cyan-700: #262626;
   --color-cyan-800: #404040;
-  --color-cyan-950: #0a0a0a;
+  --color-cyan-950: #f5f5f5;
 }
 
 body {

@@ -14,7 +14,7 @@ export default async function AdminEventAnalyticsPage({ params }: PageProps) {
   const session = await getSession();
 
   if (!session || session.role !== 'admin') {
-    return <div className="max-w-5xl mx-auto px-4 py-8 text-white">Unauthorized access.</div>;
+    return <div className="max-w-5xl mx-auto px-4 py-8 text-black">Unauthorized access.</div>;
   }
 
   const { id } = await params;
@@ -65,35 +65,35 @@ export default async function AdminEventAnalyticsPage({ params }: PageProps) {
   });
 
   return (
-    <main className="max-w-5xl mx-auto px-4 py-8 text-white">
+    <main className="max-w-5xl mx-auto px-4 py-8 text-black">
       <div className="mb-6 flex justify-between items-center">
         <Link href="/admin/dashboard" className="text-indigo-400 hover:underline">
           &larr; Back to Admin Dashboard
         </Link>
-        <span className="bg-purple-950 border border-purple-800 text-purple-300 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+        <span className="bg-purple-50 border border-purple-200 text-purple-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
           Admin / Organizer View
         </span>
       </div>
 
       <div className="mb-8">
-        <h1 className="text-3xl font-extrabold text-white">
+        <h1 className="text-3xl font-extrabold text-black">
           Analytics: {event.title}
         </h1>
-        <p className="text-neutral-400 text-sm mt-1">Real-time inventory and revenue tracking (Private View)</p>
+        <p className="text-neutral-500 text-sm mt-1">Real-time inventory and revenue tracking (Private View)</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-neutral-950 p-6 rounded-lg border border-white/10 shadow-lg">
+        <div className="bg-white p-6 rounded-lg border border-black/10 shadow-lg">
           <p className="text-indigo-300 font-medium text-sm">Total Revenue Generated</p>
           <p className="text-2xl font-bold text-cyan-400 mt-2">KES {totalRevenue.toLocaleString()}</p>
         </div>
-        <div className="bg-neutral-950 p-6 rounded-lg border border-white/10 shadow-lg">
+        <div className="bg-white p-6 rounded-lg border border-black/10 shadow-lg">
           <p className="text-indigo-300 font-medium text-sm">Tickets Sold / Capacity</p>
-          <p className="text-2xl font-bold text-emerald-400 mt-2">{totalSold} <span className="text-neutral-500 text-lg">/ {totalCapacity}</span></p>
+          <p className="text-2xl font-bold text-emerald-600 mt-2">{totalSold} <span className="text-neutral-500 text-lg">/ {totalCapacity}</span></p>
         </div>
-        <div className="bg-neutral-950 p-6 rounded-lg border border-white/10 shadow-lg">
+        <div className="bg-white p-6 rounded-lg border border-black/10 shadow-lg">
           <p className="text-indigo-300 font-medium text-sm">Overall Sell-Through</p>
-          <p className="text-2xl font-bold text-amber-400 mt-2">
+          <p className="text-2xl font-bold text-amber-600 mt-2">
             {totalCapacity > 0 ? Math.round((totalSold / totalCapacity) * 100) : 0}%
           </p>
         </div>
@@ -101,13 +101,13 @@ export default async function AdminEventAnalyticsPage({ params }: PageProps) {
 
       <SalesTrendChart orders={orders as any} />
 
-      <div className="bg-neutral-950 p-6 rounded-lg border border-white/10 shadow-lg">
+      <div className="bg-white p-6 rounded-lg border border-black/10 shadow-lg">
         <h2 className="text-xl font-bold mb-4 text-indigo-300">Ticket Tier Breakdown</h2>
         {processedTiers.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-white/10 text-neutral-400 text-sm">
+                <tr className="border-b border-black/10 text-neutral-500 text-sm">
                   <th className="py-3 px-4">Tier Name</th>
                   <th className="py-3 px-4">Price</th>
                   <th className="py-3 px-4">Total Capacity</th>
@@ -116,23 +116,23 @@ export default async function AdminEventAnalyticsPage({ params }: PageProps) {
                   <th className="py-3 px-4">Progress</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-800 text-sm">
+              <tbody className="divide-y divide-black/10 text-sm">
                 {processedTiers.map((tier: any) => (
-                  <tr key={tier.id} className="hover:bg-neutral-900/50">
-                    <td className="py-3 px-4 font-semibold text-white">{tier.name}</td>
+                  <tr key={tier.id} className="hover:bg-neutral-100/50">
+                    <td className="py-3 px-4 font-semibold text-black">{tier.name}</td>
                     <td className="py-3 px-4 text-cyan-400">KES {tier.tierPrice.toLocaleString()}</td>
-                    <td className="py-3 px-4 text-neutral-300">{tier.total}</td>
-                    <td className="py-3 px-4 text-emerald-400 font-semibold">{tier.sold}</td>
-                    <td className="py-3 px-4 text-amber-400 font-semibold">{tier.remaining}</td>
+                    <td className="py-3 px-4 text-neutral-700">{tier.total}</td>
+                    <td className="py-3 px-4 text-emerald-600 font-semibold">{tier.sold}</td>
+                    <td className="py-3 px-4 text-amber-600 font-semibold">{tier.remaining}</td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
-                        <div className="w-24 bg-neutral-900 h-2 rounded-full overflow-hidden border border-white/15">
+                        <div className="w-24 bg-neutral-100 h-2 rounded-full overflow-hidden border border-black/15">
                           <div 
                             className="bg-indigo-500 h-full" 
                             style={{ width: `${tier.percentageSold}%` }}
                           />
                         </div>
-                        <span className="text-xs text-neutral-400">{tier.percentageSold}%</span>
+                        <span className="text-xs text-neutral-500">{tier.percentageSold}%</span>
                       </div>
                     </td>
                   </tr>
@@ -141,7 +141,7 @@ export default async function AdminEventAnalyticsPage({ params }: PageProps) {
             </table>
           </div>
         ) : (
-          <p className="text-neutral-400">No ticket types found for this event.</p>
+          <p className="text-neutral-500">No ticket types found for this event.</p>
         )}
       </div>
     </main>

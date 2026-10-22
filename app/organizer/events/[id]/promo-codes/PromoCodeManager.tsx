@@ -82,8 +82,8 @@ export default function PromoCodeManager({ eventId, initialCodes }: { eventId: s
     }
   }
 
-  const inputClass = 'w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-indigo-500 transition';
-  const labelClass = 'block text-xs font-semibold text-neutral-300 mb-1.5';
+  const inputClass = 'w-full bg-neutral-50 border border-black/10 rounded-lg px-3 py-2 text-sm text-black placeholder-neutral-500 focus:outline-none focus:border-indigo-500 transition';
+  const labelClass = 'block text-xs font-semibold text-neutral-700 mb-1.5';
 
   return (
     <div>
@@ -95,7 +95,7 @@ export default function PromoCodeManager({ eventId, initialCodes }: { eventId: s
           + Create Promo Code
         </button>
       ) : (
-        <form onSubmit={handleCreate} className="bg-neutral-950 border border-white/10 rounded-2xl p-5 mb-6 flex flex-col gap-4">
+        <form onSubmit={handleCreate} className="bg-white border border-black/10 rounded-2xl p-5 mb-6 flex flex-col gap-4">
           <div>
             <label className={labelClass}>Code</label>
             <input
@@ -150,7 +150,7 @@ export default function PromoCodeManager({ eventId, initialCodes }: { eventId: s
             </div>
           </div>
 
-          {error && <p className="text-red-400 text-sm">{error}</p>}
+          {error && <p className="text-red-600 text-sm">{error}</p>}
 
           <div className="flex gap-2">
             <button
@@ -163,7 +163,7 @@ export default function PromoCodeManager({ eventId, initialCodes }: { eventId: s
             <button
               type="button"
               onClick={() => { setShowForm(false); setError(''); }}
-              className="bg-neutral-900 hover:bg-neutral-800 text-neutral-300 px-5 py-2.5 rounded-lg text-sm transition"
+              className="bg-neutral-100 hover:bg-neutral-200 text-neutral-700 px-5 py-2.5 rounded-lg text-sm transition"
             >
               Cancel
             </button>
@@ -172,7 +172,7 @@ export default function PromoCodeManager({ eventId, initialCodes }: { eventId: s
       )}
 
       {codes.length === 0 ? (
-        <p className="text-neutral-400">No promo codes yet. Create one to give buyers a discount at checkout.</p>
+        <p className="text-neutral-500">No promo codes yet. Create one to give buyers a discount at checkout.</p>
       ) : (
         <ul className="list-none p-0 flex flex-col gap-3">
           {codes.map((c) => {
@@ -181,22 +181,22 @@ export default function PromoCodeManager({ eventId, initialCodes }: { eventId: s
             const effectivelyActive = c.active && !isExpired && !isMaxedOut;
 
             return (
-              <li key={c.id} className="bg-neutral-950 border border-white/10 rounded-xl p-4 flex items-center justify-between flex-wrap gap-3">
+              <li key={c.id} className="bg-white border border-black/10 rounded-xl p-4 flex items-center justify-between flex-wrap gap-3">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-white">{c.code}</span>
+                    <span className="font-mono font-bold text-black">{c.code}</span>
                     <span
                       className={
                         'text-xs font-semibold px-2 py-0.5 rounded-full ' +
                         (effectivelyActive
-                          ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/50'
-                          : 'bg-neutral-900 text-neutral-400 border border-white/15')
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                          : 'bg-neutral-100 text-neutral-500 border border-black/15')
                       }
                     >
                       {!c.active ? 'Disabled' : isExpired ? 'Expired' : isMaxedOut ? 'Limit reached' : 'Active'}
                     </span>
                   </div>
-                  <p className="text-xs text-neutral-400 mt-1">
+                  <p className="text-xs text-neutral-500 mt-1">
                     {c.discount_type === 'percent' ? `${c.discount_value}% off` : `KES ${Number(c.discount_value).toLocaleString()} off`}
                     {' '}&middot; Used {c.uses_count}{c.max_uses ? ` / ${c.max_uses}` : ''} time{c.uses_count === 1 ? '' : 's'}
                     {c.expires_at && ` \u00b7 Expires ${new Date(c.expires_at).toLocaleDateString()}`}
@@ -204,7 +204,7 @@ export default function PromoCodeManager({ eventId, initialCodes }: { eventId: s
                 </div>
                 <button
                   onClick={() => handleToggleActive(c.id, c.active)}
-                  className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-300 transition"
+                  className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 transition"
                 >
                   {c.active ? 'Disable' : 'Enable'}
                 </button>

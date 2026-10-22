@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 export default async function InboxPage() {
   const session = await getSession();
   if (!session) {
-    return <div className="max-w-2xl mx-auto py-12 px-4 text-white">Please log in to view your inbox.</div>;
+    return <div className="max-w-2xl mx-auto py-12 px-4 text-black">Please log in to view your inbox.</div>;
   }
 
   const messages = await sql`
@@ -22,8 +22,8 @@ export default async function InboxPage() {
   `;
 
   return (
-    <div className="max-w-2xl mx-auto py-12 px-4 text-white">
-      <h1 className="text-3xl font-extrabold text-white">Your Inbox</h1>
+    <div className="max-w-2xl mx-auto py-12 px-4 text-black">
+      <h1 className="text-3xl font-extrabold text-black">Your Inbox</h1>
       <InboxMessageList initialMessages={messages as any} />
     </div>
   );

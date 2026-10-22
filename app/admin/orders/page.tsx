@@ -39,31 +39,31 @@ export default async function AdminOrdersSearchPage({
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-10 px-4 text-white">
+    <div className="max-w-4xl mx-auto py-10 px-4 text-black">
       <Link href="/admin/dashboard" className="text-sm text-indigo-400 hover:underline">&larr; Admin</Link>
       <h1 className="text-2xl font-extrabold mt-2 mb-2">Order search</h1>
-      <p className="text-neutral-400 text-sm mb-6">Search by email, name, phone, Paystack reference, or order UUID.</p>
+      <p className="text-neutral-500 text-sm mb-6">Search by email, name, phone, Paystack reference, or order UUID.</p>
       <form className="flex gap-2 mb-8">
         <input name="q" defaultValue={q} placeholder="email, phone, reference…"
-          className="flex-1 bg-neutral-950 border border-white/15 rounded-lg px-3 py-2 text-sm" />
+          className="flex-1 bg-white border border-black/15 rounded-lg px-3 py-2 text-sm" />
         <button type="submit" className="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-lg text-sm font-semibold">Search</button>
       </form>
       {q && orders.length === 0 && <p className="text-neutral-500 text-sm">No orders matched &ldquo;{q}&rdquo;.</p>}
       <ul className="space-y-3">
         {orders.map((o) => (
-          <li key={o.id} className="bg-neutral-950 border border-white/10 rounded-xl p-4 text-sm">
+          <li key={o.id} className="bg-white border border-black/10 rounded-xl p-4 text-sm">
             <div className="flex flex-wrap justify-between gap-2">
               <div>
-                <p className="font-bold text-white">{o.buyer_name}</p>
-                <p className="text-neutral-400">{o.buyer_email} · {o.buyer_phone || '—'}</p>
+                <p className="font-bold text-black">{o.buyer_name}</p>
+                <p className="text-neutral-500">{o.buyer_email} · {o.buyer_phone || '—'}</p>
                 <p className="text-neutral-500 text-xs mt-1">Ref: {o.paystack_reference || '—'} · {o.id}</p>
               </div>
               <div className="text-right">
                 <p className="font-semibold text-cyan-400">KES {Number(o.total_amount_kes).toLocaleString()}</p>
-                <p className="text-xs uppercase text-neutral-400">{o.payment_status}</p>
+                <p className="text-xs uppercase text-neutral-500">{o.payment_status}</p>
               </div>
             </div>
-            <p className="mt-2 text-neutral-300">
+            <p className="mt-2 text-neutral-700">
               <Link href={`/events/${o.slug || o.event_id}`} className="text-indigo-400 hover:underline">{o.event_title}</Link>
               <span className="text-neutral-500"> · {o.organizer_name}</span>
             </p>

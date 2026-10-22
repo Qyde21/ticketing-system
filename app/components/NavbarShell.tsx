@@ -30,26 +30,26 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
   const getLinkClass = (path: string) =>
     `transition py-1 ${
       isActive(path)
-        ? 'text-white font-semibold border-b-2 border-white'
-        : 'text-neutral-400 hover:text-white'
+        ? 'text-black font-semibold border-b-2 border-black'
+        : 'text-neutral-500 hover:text-black'
     }`;
 
   const getMobileLinkClass = (path: string) =>
     `flex items-center gap-3 px-3 py-3 rounded-xl text-[15px] font-medium transition ${
       isActive(path)
-        ? 'bg-white/10 text-white border border-white/20'
-        : 'text-neutral-300 hover:bg-white/5 border border-transparent'
+        ? 'bg-black/5 text-black border border-black/15'
+        : 'text-neutral-700 hover:bg-black/5 border border-transparent'
     }`;
 
   const roleLabel =
     userRole === 'admin' ? 'Admin' : userRole === 'organizer' ? 'Organizer' : userRole === 'attendee' ? 'Attendee' : '';
 
   return (
-    <header className="bg-black/90 backdrop-blur-md border-b border-white/10 text-white sticky top-0 z-50">
+    <header className="bg-white/90 backdrop-blur-md border-b border-black/10 text-black sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2.5 hover:opacity-90 transition shrink-0" onClick={() => setMobileMenuOpen(false)}>
           <img src="/logo-badge.png" alt="TicketHub" className="h-10 w-10 rounded-lg" />
-          <span className="font-display text-2xl font-extrabold uppercase tracking-tight text-white">TicketHub</span>
+          <span className="font-display text-2xl font-extrabold uppercase tracking-tight text-black">TicketHub</span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
@@ -87,7 +87,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
                   <Link href="/inbox" className={getLinkClass('/inbox')}>Inbox</Link>
                 </>
               )}
-              <button onClick={handleLogout} className="text-neutral-300 hover:text-white transition cursor-pointer">
+              <button onClick={handleLogout} className="text-neutral-500 hover:text-black transition cursor-pointer">
                 Log out
               </button>
             </>
@@ -98,7 +98,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
               <Link href="/signup?role=organizer" className={getLinkClass('/signup?role=organizer')}>Sell Tickets</Link>
               <Link href="/my-tickets" className={getLinkClass('/my-tickets')}>My tickets</Link>
               <Link href="/login" className={getLinkClass('/login')}>Sign in</Link>
-              <Link href="/signup" className="bg-white hover:bg-neutral-200 text-black px-5 py-2 rounded-full font-semibold transition">
+              <Link href="/signup" className="bg-black hover:bg-neutral-800 text-white px-5 py-2 rounded-full font-semibold transition">
                 Get Started
               </Link>
             </>
@@ -109,7 +109,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="text-neutral-200 hover:text-white focus:outline-none p-2 rounded-lg hover:bg-white/5"
+            className="text-black hover:text-neutral-600 focus:outline-none p-2 rounded-lg hover:bg-black/5"
             aria-label="Toggle navigation menu"
             aria-expanded={mobileMenuOpen}
           >
@@ -127,15 +127,15 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
       </div>
 
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-neutral-800/80 bg-neutral-950">
+        <div className="md:hidden border-t border-black/10 bg-white">
           <div className="px-4 pt-4 pb-2">
-            <div className="flex items-center gap-3 rounded-2xl bg-neutral-950 border border-white/10 p-3.5 mb-3">
+            <div className="flex items-center gap-3 rounded-2xl bg-neutral-100 border border-black/10 p-3.5 mb-3">
               <img src="/logo-badge.png" alt="" className="h-11 w-11 rounded-xl" />
               <div className="min-w-0 flex-1">
-                <p className="font-display font-extrabold text-xl uppercase leading-tight text-white">TicketHub</p>
+                <p className="font-display font-extrabold text-xl uppercase leading-tight text-black">TicketHub</p>
                 {isLoggedIn ? (
-                  <p className="text-xs text-neutral-400 truncate mt-0.5">
-                    {roleLabel && <span className="text-white font-semibold">{roleLabel}</span>}
+                  <p className="text-xs text-neutral-500 truncate mt-0.5">
+                    {roleLabel && <span className="text-black font-semibold">{roleLabel}</span>}
                     {roleLabel && userEmail ? ' · ' : ''}
                     {userEmail}
                   </p>
@@ -178,17 +178,17 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
 
                 {(userRole === 'attendee' || userRole === 'organizer' || userRole === 'admin') && (
                   <>
-                    <div className="h-px bg-neutral-800 my-2 mx-1" />
+                    <div className="h-px bg-black/10 my-2 mx-1" />
                     <Link href="/attendee/dashboard" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/attendee/dashboard')}>My Tickets</Link>
                     <Link href="/favorites" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/favorites')}>Saved</Link>
                     <Link href="/inbox" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass('/inbox')}>Inbox</Link>
                   </>
                 )}
 
-                <div className="h-px bg-neutral-800 my-2 mx-1" />
+                <div className="h-px bg-black/10 my-2 mx-1" />
                 <button
                   onClick={() => { setMobileMenuOpen(false); handleLogout(); }}
-                  className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-[15px] font-medium text-red-300/90 hover:bg-red-950/40 border border-transparent hover:border-red-900/40 transition text-left"
+                  className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-[15px] font-medium text-red-600 hover:bg-red-50 border border-transparent hover:border-red-200 transition text-left"
                 >
                   Log out
                 </button>
@@ -203,7 +203,7 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
                 <Link
                   href="/signup"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="mt-3 block w-full text-center bg-white hover:bg-neutral-200 text-black px-4 py-3 rounded-full font-bold transition"
+                  className="mt-3 block w-full text-center bg-black hover:bg-neutral-800 text-white px-4 py-3 rounded-full font-bold transition"
                 >
                   Get Started
                 </Link>

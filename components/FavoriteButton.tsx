@@ -72,7 +72,7 @@ export default function FavoriteButton({
       aria-label={favorited ? 'Remove from saved' : 'Save event'}
       aria-pressed={favorited}
       title={favorited ? 'Saved — click to remove' : 'Save to wishlist'}
-      className="inline-flex items-center justify-center rounded-full bg-black/55 hover:bg-black/75 border border-white/15 transition disabled:opacity-60"
+      className="inline-flex items-center justify-center rounded-full bg-neutral-100 hover:bg-neutral-100 border border-black/15 transition disabled:opacity-60"
       style={{ width: dim + 14, height: dim + 14 }}
     >
       <svg
@@ -81,7 +81,7 @@ export default function FavoriteButton({
         width={dim}
         height={dim}
         fill={favorited ? '#f43f5e' : 'none'}
-        stroke={favorited ? '#f43f5e' : '#f1f5f9'}
+        stroke={favorited ? '#f43f5e' : '#171717'}
         strokeWidth={favorited ? 1.5 : 2}
         style={{
           transition: 'fill 0.15s ease, stroke 0.15s ease, transform 0.15s ease',

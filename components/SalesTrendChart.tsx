@@ -38,17 +38,17 @@ export default function SalesTrendChart({ orders }: { orders: Order[] }) {
   const barWidth = sortedDays.length > 0 ? (chartWidth - barGap * (sortedDays.length - 1)) / sortedDays.length : 0;
 
   return (
-    <div className="bg-neutral-950 border border-white/10 rounded-2xl p-6 mb-6">
+    <div className="bg-white border border-black/10 rounded-2xl p-6 mb-6">
       <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-        <h2 className="text-lg font-bold text-white">Sales Trend</h2>
+        <h2 className="text-lg font-bold text-black">Sales Trend</h2>
         <div className="flex gap-5 text-sm">
           <div>
-            <span className="text-neutral-400 text-xs block">Total Tickets Sold</span>
+            <span className="text-neutral-500 text-xs block">Total Tickets Sold</span>
             <span className="text-indigo-400 font-bold">{totalTickets}</span>
           </div>
           <div>
-            <span className="text-neutral-400 text-xs block">Total Revenue</span>
-            <span className="text-emerald-400 font-bold">KES {totalRevenue.toLocaleString()}</span>
+            <span className="text-neutral-500 text-xs block">Total Revenue</span>
+            <span className="text-emerald-600 font-bold">KES {totalRevenue.toLocaleString()}</span>
           </div>
         </div>
       </div>

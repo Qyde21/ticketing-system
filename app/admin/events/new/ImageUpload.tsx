@@ -39,8 +39,8 @@ export default function ImageUpload({ onUploaded }: { onUploaded: (url: string) 
 
   return (
     <div className="flex flex-col gap-2">
-      <label className="text-sm font-medium text-neutral-400">Cover image</label>
-      <input type="file" accept="image/*" onChange={handleFileChange} disabled={uploading} className="text-sm text-neutral-300" />
+      <label className="text-sm font-medium text-neutral-500">Cover image</label>
+      <input type="file" accept="image/*" onChange={handleFileChange} disabled={uploading} className="text-sm text-neutral-700" />
       {uploading && <p className="text-sm text-neutral-500">Uploading...</p>}
       {error && <p className="text-sm text-red-600">{error}</p>}
       {previewUrl && (

@@ -16,10 +16,10 @@ export default async function EventShiftsPage({ params }: { params: Promise<{ id
     FROM events WHERE id = ${id}
   `;
   if (!event) {
-    return <div className="max-w-2xl mx-auto py-12 px-4 text-white">Event not found.</div>;
+    return <div className="max-w-2xl mx-auto py-12 px-4 text-black">Event not found.</div>;
   }
   if (event.organizer_id !== session.userId && session.role !== 'admin') {
-    return <div className="max-w-2xl mx-auto py-12 px-4 text-white">Not authorized for this event.</div>;
+    return <div className="max-w-2xl mx-auto py-12 px-4 text-black">Not authorized for this event.</div>;
   }
 
   const eventEnded =
@@ -74,12 +74,12 @@ export default async function EventShiftsPage({ params }: { params: Promise<{ id
   }));
 
   return (
-    <div className="max-w-2xl mx-auto py-10 px-4 text-white">
+    <div className="max-w-2xl mx-auto py-10 px-4 text-black">
       <Link href="/organizer/dashboard" className="text-sm text-indigo-400 hover:underline">
         &larr; Back to dashboard
       </Link>
       <h1 className="text-2xl font-extrabold mt-2 mb-1">Shifts</h1>
-      <p className="text-neutral-400 text-sm mb-2">{event.title}</p>
+      <p className="text-neutral-500 text-sm mb-2">{event.title}</p>
       <p className="text-neutral-500 text-xs mb-6">
         <Link href={`/organizer/events/${id}/staff`} className="text-indigo-400 hover:underline">
           Door staff

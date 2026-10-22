@@ -35,7 +35,7 @@ export default function DeleteEventButton({ eventId }: { eventId: string }) {
     <button
       onClick={handleDelete}
       disabled={loading}
-      className="bg-red-950/80 hover:bg-red-900 text-red-300 border border-red-800 px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow disabled:opacity-50"
+      className="bg-red-50 hover:bg-red-50 text-red-700 border border-red-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow disabled:opacity-50"
     >
       {loading ? 'Deleting...' : 'Delete Event'}
     </button>

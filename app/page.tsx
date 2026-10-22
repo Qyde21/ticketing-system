@@ -89,9 +89,9 @@ export default async function HomePage() {
   const heroPrice = featuredEvent ? priceLabel(featuredEvent.min_price) : null;
 
   return (
-    <div className="min-h-screen bg-black text-white pb-8">
+    <div className="min-h-screen bg-white text-black pb-8">
       {featuredEvent && (
-        <section className="relative w-full h-[440px] sm:h-[540px] overflow-hidden border-b border-white/10 bg-neutral-950">
+        <section className="relative w-full h-[440px] sm:h-[540px] overflow-hidden bg-neutral-900 text-white">
           {featuredEvent.cover_image_url && (
             <img
               src={featuredEvent.cover_image_url}
@@ -132,11 +132,11 @@ export default async function HomePage() {
 
       {flashSaleEvents.length > 0 && (
         <div className="mx-auto w-full max-w-[1200px] px-4 sm:px-6 mt-6">
-          <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-amber-500/40 bg-amber-500/[0.07] px-4 py-3.5">
+          <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-amber-400 bg-amber-50 px-4 py-3.5">
             <FlashSaleBadge />
             <div className="flex-1 min-w-[200px]">
-              <p className="m-0 text-sm font-bold text-amber-300">Flash sales on now</p>
-              <p className="m-0 mt-1 text-[13px] text-neutral-300">
+              <p className="m-0 text-sm font-bold text-amber-700">Flash sales on now</p>
+              <p className="m-0 mt-1 text-[13px] text-neutral-700">
                 {flashSaleEvents.map((e: any) => e.title).join(' · ')}
               </p>
             </div>
@@ -156,7 +156,7 @@ export default async function HomePage() {
       )}
 
       <div className="mx-auto w-full max-w-[1200px] px-4 sm:px-6 pt-10">
-        <h2 className="mb-6 font-display text-4xl sm:text-5xl font-extrabold uppercase tracking-tight">
+        <h2 className="mb-6 font-display text-4xl sm:text-5xl font-extrabold uppercase tracking-tight text-black">
           Upcoming events
         </h2>
         {remainingUpcoming.length > 0 ? (
@@ -169,7 +169,7 @@ export default async function HomePage() {
 
         {pastEvents.length > 0 && (
           <div className="mt-16">
-            <h2 className="mb-6 font-display text-3xl font-extrabold uppercase tracking-tight text-neutral-500">
+            <h2 className="mb-6 font-display text-3xl font-extrabold uppercase tracking-tight text-neutral-400">
               Past events
             </h2>
             <EventList events={pastEvents} showFilters={false} favoriteIds={favoriteIds} />

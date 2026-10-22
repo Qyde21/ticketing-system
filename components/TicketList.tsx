@@ -31,23 +31,23 @@ export default function TicketList({ tickets, eventTitle, quantity }: TicketList
 
   return (
     <div className="space-y-4 pt-2">
-      <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-400">Your Tickets ({quantity})</h3>
+      <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-500">Your Tickets ({quantity})</h3>
       <div className="space-y-2">
         {tickets.map((t, idx) => {
           const isOpen = expanded.has(idx);
           return (
-            <div key={t.ticketCode} className="bg-neutral-950 border border-white/10 rounded-xl overflow-hidden">
+            <div key={t.ticketCode} className="bg-white border border-black/10 rounded-xl overflow-hidden">
               <button
                 type="button"
                 onClick={() => toggle(idx)}
                 className="w-full flex items-center justify-between px-4 py-3 text-left"
               >
-                <span className="text-sm font-bold text-white">Ticket #{idx + 1} of {quantity}</span>
-                <span className={`text-neutral-400 text-xs transition-transform ${isOpen ? "rotate-180" : ""}`}>▼</span>
+                <span className="text-sm font-bold text-black">Ticket #{idx + 1} of {quantity}</span>
+                <span className={`text-neutral-500 text-xs transition-transform ${isOpen ? "rotate-180" : ""}`}>▼</span>
               </button>
 
               {isOpen && (
-                <div className="px-4 pb-4 flex flex-col items-center space-y-3 border-t border-white/10 pt-4">
+                <div className="px-4 pb-4 flex flex-col items-center space-y-3 border-t border-black/10 pt-4">
                   <div className="bg-white p-3 rounded-xl">
                     <QRCodeSVG value={t.qrData} size={130} />
                   </div>
@@ -66,7 +66,7 @@ export default function TicketList({ tickets, eventTitle, quantity }: TicketList
                         alert("Ticket link copied to clipboard!");
                       }
                     }}
-                    className="w-full py-2 bg-neutral-900 hover:bg-neutral-800 text-xs font-bold uppercase tracking-wider text-white rounded-lg transition"
+                    className="w-full py-2 bg-neutral-100 hover:bg-neutral-200 text-xs font-bold uppercase tracking-wider text-black rounded-lg transition"
                   >
                     Share / Copy Ticket
                   </button>

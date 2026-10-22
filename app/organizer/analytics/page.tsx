@@ -12,7 +12,7 @@ export default async function OrganizerAnalyticsOverviewPage() {
   const session = await getSession();
   if (!session) redirect('/login');
   if (session.role !== 'organizer' && session.role !== 'admin') {
-    return <div className="max-w-5xl mx-auto px-4 py-8 text-white">Organizer access only.</div>;
+    return <div className="max-w-5xl mx-auto px-4 py-8 text-black">Organizer access only.</div>;
   }
 
   const isAdmin = session.role === 'admin';
@@ -58,42 +58,42 @@ export default async function OrganizerAnalyticsOverviewPage() {
   const net = totalRevenue - platformFee;
 
   return (
-    <main className="max-w-5xl mx-auto px-4 py-8 text-white">
+    <main className="max-w-5xl mx-auto px-4 py-8 text-black">
       <div className="mb-8">
         <Link href="/organizer/dashboard" className="text-indigo-400 hover:underline text-sm">&larr; Dashboard</Link>
-        <h1 className="text-3xl font-extrabold mt-2 text-white">Sales analytics</h1>
-        <p className="text-neutral-400 text-sm mt-1">All your events · paid orders only</p>
+        <h1 className="text-3xl font-extrabold mt-2 text-black">Sales analytics</h1>
+        <p className="text-neutral-500 text-sm mt-1">All your events · paid orders only</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <div className="bg-neutral-950 p-5 rounded-xl border border-white/10">
+        <div className="bg-white p-5 rounded-xl border border-black/10">
           <p className="text-xs uppercase tracking-wider text-indigo-300 font-medium">Gross sales</p>
           <p className="text-2xl font-bold text-cyan-400 mt-2">KES {totalRevenue.toLocaleString()}</p>
         </div>
-        <div className="bg-neutral-950 p-5 rounded-xl border border-white/10">
+        <div className="bg-white p-5 rounded-xl border border-black/10">
           <p className="text-xs uppercase tracking-wider text-indigo-300 font-medium">Net after 4%</p>
-          <p className="text-2xl font-bold text-emerald-400 mt-2">KES {net.toLocaleString()}</p>
+          <p className="text-2xl font-bold text-emerald-600 mt-2">KES {net.toLocaleString()}</p>
           <p className="text-xs text-neutral-500 mt-1">Fees KES {platformFee.toLocaleString()}</p>
         </div>
-        <div className="bg-neutral-950 p-5 rounded-xl border border-white/10">
+        <div className="bg-white p-5 rounded-xl border border-black/10">
           <p className="text-xs uppercase tracking-wider text-indigo-300 font-medium">Tickets sold</p>
-          <p className="text-2xl font-bold text-white mt-2">{totalTickets.toLocaleString()}</p>
+          <p className="text-2xl font-bold text-black mt-2">{totalTickets.toLocaleString()}</p>
           <p className="text-xs text-neutral-500 mt-1">{eventRows.length} event(s)</p>
         </div>
       </div>
 
       <SalesTrendChart orders={overviewOrders as any} />
 
-      <div className="bg-neutral-950 border border-white/10 rounded-xl p-6 mt-8">
+      <div className="bg-white border border-black/10 rounded-xl p-6 mt-8">
         <h2 className="text-lg font-bold text-indigo-300 mb-4">By event</h2>
         {eventRows.length === 0 ? (
           <p className="text-neutral-500 text-sm">No events yet.</p>
         ) : (
-          <ul className="divide-y divide-neutral-800">
+          <ul className="divide-y divide-black/10">
             {eventRows.map((e: any) => (
               <li key={e.id} className="py-3 flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="font-semibold text-white">{e.title}</p>
+                  <p className="font-semibold text-black">{e.title}</p>
                   <p className="text-xs text-neutral-500">
                     {e.status}
                     {e.start_at && ` · ${new Date(e.start_at).toLocaleDateString('en-KE', { dateStyle: 'medium' })}`}
@@ -101,7 +101,7 @@ export default async function OrganizerAnalyticsOverviewPage() {
                 </div>
                 <div className="flex items-center gap-4 text-sm">
                   <span className="text-cyan-400 font-bold">KES {Number(e.revenue).toLocaleString()}</span>
-                  <span className="text-neutral-400">{Number(e.tickets_sold)} tix</span>
+                  <span className="text-neutral-500">{Number(e.tickets_sold)} tix</span>
                   <Link href={`/organizer/events/${e.id}/analytics`} className="text-indigo-400 hover:text-cyan-400 font-semibold">Details →</Link>
                 </div>
               </li>

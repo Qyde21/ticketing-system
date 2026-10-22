@@ -44,7 +44,7 @@ export default async function AdminPayoutsPage() {
   const totalNet = Math.round((totalGross - totalRefunded - totalFees) * 100) / 100;
 
   return (
-    <div className="max-w-3xl mx-auto py-10 px-4 text-white">
+    <div className="max-w-3xl mx-auto py-10 px-4 text-black">
       <Link href="/admin/dashboard" className="text-sm text-indigo-400 hover:underline">&larr; Admin</Link>
       <h1 className="text-2xl font-extrabold mt-2 mb-6">Platform payouts</h1>
 
@@ -61,7 +61,7 @@ export default async function AdminPayoutsPage() {
           href="https://dashboard.paystack.com/#/transfers/recipients"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 bg-neutral-900 hover:bg-neutral-800 border border-white/15 text-neutral-200 text-sm font-semibold px-4 py-2.5 rounded-xl transition"
+          className="inline-flex items-center gap-2 bg-neutral-100 hover:bg-neutral-200 border border-black/15 text-neutral-800 text-sm font-semibold px-4 py-2.5 rounded-xl transition"
         >
           Recipients
         </a>
@@ -69,14 +69,14 @@ export default async function AdminPayoutsPage() {
       <div className="flex gap-3 flex-wrap mb-8">
         {[
           { label: 'Gross paid', value: totalGross, color: 'text-indigo-400' },
-          { label: 'Platform fees (4%)', value: totalFees, color: 'text-amber-400' },
-          { label: 'Organizer net', value: totalNet, color: 'text-emerald-400' },
+          { label: 'Platform fees (4%)', value: totalFees, color: 'text-amber-600' },
+          { label: 'Organizer net', value: totalNet, color: 'text-emerald-600' },
         ].map((s) => (
-          <div key={s.label} className="bg-neutral-950 border border-white/10 rounded-xl px-5 py-3 min-w-[140px]">
+          <div key={s.label} className="bg-white border border-black/10 rounded-xl px-5 py-3 min-w-[140px]">
             <div className={`text-xl font-bold ${s.color}`}>
               KES {s.value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
             </div>
-            <div className="text-xs text-neutral-400">{s.label}</div>
+            <div className="text-xs text-neutral-500">{s.label}</div>
           </div>
         ))}
       </div>
@@ -86,7 +86,7 @@ export default async function AdminPayoutsPage() {
       ) : (
         <ul className="space-y-2 mb-8">
           {pendingPayouts.map((p) => (
-            <li key={p.id as string} className="flex justify-between items-center gap-3 bg-neutral-950 border border-white/10 rounded-xl px-4 py-3">
+            <li key={p.id as string} className="flex justify-between items-center gap-3 bg-white border border-black/10 rounded-xl px-4 py-3">
               <div>
                 <div className="font-semibold text-sm">{p.event_title as string}</div>
                 <div className="text-xs text-neutral-500">
@@ -95,7 +95,7 @@ export default async function AdminPayoutsPage() {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-emerald-400 font-bold text-sm">KES {Number(p.net_kes).toLocaleString()}</span>
+                <span className="text-emerald-600 font-bold text-sm">KES {Number(p.net_kes).toLocaleString()}</span>
                 <AdminProcessPayoutButton payoutId={p.id as string} />
               </div>
             </li>
@@ -107,14 +107,14 @@ export default async function AdminPayoutsPage() {
         {organizers.map((o) => {
           const c = computeNet(Number(o.gross), Number(o.refunded));
           return (
-            <li key={o.id as string} className="flex justify-between bg-neutral-950 border border-white/10 rounded-xl px-4 py-3">
+            <li key={o.id as string} className="flex justify-between bg-white border border-black/10 rounded-xl px-4 py-3">
               <div>
                 <div className="font-semibold text-sm">{(o.full_name as string) || 'Organizer'}</div>
                 <div className="text-xs text-neutral-500">{o.email as string}</div>
               </div>
               <div className="text-right text-sm">
-                <div className="text-emerald-400 font-bold">KES {c.net.toLocaleString(undefined, { maximumFractionDigits: 0 })} net</div>
-                <div className="text-xs text-amber-400">KES {c.fee.toLocaleString(undefined, { maximumFractionDigits: 0 })} fees</div>
+                <div className="text-emerald-600 font-bold">KES {c.net.toLocaleString(undefined, { maximumFractionDigits: 0 })} net</div>
+                <div className="text-xs text-amber-600">KES {c.fee.toLocaleString(undefined, { maximumFractionDigits: 0 })} fees</div>
               </div>
             </li>
           );

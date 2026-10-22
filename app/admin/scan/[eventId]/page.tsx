@@ -9,7 +9,7 @@ export default async function AdminScanPage({ params }: { params: Promise<{ even
   const session = await getSession();
 
   if (!session || session.role !== 'admin') {
-    return <div className="max-w-2xl mx-auto py-12 px-4 text-white">Unauthorized access.</div>;
+    return <div className="max-w-2xl mx-auto py-12 px-4 text-black">Unauthorized access.</div>;
   }
 
   const { eventId } = await params;
@@ -19,7 +19,7 @@ export default async function AdminScanPage({ params }: { params: Promise<{ even
   `;
 
   if (!event) {
-    return <div className="max-w-2xl mx-auto py-12 px-4 text-white">Event not found.</div>;
+    return <div className="max-w-2xl mx-auto py-12 px-4 text-black">Event not found.</div>;
   }
 
   const [counts] = await sql`
@@ -50,12 +50,12 @@ export default async function AdminScanPage({ params }: { params: Promise<{ even
   };
 
   return (
-    <div className="max-w-2xl mx-auto py-10 px-4 text-white">
+    <div className="max-w-2xl mx-auto py-10 px-4 text-black">
       <Link href="/admin/events" className="text-sm text-indigo-400 hover:underline">
         &larr; Back to events
       </Link>
       <h1 className="text-2xl font-extrabold mt-2">{event.title}</h1>
-      <p className="text-neutral-400 text-sm">
+      <p className="text-neutral-500 text-sm">
         {event.venue_name || 'No Venue'} &middot; {event.start_at ? new Date(event.start_at).toLocaleString() : 'No Date'}
       </p>
       <LiveOverview eventId={eventId} initial={initial} />

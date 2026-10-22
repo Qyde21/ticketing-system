@@ -32,9 +32,9 @@ export default function MyTicketsRequestPage() {
 
   return (
     <main className="min-h-[70vh] flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md bg-neutral-950/90 border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl">
-        <h1 className="text-2xl font-extrabold text-white text-center">My tickets</h1>
-        <p className="text-neutral-400 text-sm text-center mt-2 mb-6">
+      <div className="w-full max-w-md bg-white/90 border border-black/10 rounded-2xl p-6 sm:p-8 shadow-2xl">
+        <h1 className="text-2xl font-extrabold text-black text-center">My tickets</h1>
+        <p className="text-neutral-500 text-sm text-center mt-2 mb-6">
           Enter the email you used at checkout. We will send a secure link to view your tickets — no account needed.
         </p>
         <form onSubmit={submit} className="space-y-4">
@@ -45,18 +45,18 @@ export default function MyTicketsRequestPage() {
             placeholder="you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-neutral-900/80 border border-white/15 rounded-xl px-4 py-3.5 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+            className="w-full bg-neutral-100/80 border border-black/15 rounded-xl px-4 py-3.5 text-black placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
           />
           {err && (
-            <div className="p-3 bg-red-950/80 border border-red-800 text-red-300 rounded-xl text-sm">{err}</div>
+            <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">{err}</div>
           )}
           {msg && (
-            <div className="p-3 bg-emerald-950/50 border border-emerald-800 text-emerald-300 rounded-xl text-sm">{msg}</div>
+            <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl text-sm">{msg}</div>
           )}
           <button
             type="submit"
             disabled={loading}
-            className="w-full disabled:opacity-50 font-bold py-3.5 rounded-full bg-white text-black hover:bg-neutral-200"
+            className="w-full disabled:opacity-50 font-bold py-3.5 rounded-full bg-black text-white hover:bg-neutral-800"
           >
             {loading ? 'Sending…' : 'Email me a link'}
           </button>
