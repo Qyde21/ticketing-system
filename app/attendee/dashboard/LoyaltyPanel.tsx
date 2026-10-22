@@ -10,9 +10,9 @@ interface Summary {
 }
 
 const TIER_STYLES: Record<Tier, { bg: string; text: string; ring: string }> = {
-  Bronze: { bg: 'bg-amber-950/50', text: 'text-amber-400', ring: 'border-amber-800' },
-  Silver: { bg: 'bg-slate-800/60', text: 'text-slate-300', ring: 'border-slate-600' },
-  Gold: { bg: 'bg-yellow-950/40', text: 'text-yellow-400', ring: 'border-yellow-700' },
+  Bronze: { bg: 'bg-amber-50', text: 'text-amber-600', ring: 'border-amber-200' },
+  Silver: { bg: 'bg-neutral-200/60', text: 'text-neutral-700', ring: 'border-black/20' },
+  Gold: { bg: 'bg-yellow-50', text: 'text-yellow-600', ring: 'border-yellow-200' },
 };
 
 export default function LoyaltyPanel({
@@ -70,12 +70,12 @@ export default function LoyaltyPanel({
   }
 
   return (
-    <div className="bg-neutral-950 border border-white/10 rounded-2xl p-5">
+    <div className="bg-white border border-black/10 rounded-2xl p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-neutral-400">Loyalty points</p>
-            <p className="text-2xl font-extrabold text-white">{summary.balance.toLocaleString()}</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-neutral-500">Loyalty points</p>
+            <p className="text-2xl font-extrabold text-black">{summary.balance.toLocaleString()}</p>
           </div>
           <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${tierStyle.bg} ${tierStyle.text} ${tierStyle.ring}`}>
             {summary.tier} member
@@ -99,20 +99,20 @@ export default function LoyaltyPanel({
       )}
 
       {open && (
-        <form onSubmit={handleRedeem} className="mt-4 pt-4 border-t border-white/10 space-y-3">
+        <form onSubmit={handleRedeem} className="mt-4 pt-4 border-t border-black/10 space-y-3">
           {result ? (
-            <div className="bg-emerald-950/40 border border-emerald-800 rounded-xl p-4">
-              <p className="text-emerald-300 text-sm font-semibold mb-2">
+            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+              <p className="text-emerald-700 text-sm font-semibold mb-2">
                 Redeemed! KES {result.discountKes.toLocaleString()} off your next order.
               </p>
               <div className="flex items-center gap-2">
-                <code className="bg-black border border-white/10 rounded-lg px-3 py-2 text-sm text-white flex-1">
+                <code className="bg-neutral-50 border border-black/10 rounded-lg px-3 py-2 text-sm text-black flex-1">
                   {result.code}
                 </code>
                 <button
                   type="button"
                   onClick={copyCode}
-                  className="text-xs font-bold px-3 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-200 whitespace-nowrap"
+                  className="text-xs font-bold px-3 py-2 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-800 whitespace-nowrap"
                 >
                   {copied ? 'Copied!' : 'Copy'}
                 </button>
@@ -124,13 +124,13 @@ export default function LoyaltyPanel({
           ) : (
             <>
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-500 mb-1">
                   Redeem toward
                 </label>
                 <select
                   value={eventId}
                   onChange={(e) => setEventId(e.target.value)}
-                  className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-sm text-white"
+                  className="w-full bg-neutral-50 border border-black/10 rounded-lg px-3 py-2 text-sm text-black"
                 >
                   {events.map((ev) => (
                     <option key={ev.id} value={ev.id}>
@@ -140,7 +140,7 @@ export default function LoyaltyPanel({
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-500 mb-1">
                   Points to redeem (min 100, 1 point = KES 1 off)
                 </label>
                 <input
@@ -150,10 +150,10 @@ export default function LoyaltyPanel({
                   max={summary.balance}
                   value={points}
                   onChange={(e) => setPoints(Number(e.target.value))}
-                  className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-sm text-white"
+                  className="w-full bg-neutral-50 border border-black/10 rounded-lg px-3 py-2 text-sm text-black"
                 />
               </div>
-              {error && <p className="text-xs text-red-400">{error}</p>}
+              {error && <p className="text-xs text-red-600">{error}</p>}
               <button
                 type="submit"
                 disabled={busy || summary.balance < 100}

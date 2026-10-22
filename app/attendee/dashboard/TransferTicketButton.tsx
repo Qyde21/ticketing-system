@@ -41,14 +41,14 @@ export default function TransferTicketButton({ code }: { code: string }) {
   }
 
   if (success) {
-    return <span className="text-xs text-emerald-400 font-semibold whitespace-nowrap">Transferred!</span>;
+    return <span className="text-xs text-emerald-600 font-semibold whitespace-nowrap">Transferred!</span>;
   }
 
   if (!open) {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="text-xs px-2 py-1 rounded border border-white/15 bg-neutral-900 hover:bg-neutral-800 text-neutral-300 whitespace-nowrap transition"
+        className="text-xs px-2 py-1 rounded border border-black/15 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 whitespace-nowrap transition"
       >
         Transfer
       </button>
@@ -56,23 +56,23 @@ export default function TransferTicketButton({ code }: { code: string }) {
   }
 
   return (
-    <div className="w-full bg-black border border-white/10 rounded-lg p-3 mt-2 flex flex-col gap-2">
-      <p className="text-xs font-semibold text-neutral-300">Transfer this ticket to:</p>
+    <div className="w-full bg-neutral-50 border border-black/10 rounded-lg p-3 mt-2 flex flex-col gap-2">
+      <p className="text-xs font-semibold text-neutral-700">Transfer this ticket to:</p>
       <input
         type="text"
         value={name}
         onChange={(e) => setName(e.target.value)}
         placeholder="Recipient's full name"
-        className="w-full bg-neutral-950 border border-white/10 rounded-md px-2.5 py-1.5 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-indigo-500"
+        className="w-full bg-white border border-black/10 rounded-md px-2.5 py-1.5 text-xs text-black placeholder-neutral-500 focus:outline-none focus:border-indigo-500"
       />
       <input
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="Recipient's email"
-        className="w-full bg-neutral-950 border border-white/10 rounded-md px-2.5 py-1.5 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-indigo-500"
+        className="w-full bg-white border border-black/10 rounded-md px-2.5 py-1.5 text-xs text-black placeholder-neutral-500 focus:outline-none focus:border-indigo-500"
       />
-      {error && <p className="text-red-400 text-xs">{error}</p>}
+      {error && <p className="text-red-600 text-xs">{error}</p>}
       <div className="flex gap-2">
         <button
           onClick={handleTransfer}
@@ -83,7 +83,7 @@ export default function TransferTicketButton({ code }: { code: string }) {
         </button>
         <button
           onClick={() => { setOpen(false); setError(''); }}
-          className="bg-neutral-900 hover:bg-neutral-800 text-neutral-300 text-xs px-3 py-1.5 rounded-md transition"
+          className="bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs px-3 py-1.5 rounded-md transition"
         >
           Cancel
         </button>

@@ -40,15 +40,15 @@ export default function ReviewForm({ eventId }: { eventId: string }) {
 
   if (submitted) {
     return (
-      <div className="bg-emerald-950/40 border border-emerald-800/60 text-emerald-300 font-semibold px-4 py-3 rounded-xl">
+      <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 font-semibold px-4 py-3 rounded-xl">
         Thanks for your review!
       </div>
     );
   }
 
   return (
-    <div className="bg-neutral-950 border border-white/10 rounded-xl p-4">
-      <p className="text-sm font-bold text-white mb-2">Leave a review</p>
+    <div className="bg-white border border-black/10 rounded-xl p-4">
+      <p className="text-sm font-bold text-black mb-2">Leave a review</p>
       <div className="flex gap-1 mb-3">
         {[1, 2, 3, 4, 5].map((star) => (
           <button
@@ -79,9 +79,9 @@ export default function ReviewForm({ eventId }: { eventId: string }) {
         placeholder="Optional — share what you thought (max 2000 characters)"
         maxLength={2000}
         rows={3}
-        className="w-full bg-black border border-white/15 rounded-lg p-2.5 text-sm text-white mb-3 resize-none"
+        className="w-full bg-neutral-50 border border-black/15 rounded-lg p-2.5 text-sm text-black mb-3 resize-none"
       />
-      {error && <p className="text-red-400 text-xs mb-2">{error}</p>}
+      {error && <p className="text-red-600 text-xs mb-2">{error}</p>}
       <button
         type="button"
         onClick={handleSubmit}

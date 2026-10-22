@@ -99,7 +99,7 @@ export default async function OrganizerProfilePage({
     : null;
 
   return (
-    <div className="max-w-6xl mx-auto py-12 px-4 text-white">
+    <div className="max-w-6xl mx-auto py-12 px-4 text-black">
       <div className="flex items-center gap-3 flex-wrap mb-2">
         <h1 className="text-3xl font-extrabold">{organizer.display_name}</h1>
         {organizer.is_verified && (
@@ -112,23 +112,23 @@ export default async function OrganizerProfilePage({
         )}
       </div>
       {memberSince && (
-        <p className="text-neutral-400 text-sm mb-10">Organizing events on TicketHub since {memberSince}</p>
+        <p className="text-neutral-500 text-sm mb-10">Organizing events on TicketHub since {memberSince}</p>
       )}
       {!memberSince && <div className="mb-10" />}
 
       <h2 className="text-xl font-bold mb-4">Upcoming events</h2>
       {upcomingEvents.length > 0 ? (
         <div className="mb-12">
-          <EventList events={upcomingEvents} showFilters={false} theme="dark" />
+          <EventList events={upcomingEvents} showFilters={false} />
         </div>
       ) : (
-        <p className="text-neutral-400 mb-12">No upcoming events right now.</p>
+        <p className="text-neutral-500 mb-12">No upcoming events right now.</p>
       )}
 
       {pastEvents.length > 0 && (
         <>
           <h2 className="text-xl font-bold mb-4">Past events</h2>
-          <EventList events={pastEvents} showFilters={false} theme="dark" />
+          <EventList events={pastEvents} showFilters={false} />
         </>
       )}
     </div>

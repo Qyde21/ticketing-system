@@ -23,7 +23,7 @@ export default async function TicketPage({ params }: { params: Promise<{ code: s
 
   if (!ticket) {
     return (
-      <div className="max-w-lg mx-auto py-16 px-4 text-center text-white">
+      <div className="max-w-lg mx-auto py-16 px-4 text-center text-black">
         <p className="text-lg font-semibold">Ticket not found.</p>
       </div>
     );
@@ -44,12 +44,12 @@ export default async function TicketPage({ params }: { params: Promise<{ code: s
   const isExpired = displayStatus === 'expired';
 
   return (
-    <div className="min-h-[70vh] w-full px-3 sm:px-6 py-6 sm:py-10 text-white">
+    <div className="min-h-[70vh] w-full px-3 sm:px-6 py-6 sm:py-10 text-black">
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="text-center sm:text-left">
           <p className="text-xs font-bold uppercase tracking-widest text-indigo-300/80 mb-1">Your ticket</p>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-white leading-tight">{ticket.event_title}</h1>
-          <p className="text-sm text-neutral-400 mt-1">Show this at the entrance — QR or barcode both work</p>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-black leading-tight">{ticket.event_title}</h1>
+          <p className="text-sm text-neutral-500 mt-1">Show this at the entrance — QR or barcode both work</p>
         </div>
 
         <EventTicket
@@ -68,9 +68,9 @@ export default async function TicketPage({ params }: { params: Promise<{ code: s
         />
 
         <div className="flex flex-wrap items-center justify-center sm:justify-between gap-3 text-sm">
-          <p className="text-neutral-400">
+          <p className="text-neutral-500">
             Status:{' '}
-            <strong className={isUsed ? 'text-red-400' : isExpired ? 'text-neutral-400' : 'text-emerald-400'}>
+            <strong className={isUsed ? 'text-red-600' : isExpired ? 'text-neutral-500' : 'text-emerald-600'}>
               {displayStatus}
             </strong>
           </p>

@@ -17,9 +17,9 @@ export default async function MyTicketsViewPage({
   const verified = await verifyTicketsMagicLink(token);
   if (!verified) {
     return (
-      <main className="max-w-md mx-auto py-16 px-4 text-white text-center">
-        <h1 className="text-xl font-bold text-red-400 mb-2">Link expired or invalid</h1>
-        <p className="text-neutral-400 text-sm mb-6">
+      <main className="max-w-md mx-auto py-16 px-4 text-black text-center">
+        <h1 className="text-xl font-bold text-red-600 mb-2">Link expired or invalid</h1>
+        <p className="text-neutral-500 text-sm mb-6">
           Magic links work for one hour. Request a new one with the same email.
         </p>
         <Link
@@ -77,9 +77,9 @@ export default async function MyTicketsViewPage({
   }
 
   return (
-    <main className="max-w-2xl mx-auto py-10 px-4 text-white">
+    <main className="max-w-2xl mx-auto py-10 px-4 text-black">
       <h1 className="text-2xl font-extrabold mb-1">Your tickets</h1>
-      <p className="text-neutral-400 text-sm mb-6">
+      <p className="text-neutral-500 text-sm mb-6">
         Showing paid orders for <span className="text-indigo-300">{email}</span>
       </p>
 
@@ -90,7 +90,7 @@ export default async function MyTicketsViewPage({
           {orders.map((o) => {
             const list = ticketsByOrder.get(o.id as string) || [];
             return (
-              <li key={o.id as string} className="bg-neutral-950 border border-white/10 rounded-2xl p-5">
+              <li key={o.id as string} className="bg-white border border-black/10 rounded-2xl p-5">
                 <div className="flex justify-between gap-3 flex-wrap mb-3">
                   <div>
                     <h2 className="font-bold text-lg">{o.event_title as string}</h2>
@@ -100,7 +100,7 @@ export default async function MyTicketsViewPage({
                     </p>
                   </div>
                   <div className="text-right text-sm">
-                    <div className="text-emerald-400 font-semibold">
+                    <div className="text-emerald-600 font-semibold">
                       KES {Number(o.total_amount_kes).toLocaleString()}
                     </div>
                     <div className="text-xs text-neutral-500">
@@ -123,7 +123,7 @@ export default async function MyTicketsViewPage({
                       return (
                       <li
                         key={t.ticket_code as string}
-                        className="flex justify-between items-center bg-black/80 border border-white/10 rounded-xl px-3 py-2.5"
+                        className="flex justify-between items-center bg-neutral-100 border border-black/10 rounded-xl px-3 py-2.5"
                       >
                         <div>
                           <span className="font-mono text-sm text-indigo-300">
@@ -134,7 +134,7 @@ export default async function MyTicketsViewPage({
                             {t.holder_name ? ` · ${t.holder_name}` : ''}
                           </span>
                           {displayStatus === 'used' && (
-                            <span className="ml-2 text-xs text-red-400">Used</span>
+                            <span className="ml-2 text-xs text-red-600">Used</span>
                           )}
                           {displayStatus === 'expired' && (
                             <span className="ml-2 text-xs text-neutral-500">Expired</span>

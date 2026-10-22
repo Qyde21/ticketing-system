@@ -70,25 +70,25 @@ export default function LiveOverview({
       <div className="flex gap-3 mt-4 flex-wrap">
         {[
           { label: 'Total tickets', value: stats.total, color: 'text-indigo-400' },
-          { label: 'Checked in', value: stats.checkedIn, color: 'text-emerald-400' },
-          { label: 'Not yet in', value: stats.remaining, color: 'text-amber-400' },
-          { label: 'Cancelled', value: stats.cancelled, color: 'text-red-400' },
+          { label: 'Checked in', value: stats.checkedIn, color: 'text-emerald-600' },
+          { label: 'Not yet in', value: stats.remaining, color: 'text-amber-600' },
+          { label: 'Cancelled', value: stats.cancelled, color: 'text-red-600' },
         ].map((stat) => (
           <div
             key={stat.label}
-            className="bg-neutral-950 border border-white/10 rounded-xl px-5 py-3 text-center"
+            className="bg-white border border-black/10 rounded-xl px-5 py-3 text-center"
             style={{ minWidth: 120 }}
           >
             <div className={'text-2xl font-bold ' + stat.color}>{stat.value}</div>
-            <div className="text-xs text-neutral-400 mt-0.5">{stat.label}</div>
+            <div className="text-xs text-neutral-500 mt-0.5">{stat.label}</div>
           </div>
         ))}
       </div>
 
-      <div className="mt-4 bg-neutral-900 rounded-full overflow-hidden" style={{ height: 8 }}>
+      <div className="mt-4 bg-neutral-100 rounded-full overflow-hidden" style={{ height: 8 }}>
         <div className="bg-emerald-500 h-full transition-all duration-300" style={{ width: `${percent}%` }} />
       </div>
-      <p className="text-xs text-neutral-400 mt-1 flex justify-between">
+      <p className="text-xs text-neutral-500 mt-1 flex justify-between">
         <span>{percent}% checked in</span>
         <button type="button" onClick={() => void refresh()} className="text-indigo-400 hover:underline">
           Refresh now
@@ -98,7 +98,7 @@ export default function LiveOverview({
 
       {eventEnded ? (
         <span
-          className="inline-block mt-3 bg-neutral-900 text-neutral-500 px-5 py-2 rounded-lg font-semibold text-sm cursor-not-allowed border border-white/15"
+          className="inline-block mt-3 bg-neutral-100 text-neutral-500 px-5 py-2 rounded-lg font-semibold text-sm cursor-not-allowed border border-black/15"
           title="Scanning is closed because this event has ended"
         >
           Open Scanner (closed)
@@ -120,13 +120,13 @@ export default function LiveOverview({
           {byStaff.map((s) => (
             <li
               key={(s.email || s.name) + String(s.count)}
-              className="flex items-center justify-between gap-3 bg-neutral-950 border border-white/10 rounded-xl px-4 py-3"
+              className="flex items-center justify-between gap-3 bg-white border border-black/10 rounded-xl px-4 py-3"
             >
               <div>
-                <p className="font-semibold text-white text-sm">{s.name}</p>
-                {s.email && <p className="text-xs text-neutral-400">{s.email}</p>}
+                <p className="font-semibold text-black text-sm">{s.name}</p>
+                {s.email && <p className="text-xs text-neutral-500">{s.email}</p>}
               </div>
-              <span className="text-sm font-bold text-emerald-400">
+              <span className="text-sm font-bold text-emerald-600">
                 {s.count} scan{s.count === 1 ? '' : 's'}
               </span>
             </li>
@@ -142,11 +142,11 @@ export default function LiveOverview({
           {stats.recent.map((t) => (
             <li
               key={t.ticketCode + (t.checkedInAt || '')}
-              className="flex justify-between items-start gap-3 px-3 py-2.5 bg-neutral-950 border border-white/10 rounded-xl"
+              className="flex justify-between items-start gap-3 px-3 py-2.5 bg-white border border-black/10 rounded-xl"
             >
               <div>
-                <strong className="text-sm text-white font-mono">{t.ticketCode}</strong>
-                <div className="text-xs text-neutral-400">
+                <strong className="text-sm text-black font-mono">{t.ticketCode}</strong>
+                <div className="text-xs text-neutral-500">
                   {t.holderName || 'Guest'}
                   {t.ticketType ? ` · ${t.ticketType}` : ''}
                 </div>
@@ -155,7 +155,7 @@ export default function LiveOverview({
                   {t.scannedByEmail ? ` (${t.scannedByEmail})` : ''}
                 </div>
               </div>
-              <span className="text-xs text-emerald-400 font-medium whitespace-nowrap">
+              <span className="text-xs text-emerald-600 font-medium whitespace-nowrap">
                 {t.checkedInAt ? new Date(t.checkedInAt).toLocaleTimeString() : '—'}
               </span>
             </li>

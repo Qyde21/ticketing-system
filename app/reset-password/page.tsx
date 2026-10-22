@@ -4,7 +4,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import PasswordInput from '@/components/PasswordInput';
 
-const inputClass = 'w-full bg-neutral-900 border border-white/15 rounded-lg px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:border-indigo-500 transition';
+const inputClass = 'w-full bg-neutral-100 border border-black/15 rounded-lg px-4 py-3 text-black placeholder-neutral-500 focus:outline-none focus:border-indigo-500 transition';
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams();
@@ -55,7 +55,7 @@ function ResetPasswordForm() {
 
   if (!token) {
     return (
-      <div className="p-4 bg-red-950/80 border border-red-800 text-red-300 rounded-lg text-sm font-medium text-center">
+      <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm font-medium text-center">
         This reset link is missing a token. Please request a new one from the{' '}
         <Link href="/forgot-password" className="underline font-semibold">forgot password page</Link>.
       </div>
@@ -64,7 +64,7 @@ function ResetPasswordForm() {
 
   if (success) {
     return (
-      <div className="p-4 bg-green-950/60 border border-green-800/50 text-green-300 rounded-lg text-sm font-medium text-center">
+      <div className="p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm font-medium text-center">
         Password reset successfully! Redirecting you to log in...
       </div>
     );
@@ -73,7 +73,7 @@ function ResetPasswordForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {error && (
-        <div className="p-4 bg-red-950/80 border border-red-800 text-red-300 rounded-lg text-sm font-medium">
+        <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm font-medium">
           {error}
         </div>
       )}
@@ -105,7 +105,7 @@ function ResetPasswordForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full font-bold py-3 px-4 rounded-full transition disabled:opacity-50 bg-white text-black hover:bg-neutral-200"
+        className="w-full font-bold py-3 px-4 rounded-full transition disabled:opacity-50 bg-black text-white hover:bg-neutral-800"
       >
         {loading ? 'Resetting...' : 'Reset Password'}
       </button>
@@ -115,13 +115,13 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <main className="max-w-md mx-auto px-4 py-16 text-white">
-      <div className="bg-neutral-950 border border-white/10 rounded-2xl p-8 shadow-2xl">
+    <main className="max-w-md mx-auto px-4 py-16 text-black">
+      <div className="bg-white border border-black/10 rounded-2xl p-8 shadow-2xl">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-extrabold text-white">Reset Password</h1>
-          <p className="text-neutral-400 text-sm mt-2">Choose a new password for your account</p>
+          <h1 className="text-3xl font-extrabold text-black">Reset Password</h1>
+          <p className="text-neutral-500 text-sm mt-2">Choose a new password for your account</p>
         </div>
-        <Suspense fallback={<div className="text-center text-neutral-400">Loading...</div>}>
+        <Suspense fallback={<div className="text-center text-neutral-500">Loading...</div>}>
           <ResetPasswordForm />
         </Suspense>
       </div>

@@ -66,7 +66,7 @@ export default function AdminEventActions({ eventId, status, title }: AdminEvent
           type="button"
           onClick={() => void handleCancel()}
           disabled={!!loading}
-          className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-amber-700/60 bg-amber-950/40 text-amber-300 hover:bg-amber-900/50 transition disabled:opacity-50"
+          className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-50 transition disabled:opacity-50"
         >
           {loading === 'cancel' ? 'Cancelling…' : 'Cancel'}
         </button>
@@ -75,7 +75,7 @@ export default function AdminEventActions({ eventId, status, title }: AdminEvent
         type="button"
         onClick={() => void handleDelete()}
         disabled={!!loading}
-        className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-red-700/70 bg-red-950/50 text-red-300 hover:bg-red-900/60 transition disabled:opacity-50"
+        className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-50 transition disabled:opacity-50"
       >
         {loading === 'delete' ? 'Deleting…' : 'Delete'}
       </button>

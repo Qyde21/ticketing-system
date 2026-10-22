@@ -11,7 +11,7 @@ export default async function EventOrdersPage({ params }: { params: Promise<{ id
   const session = await getSession();
 
   if (!session || session.role !== 'admin') {
-    return <div className="max-w-6xl mx-auto px-4 py-8 text-white">Unauthorized.</div>;
+    return <div className="max-w-6xl mx-auto px-4 py-8 text-black">Unauthorized.</div>;
   }
 
   const decodedId = decodeURIComponent(id);
@@ -23,11 +23,11 @@ export default async function EventOrdersPage({ params }: { params: Promise<{ id
 
   if (events.length === 0) {
     return (
-      <main className="max-w-6xl mx-auto px-4 py-8 text-white">
-        <h1 className="text-2xl font-bold text-red-400 mb-2">Event Not Found</h1>
-        <p className="text-neutral-400">
+      <main className="max-w-6xl mx-auto px-4 py-8 text-black">
+        <h1 className="text-2xl font-bold text-red-600 mb-2">Event Not Found</h1>
+        <p className="text-neutral-500">
           Could not find an event matching:{' '}
-          <code className="bg-neutral-900 px-2 py-1 rounded text-cyan-300">{decodedId}</code>
+          <code className="bg-neutral-100 px-2 py-1 rounded text-cyan-300">{decodedId}</code>
         </p>
         <div className="mt-6">
           <Link href="/admin/events" className="text-indigo-400 hover:underline">
@@ -55,23 +55,23 @@ export default async function EventOrdersPage({ params }: { params: Promise<{ id
   `;
 
   return (
-    <main className="max-w-6xl mx-auto px-4 py-8 text-white">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8 pb-4 border-b border-white/10">
+    <main className="max-w-6xl mx-auto px-4 py-8 text-black">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8 pb-4 border-b border-black/10">
         <div>
-          <h1 className="text-3xl font-extrabold text-white">
+          <h1 className="text-3xl font-extrabold text-black">
             Orders for {event.title}
           </h1>
-          <p className="text-neutral-400 text-sm mt-1">
+          <p className="text-neutral-500 text-sm mt-1">
             Review ticket purchases, customer details, and process refunds
             {eventEnded && (
-              <span className="text-amber-400"> · Event ended — refunds disabled</span>
+              <span className="text-amber-600"> · Event ended — refunds disabled</span>
             )}
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
           <a
             href={`/api/events/${event.id}/orders/export`}
-            className="bg-emerald-950/50 hover:bg-emerald-900/50 text-emerald-300 border border-emerald-800/60 font-semibold px-4 py-2 rounded-lg text-sm transition"
+            className="bg-emerald-50 hover:bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold px-4 py-2 rounded-lg text-sm transition"
           >
             Export CSV
           </a>
@@ -82,7 +82,7 @@ export default async function EventOrdersPage({ params }: { params: Promise<{ id
       </div>
 
       {orders.length === 0 ? (
-        <div className="text-center py-16 bg-neutral-950 border border-white/10 rounded-2xl shadow-xl text-neutral-400">
+        <div className="text-center py-16 bg-white border border-black/10 rounded-2xl shadow-xl text-neutral-500">
           No orders found for this event yet.
         </div>
       ) : (
@@ -93,27 +93,27 @@ export default async function EventOrdersPage({ params }: { params: Promise<{ id
             return (
               <div
                 key={order.id}
-                className="bg-neutral-950 border border-white/10 rounded-xl p-6 shadow-lg flex flex-col md:flex-row gap-6 items-start md:items-center justify-between transition hover:border-white/15"
+                className="bg-white border border-black/10 rounded-xl p-6 shadow-lg flex flex-col md:flex-row gap-6 items-start md:items-center justify-between transition hover:border-black/15"
               >
                 <div>
                   <div className="flex items-center gap-3 flex-wrap">
-                    <h2 className="text-lg font-bold text-white">
+                    <h2 className="text-lg font-bold text-black">
                       {order.buyer_name || order.buyer_email || 'Customer'}
                     </h2>
                     <span
                       className={
                         'px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider ' +
                         (isPaid
-                          ? 'bg-green-950 text-green-400 border border-green-800'
+                          ? 'bg-green-50 text-green-600 border border-green-200'
                           : order.payment_status === 'refunded'
-                            ? 'bg-neutral-900 text-neutral-400 border border-white/15'
-                            : 'bg-amber-950 text-amber-400 border border-amber-800')
+                            ? 'bg-neutral-100 text-neutral-500 border border-black/15'
+                            : 'bg-amber-50 text-amber-600 border border-amber-200')
                       }
                     >
                       {order.payment_status || 'pending'}
                     </span>
                   </div>
-                  <p className="text-xs text-neutral-400 mt-1">
+                  <p className="text-xs text-neutral-500 mt-1">
                     Email: <span className="text-indigo-300 font-semibold">{order.buyer_email}</span> | Ticket:{' '}
                     <span className="text-cyan-300 font-semibold">
                       {order.ticket_name || 'Standard Ticket'}
@@ -125,9 +125,9 @@ export default async function EventOrdersPage({ params }: { params: Promise<{ id
                   </p>
                 </div>
 
-                <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end pt-4 md:pt-0 border-t md:border-t-0 border-white/10">
+                <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end pt-4 md:pt-0 border-t md:border-t-0 border-black/10">
                   <div className="text-right">
-                    <span className="text-xs text-neutral-400 block">Total Amount</span>
+                    <span className="text-xs text-neutral-500 block">Total Amount</span>
                     <span className="text-lg font-bold text-indigo-300">
                       KES {Number(order.total_amount_kes).toLocaleString()}
                     </span>

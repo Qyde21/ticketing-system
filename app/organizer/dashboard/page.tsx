@@ -11,7 +11,7 @@ export default async function OrganizerDashboardPage() {
   const session = await getSession();
 
   if (!session) {
-    return <div className="max-w-6xl mx-auto px-4 py-8 text-white">Unauthorized.</div>;
+    return <div className="max-w-6xl mx-auto px-4 py-8 text-black">Unauthorized.</div>;
   }
 
   // Fetch events belonging to this organizer (or all if admin)
@@ -74,15 +74,15 @@ export default async function OrganizerDashboardPage() {
     .slice(0, 5);
 
   return (
-    <main className="max-w-6xl mx-auto px-4 py-8 text-white">
-      <div className="flex justify-between items-center mb-8 pb-4 border-b border-white/10">
+    <main className="max-w-6xl mx-auto px-4 py-8 text-black">
+      <div className="flex justify-between items-center mb-8 pb-4 border-b border-black/10">
         <div>
-          <h1 className="text-3xl font-extrabold text-white">Events & Ticket Inventory Analytics</h1>
-          <p className="text-neutral-400 text-sm mt-1">Real-time status breakdown and ticket sales overview</p>
+          <h1 className="text-3xl font-extrabold text-black">Events & Ticket Inventory Analytics</h1>
+          <p className="text-neutral-500 text-sm mt-1">Real-time status breakdown and ticket sales overview</p>
         </div>
         {isSuspended ? (
           <span
-            className="bg-red-950/60 border border-red-800 text-red-300 font-medium px-4 py-2 rounded-lg text-sm"
+            className="bg-red-50 border border-red-200 text-red-700 font-medium px-4 py-2 rounded-lg text-sm"
             title="Your account has been suspended"
           >
             ⛔ Account suspended
@@ -96,7 +96,7 @@ export default async function OrganizerDashboardPage() {
           </Link>
         ) : (
           <span
-            className="flash-sale-badge bg-amber-950/60 border border-amber-700 text-amber-300 font-medium px-4 py-2 rounded-lg text-sm"
+            className="flash-sale-badge bg-amber-50 border border-amber-200 text-amber-700 font-medium px-4 py-2 rounded-lg text-sm"
             title="An admin needs to approve your organizer account before you can create events"
           >
             ⏳ Pending admin approval
@@ -105,54 +105,54 @@ export default async function OrganizerDashboardPage() {
       </div>
 
       {isSuspended && (
-        <div className="mb-8 p-4 bg-red-950/40 border border-red-800 rounded-lg text-red-200 text-sm">
+        <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
           Your organizer account has been suspended. You cannot create new events while suspended. Contact support if you believe this is a mistake.
         </div>
       )}
 
       {!isSuspended && !isVerifiedOrganizer && (
-        <div className="flash-sale-badge mb-8 p-4 bg-amber-950/40 border border-amber-800 rounded-lg text-amber-200 text-sm">
+        <div className="flash-sale-badge mb-8 p-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-sm">
           Your organizer account is awaiting approval from a TicketHub admin. Once approved, you&apos;ll be able to create and publish events. This usually doesn&apos;t take long — check back soon.
         </div>
       )}
 
       {events.length > 0 && (
         <div className="mb-10">
-          <h2 className="text-lg font-bold text-white mb-4">Overview — All Events</h2>
+          <h2 className="text-lg font-bold text-black mb-4">Overview — All Events</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div className="bg-neutral-950 p-6 rounded-lg border border-white/10 shadow-lg">
+            <div className="bg-white p-6 rounded-lg border border-black/10 shadow-lg">
               <p className="text-indigo-300 font-medium text-sm">Total Revenue (all events)</p>
               <p className="text-2xl font-bold text-cyan-400 mt-2">KES {totalRevenueAllEvents.toLocaleString()}</p>
             </div>
-            <div className="bg-neutral-950 p-6 rounded-lg border border-white/10 shadow-lg">
+            <div className="bg-white p-6 rounded-lg border border-black/10 shadow-lg">
               <p className="text-indigo-300 font-medium text-sm">Total Tickets Sold</p>
-              <p className="text-2xl font-bold text-emerald-400 mt-2">{totalTicketsAllEvents.toLocaleString()}</p>
+              <p className="text-2xl font-bold text-emerald-600 mt-2">{totalTicketsAllEvents.toLocaleString()}</p>
             </div>
-            <div className="bg-neutral-950 p-6 rounded-lg border border-white/10 shadow-lg">
+            <div className="bg-white p-6 rounded-lg border border-black/10 shadow-lg">
               <p className="text-indigo-300 font-medium text-sm">Total Events</p>
-              <p className="text-2xl font-bold text-amber-400 mt-2">{events.length}</p>
+              <p className="text-2xl font-bold text-amber-600 mt-2">{events.length}</p>
             </div>
           </div>
 
           <SalesTrendChart orders={overviewOrders as any} />
 
           {topEvents.length > 0 && (
-            <div className="bg-neutral-950 border border-white/10 rounded-2xl p-6">
+            <div className="bg-white border border-black/10 rounded-2xl p-6">
               <h3 className="text-base font-bold text-indigo-300 mb-4">Top Performing Events</h3>
               <div className="space-y-2">
                 {topEvents.map((e: any, i: number) => (
                   <Link
                     key={e.id}
                     href={`/organizer/events/${e.id}/analytics`}
-                    className="flex items-center justify-between gap-3 bg-black/60 hover:bg-neutral-900/60 border border-white/10 rounded-xl px-4 py-3 transition"
+                    className="flex items-center justify-between gap-3 bg-neutral-100 hover:bg-neutral-100/60 border border-black/10 rounded-xl px-4 py-3 transition"
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <span className="text-neutral-500 font-bold text-sm w-5 shrink-0">{i + 1}</span>
-                      <span className="text-white font-semibold text-sm truncate">{e.title}</span>
+                      <span className="text-black font-semibold text-sm truncate">{e.title}</span>
                     </div>
                     <div className="flex items-center gap-4 shrink-0 text-sm">
-                      <span className="text-neutral-400">{Number(e.tickets_sold).toLocaleString()} sold</span>
-                      <span className="text-emerald-400 font-bold">KES {Number(e.revenue).toLocaleString()}</span>
+                      <span className="text-neutral-500">{Number(e.tickets_sold).toLocaleString()} sold</span>
+                      <span className="text-emerald-600 font-bold">KES {Number(e.revenue).toLocaleString()}</span>
                     </div>
                   </Link>
                 ))}
@@ -163,7 +163,7 @@ export default async function OrganizerDashboardPage() {
       )}
 
       {events.length === 0 ? (
-        <div className="text-center py-16 bg-neutral-950 border border-white/10 rounded-2xl shadow-xl text-neutral-400">
+        <div className="text-center py-16 bg-white border border-black/10 rounded-2xl shadow-xl text-neutral-500">
           No events found.
         </div>
       ) : (
@@ -188,11 +188,11 @@ export default async function OrganizerDashboardPage() {
 
 
             return (
-              <div key={event.id} className="bg-neutral-950 border border-white/10 rounded-2xl p-6 shadow-xl space-y-4">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-white/10 pb-4">
+              <div key={event.id} className="bg-white border border-black/10 rounded-2xl p-6 shadow-xl space-y-4">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-black/10 pb-4">
                   <div>
                     <div className="flex items-center gap-3">
-                      <h2 className="text-xl font-bold text-white">{event.title}</h2>
+                      <h2 className="text-xl font-bold text-black">{event.title}</h2>
                       {(() => {
                         const eventEnded =
                           event.status !== 'cancelled' &&
@@ -200,17 +200,17 @@ export default async function OrganizerDashboardPage() {
                         const isCompleted = event.status === 'completed' || eventEnded;
                         if (isCompleted) {
                           return (
-                            <span className="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider bg-neutral-900 text-neutral-300 border border-neutral-600">
+                            <span className="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider bg-neutral-100 text-neutral-700 border border-black/20">
                               Completed
                             </span>
                           );
                         }
                         return (
                           <span className={`px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider ${
-                            event.status === 'published' ? 'bg-green-950 text-green-400 border border-green-800'
-                            : event.status === 'pending_review' ? 'bg-amber-950 text-amber-400 border border-amber-800'
-                            : event.status === 'cancelled' ? 'bg-red-950 text-red-400 border border-red-800'
-                            : 'bg-neutral-900 text-neutral-400'
+                            event.status === 'published' ? 'bg-green-50 text-green-600 border border-green-200'
+                            : event.status === 'pending_review' ? 'bg-amber-50 text-amber-600 border border-amber-200'
+                            : event.status === 'cancelled' ? 'bg-red-50 text-red-600 border border-red-200'
+                            : 'bg-neutral-100 text-neutral-500'
                           }`}>
                             {event.status === 'pending_review' ? 'Pending Review' : event.status}
                           </span>
@@ -222,45 +222,45 @@ export default async function OrganizerDashboardPage() {
 
                   <div className="flex items-center gap-6 text-right">
                     <div>
-                      <span className="text-xs text-neutral-400 block">Revenue</span>
+                      <span className="text-xs text-neutral-500 block">Revenue</span>
                       <span className="text-lg font-extrabold text-cyan-400">KES {totalRevenue.toLocaleString()}</span>
                     </div>
                     <div>
-                      <span className="text-xs text-neutral-400 block">Tickets Sold</span>
-                      <span className="text-lg font-extrabold text-emerald-400">{totalTicketsSold} / {totalInventory || '∞'}</span>
+                      <span className="text-xs text-neutral-500 block">Tickets Sold</span>
+                      <span className="text-lg font-extrabold text-emerald-600">{totalTicketsSold} / {totalInventory || '∞'}</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-indigo-400 pt-1">
-                  <Link href={`/organizer/events/${event.id}/orders`} className="hover:underline text-cyan-300 bg-neutral-900/60 px-3 py-1.5 rounded-lg border border-white/15">Orders</Link>
-                  <Link href={`/organizer/events/${event.id}/analytics`} className="hover:underline text-cyan-300 bg-neutral-900/60 px-3 py-1.5 rounded-lg border border-white/15">Analytics</Link>
+                  <Link href={`/organizer/events/${event.id}/orders`} className="hover:underline text-cyan-300 bg-neutral-100/60 px-3 py-1.5 rounded-lg border border-black/15">Orders</Link>
+                  <Link href={`/organizer/events/${event.id}/analytics`} className="hover:underline text-cyan-300 bg-neutral-100/60 px-3 py-1.5 rounded-lg border border-black/15">Analytics</Link>
 {eventEnded ? (
-                    <span className="text-neutral-600 bg-neutral-950/60 px-3 py-1.5 rounded-lg border border-white/10 cursor-not-allowed" title="Flash sales are disabled after the event has ended">Flash Sales</span>
+                    <span className="text-neutral-600 bg-white/60 px-3 py-1.5 rounded-lg border border-black/10 cursor-not-allowed" title="Flash sales are disabled after the event has ended">Flash Sales</span>
                   ) : (
-                    <Link href={`/organizer/events/${event.id}/flash-sales`} className="hover:underline text-amber-300 bg-neutral-900/60 px-3 py-1.5 rounded-lg border border-white/15">Flash Sales</Link>
+                    <Link href={`/organizer/events/${event.id}/flash-sales`} className="hover:underline text-amber-700 bg-neutral-100/60 px-3 py-1.5 rounded-lg border border-black/15">Flash Sales</Link>
                   )}
-                  <Link href={`/organizer/events/${event.id}/edit`} className="hover:underline bg-neutral-900/60 px-3 py-1.5 rounded-lg border border-white/15">Manage Details</Link>
-                  <Link href={`/organizer/events/${event.id}/comp-tickets`} className="hover:underline bg-neutral-900/60 px-3 py-1.5 rounded-lg border border-white/15">Comp Tickets</Link>
-                  <Link href={`/organizer/events/${event.id}/messages`} className="hover:underline bg-neutral-900/60 px-3 py-1.5 rounded-lg border border-white/15">Messages</Link>
-                  <Link href={`/organizer/events/${event.id}/scan-overview`} className="hover:underline bg-neutral-900/60 px-3 py-1.5 rounded-lg border border-white/15">Scan Overview</Link>
+                  <Link href={`/organizer/events/${event.id}/edit`} className="hover:underline bg-neutral-100/60 px-3 py-1.5 rounded-lg border border-black/15">Manage Details</Link>
+                  <Link href={`/organizer/events/${event.id}/comp-tickets`} className="hover:underline bg-neutral-100/60 px-3 py-1.5 rounded-lg border border-black/15">Comp Tickets</Link>
+                  <Link href={`/organizer/events/${event.id}/messages`} className="hover:underline bg-neutral-100/60 px-3 py-1.5 rounded-lg border border-black/15">Messages</Link>
+                  <Link href={`/organizer/events/${event.id}/scan-overview`} className="hover:underline bg-neutral-100/60 px-3 py-1.5 rounded-lg border border-black/15">Scan Overview</Link>
                   {eventEnded ? (
-                    <span className="text-neutral-600 bg-neutral-950/60 px-3 py-1.5 rounded-lg border border-white/10 cursor-not-allowed" title="Shifts closed after event ended">Shifts</span>
+                    <span className="text-neutral-600 bg-white/60 px-3 py-1.5 rounded-lg border border-black/10 cursor-not-allowed" title="Shifts closed after event ended">Shifts</span>
                   ) : (
-                    <Link href={`/organizer/events/${event.id}/shifts`} className="hover:underline bg-neutral-900/60 px-3 py-1.5 rounded-lg border border-white/15">Shifts</Link>
+                    <Link href={`/organizer/events/${event.id}/shifts`} className="hover:underline bg-neutral-100/60 px-3 py-1.5 rounded-lg border border-black/15">Shifts</Link>
                   )}
-                  <Link href={`/organizer/events/${event.id}/staff`} className="hover:underline bg-neutral-900/60 px-3 py-1.5 rounded-lg border border-white/15">Door staff</Link>
+                  <Link href={`/organizer/events/${event.id}/staff`} className="hover:underline bg-neutral-100/60 px-3 py-1.5 rounded-lg border border-black/15">Door staff</Link>
                   {eventEnded ? (
-                    <span className="text-neutral-600 bg-neutral-950/60 px-3 py-1.5 rounded-lg border border-white/10 cursor-not-allowed" title="Promo codes are disabled after the event has ended">Promo Codes</span>
+                    <span className="text-neutral-600 bg-white/60 px-3 py-1.5 rounded-lg border border-black/10 cursor-not-allowed" title="Promo codes are disabled after the event has ended">Promo Codes</span>
                   ) : (
-                    <Link href={`/organizer/events/${event.id}/promo-codes`} className="hover:underline bg-neutral-900/60 px-3 py-1.5 rounded-lg border border-white/15">Promo Codes</Link>
+                    <Link href={`/organizer/events/${event.id}/promo-codes`} className="hover:underline bg-neutral-100/60 px-3 py-1.5 rounded-lg border border-black/15">Promo Codes</Link>
                   )}
-                  <Link href={`/organizer/events/new?duplicateFrom=${event.id}`} className="hover:underline bg-neutral-900/60 px-3 py-1.5 rounded-lg border border-white/15">Duplicate</Link>
+                  <Link href={`/organizer/events/new?duplicateFrom=${event.id}`} className="hover:underline bg-neutral-100/60 px-3 py-1.5 rounded-lg border border-black/15">Duplicate</Link>
                   {event.status === 'draft' && (
                     <PublishButton eventId={event.id} />
                   )}
                   {event.status === 'pending_review' && (
-                    <span className="flash-sale-badge bg-amber-950/50 text-amber-300 border border-amber-800/50 px-3 py-1.5 rounded-lg font-semibold">
+                    <span className="flash-sale-badge bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1.5 rounded-lg font-semibold">
                       Awaiting Admin Review
                     </span>
                   )}
@@ -278,22 +278,22 @@ export default async function OrganizerDashboardPage() {
                     const progress = Math.min(100, (sold / ticket.quantity_total) * 100);
 
                     return (
-                      <div key={ticket.id} className="bg-black border border-neutral-800/80 rounded-xl p-4 space-y-2">
+                      <div key={ticket.id} className="bg-neutral-50 border border-black/10 rounded-xl p-4 space-y-2">
                         <div className="flex justify-between items-start">
-                          <h3 className="font-semibold text-white text-sm">{ticket.name}</h3>
+                          <h3 className="font-semibold text-black text-sm">{ticket.name}</h3>
                           <span className="text-indigo-300 font-bold text-sm">KES {Number(ticket.price_kes).toLocaleString()}</span>
                         </div>
-                        <div className="flex justify-between text-xs text-neutral-400">
-                          <span>Sold: <strong className="text-white">{sold}</strong></span>
-                          <span>Remaining: <strong className={remaining <= 0 ? 'text-red-500 font-extrabold' : 'text-white'}>{remaining}</strong></span>
-                          <span>Total: <strong className="text-white">{ticket.quantity_total}</strong></span>
+                        <div className="flex justify-between text-xs text-neutral-500">
+                          <span>Sold: <strong className="text-black">{sold}</strong></span>
+                          <span>Remaining: <strong className={remaining <= 0 ? 'text-red-500 font-extrabold' : 'text-black'}>{remaining}</strong></span>
+                          <span>Total: <strong className="text-black">{ticket.quantity_total}</strong></span>
                         </div>
                         {remaining <= 0 && (
-                          <span className="inline-block text-[10px] font-bold uppercase tracking-wider text-red-400 bg-red-950/50 border border-red-800 rounded px-2 py-0.5">
+                          <span className="inline-block text-[10px] font-bold uppercase tracking-wider text-red-600 bg-red-50 border border-red-200 rounded px-2 py-0.5">
                             Sold Out
                           </span>
                         )}
-                        <div className="w-full bg-neutral-900 h-1.5 rounded-full overflow-hidden">
+                        <div className="w-full bg-neutral-100 h-1.5 rounded-full overflow-hidden">
                           <div className="bg-cyan-500 h-full rounded-full transition-all" style={{ width: `${progress}%` }} />
                         </div>
                       </div>

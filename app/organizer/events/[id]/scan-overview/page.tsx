@@ -27,9 +27,9 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
 
   if (!event) {
     return (
-      <div className="max-w-xl mx-auto my-16 p-8 bg-red-950/40 border border-red-800/60 rounded-2xl text-white">
-        <h1 className="text-red-400 text-xl font-bold mb-2">Access Denied</h1>
-        <p className="text-red-300 text-sm">We couldn&apos;t load this event, or you don&apos;t have permission to view it.</p>
+      <div className="max-w-xl mx-auto my-16 p-8 bg-red-50 border border-red-200 rounded-2xl text-black">
+        <h1 className="text-red-600 text-xl font-bold mb-2">Access Denied</h1>
+        <p className="text-red-700 text-sm">We couldn&apos;t load this event, or you don&apos;t have permission to view it.</p>
       </div>
     );
   }
@@ -123,7 +123,7 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
   }
 
   return (
-    <div className="max-w-2xl mx-auto py-10 px-4 text-white">
+    <div className="max-w-2xl mx-auto py-10 px-4 text-black">
       <Link
         href={session.role === 'admin' ? `/admin/organizers/${event.organizer_id}/events` : `/organizer/dashboard`}
         className="text-sm text-indigo-400 hover:underline"
@@ -133,7 +133,7 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
       <div className="flex flex-wrap items-start justify-between gap-3 mt-2">
         <div>
           <h1 className="text-2xl font-extrabold">{event.title}</h1>
-          <p className="text-neutral-400 text-sm">
+          <p className="text-neutral-500 text-sm">
             {event.venue_name || 'No Venue'} &middot;{' '}
             {event.start_at ? new Date(event.start_at).toLocaleString() : 'No Date'}
           </p>
@@ -141,13 +141,13 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
         <div className="flex flex-wrap items-center gap-2">
           <Link
             href={`/organizer/events/${eventId}/staff`}
-            className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-semibold px-3 py-2 rounded-lg border border-white/15 transition"
+            className="inline-flex items-center gap-1.5 bg-neutral-100 hover:bg-neutral-200 text-black text-xs font-semibold px-3 py-2 rounded-lg border border-black/15 transition"
           >
             Door staff
           </Link>
           <a
             href={`/api/events/${eventId}/door-list`}
-            className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-semibold px-3 py-2 rounded-lg border border-white/15 transition"
+            className="inline-flex items-center gap-1.5 bg-neutral-100 hover:bg-neutral-200 text-black text-xs font-semibold px-3 py-2 rounded-lg border border-black/15 transition"
           >
             Download door list (CSV)
           </a>
@@ -158,7 +158,7 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
       {shiftRows.length > 0 && (
         <div className="mt-8">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-400">Shifts</h2>
+            <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-500">Shifts</h2>
             <Link href={`/organizer/events/${eventId}/shifts`} className="text-xs text-indigo-400 hover:underline">
               Manage shifts
             </Link>
@@ -176,29 +176,29 @@ export default async function OrganizerScanOverviewPage({ params }: { params: Pr
                   className={
                     'rounded-xl border px-3 py-3 text-sm ' +
                     (onDuty
-                      ? 'border-emerald-700 bg-emerald-950/30'
-                      : 'border-white/10 bg-neutral-950/80')
+                      ? 'border-emerald-200 bg-emerald-50'
+                      : 'border-black/10 bg-white/80')
                   }
                 >
                   <div className="flex flex-wrap justify-between gap-2">
-                    <span className="font-semibold text-white">
+                    <span className="font-semibold text-black">
                       {s.name}
                       {s.gate ? ` · ${s.gate}` : ''}
                       {onDuty && (
-                        <span className="ml-2 text-[10px] uppercase tracking-wider text-emerald-300 font-bold">
+                        <span className="ml-2 text-[10px] uppercase tracking-wider text-emerald-700 font-bold">
                           On duty now
                         </span>
                       )}
                     </span>
-                    <span className={under ? 'text-amber-400 text-xs' : 'text-neutral-400 text-xs'}>
+                    <span className={under ? 'text-amber-600 text-xs' : 'text-neutral-500 text-xs'}>
                       {names.length}/{s.slots_needed}
                       {under ? ' understaffed' : ''}
                     </span>
                   </div>
-                  <p className="text-xs text-neutral-400 mt-1">
+                  <p className="text-xs text-neutral-500 mt-1">
                     {start.toLocaleString()} → {end.toLocaleString()}
                   </p>
-                  <p className="text-xs text-neutral-300 mt-1">
+                  <p className="text-xs text-neutral-700 mt-1">
                     {names.length ? names.join(', ') : 'No one assigned'}
                   </p>
                 </li>

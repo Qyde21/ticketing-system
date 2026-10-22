@@ -10,8 +10,8 @@ interface TicketTypeInput {
 }
 
 const inputClass =
-  'w-full bg-neutral-950 border border-white/10 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500 placeholder:text-neutral-500';
-const labelClass = 'block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2';
+  'w-full bg-white border border-black/10 rounded-xl p-3 text-black text-sm focus:outline-none focus:border-indigo-500 placeholder:text-neutral-500';
+const labelClass = 'block text-xs font-bold uppercase tracking-wider text-neutral-500 mb-2';
 
 function NewEventForm() {
   const router = useRouter();
@@ -125,17 +125,17 @@ function NewEventForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-xl mx-auto py-12 px-4 text-white space-y-6">
-      <h1 className="text-3xl font-extrabold text-white">
+    <form onSubmit={handleSubmit} className="max-w-xl mx-auto py-12 px-4 text-black space-y-6">
+      <h1 className="text-3xl font-extrabold text-black">
         {duplicateFrom ? 'Duplicate Event' : 'Create Event'}
       </h1>
 
       {loadingDuplicate && (
-        <p className="text-neutral-400 text-sm">Loading event details to duplicate...</p>
+        <p className="text-neutral-500 text-sm">Loading event details to duplicate...</p>
       )}
 
       {duplicateFrom && !loadingDuplicate && (
-        <p className="text-amber-400 text-sm bg-amber-950/30 border border-amber-800/40 rounded-xl px-4 py-3">
+        <p className="text-amber-600 text-sm bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
           Details copied from the original event. Don&apos;t forget to set a new date below before creating.
         </p>
       )}
@@ -145,7 +145,7 @@ function NewEventForm() {
         <input className={inputClass} placeholder="Event title" value={title} onChange={(e) => setTitle(e.target.value)} required />
       </div>
 
-      <div className="bg-neutral-950 border border-white/10 rounded-xl p-4">
+      <div className="bg-white border border-black/10 rounded-xl p-4">
         <ImageUpload onUploaded={setCoverImageUrl} />
       </div>
 
@@ -181,10 +181,10 @@ function NewEventForm() {
       </div>
 
       <div>
-        <h2 className="text-xl font-bold text-white mb-3">Ticket Types</h2>
+        <h2 className="text-xl font-bold text-black mb-3">Ticket Types</h2>
         <div className="space-y-3">
           {ticketTypes.map((tt, i) => (
-            <div key={i} className="flex flex-col sm:flex-row gap-2 bg-neutral-950 border border-white/10 rounded-xl p-3">
+            <div key={i} className="flex flex-col sm:flex-row gap-2 bg-white border border-black/10 rounded-xl p-3">
               <input className={inputClass} placeholder="Name (e.g. Regular)" value={tt.name} onChange={(e) => updateTicketType(i, 'name', e.target.value)} required />
               <input className={inputClass} placeholder="Price (KES)" type="number" min="0" value={tt.priceKes} onChange={(e) => updateTicketType(i, 'priceKes', e.target.value)} required />
               <input className={inputClass} placeholder="Quantity" type="number" min="1" value={tt.quantityTotal} onChange={(e) => updateTicketType(i, 'quantityTotal', e.target.value)} required />
@@ -192,7 +192,7 @@ function NewEventForm() {
                 <button
                   type="button"
                   onClick={() => removeTicketType(i)}
-                  className="px-3 py-2 text-xs font-bold uppercase tracking-wider text-red-400 hover:text-red-300 transition whitespace-nowrap"
+                  className="px-3 py-2 text-xs font-bold uppercase tracking-wider text-red-600 hover:text-red-700 transition whitespace-nowrap"
                 >
                   Remove
                 </button>
@@ -203,18 +203,18 @@ function NewEventForm() {
         <button
           type="button"
           onClick={addTicketType}
-          className="mt-3 px-4 py-2 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition"
+          className="mt-3 px-4 py-2 bg-neutral-100 hover:bg-neutral-200 text-black text-xs font-bold uppercase tracking-wider rounded-lg transition"
         >
           + Add ticket type
         </button>
       </div>
 
-      <label className="flex items-center gap-2 text-sm text-neutral-300 bg-neutral-950 border border-white/10 rounded-xl p-4 cursor-pointer">
+      <label className="flex items-center gap-2 text-sm text-neutral-700 bg-white border border-black/10 rounded-xl p-4 cursor-pointer">
         <input type="checkbox" checked={publishNow} onChange={(e) => setPublishNow(e.target.checked)} />
         Publish immediately (otherwise this event is saved as a draft and won&apos;t be visible to buyers until you publish it)
       </label>
 
-      {error && <p className="text-red-400 text-sm font-medium">{error}</p>}
+      {error && <p className="text-red-600 text-sm font-medium">{error}</p>}
 
       <button
         type="submit"
@@ -229,7 +229,7 @@ function NewEventForm() {
 
 export default function NewEventPage() {
   return (
-    <Suspense fallback={<div className="max-w-xl mx-auto py-12 px-4 text-white">Loading...</div>}>
+    <Suspense fallback={<div className="max-w-xl mx-auto py-12 px-4 text-black">Loading...</div>}>
       <NewEventForm />
     </Suspense>
   );

@@ -19,13 +19,13 @@ function Shell({
   return (
     <main className="min-h-[70vh] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
-        <div className="bg-neutral-950/90 border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl shadow-indigo-950/30">
+        <div className="bg-white/90 border border-black/10 rounded-2xl p-6 sm:p-8 shadow-2xl shadow-indigo-950/30">
           <div className="text-center mb-6">
-            <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-500 text-white font-extrabold text-lg mb-4 shadow-lg shadow-indigo-900/40">
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-black to-neutral-700 text-white font-extrabold text-lg mb-4 shadow-lg shadow-indigo-900/40">
               T
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">{title}</h1>
-            <p className="text-neutral-400 text-sm mt-2">{subtitle}</p>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-black tracking-tight">{title}</h1>
+            <p className="text-neutral-500 text-sm mt-2">{subtitle}</p>
           </div>
           {children}
         </div>
@@ -222,13 +222,13 @@ export default function LoginPage() {
   }
 
   const errorBox = error ? (
-    <div className="mb-5 p-3.5 bg-red-950/80 border border-red-800/80 text-red-300 rounded-xl text-sm font-medium">
+    <div className="mb-5 p-3.5 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm font-medium">
       {error}
       {unverifiedEmail ? (
         <button
           type="button"
           onClick={handleResendConfirmation}
-          className="mt-2 block text-red-200 underline underline-offset-2 hover:text-white"
+          className="mt-2 block text-red-800 underline underline-offset-2 hover:text-black"
         >
           Resend confirmation email
         </button>
@@ -237,7 +237,7 @@ export default function LoginPage() {
   ) : null;
 
   const resendBox = resendMsg ? (
-    <div className="mb-5 p-3.5 bg-emerald-950/50 border border-emerald-800/60 text-emerald-300 rounded-xl text-sm font-medium">
+    <div className="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl text-sm font-medium">
       {resendMsg}
     </div>
   ) : null;
@@ -264,12 +264,12 @@ export default function LoginPage() {
             placeholder="123456"
             value={code}
             onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-            className="w-full bg-neutral-900/80 border border-white/15 rounded-xl px-4 py-3.5 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500 transition text-center tracking-[0.35em] text-lg font-semibold"
+            className="w-full bg-neutral-100/80 border border-black/15 rounded-xl px-4 py-3.5 text-black placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500 transition text-center tracking-[0.35em] text-lg font-semibold"
           />
           <button
             type="submit"
             disabled={loading || code.length < 6}
-            className="w-full font-bold py-3.5 px-4 rounded-full transition disabled:opacity-50 bg-white text-black hover:bg-neutral-200"
+            className="w-full font-bold py-3.5 px-4 rounded-full transition disabled:opacity-50 bg-black text-white hover:bg-neutral-800"
           >
             {loading ? 'Verifying…' : 'Verify & continue'}
           </button>
@@ -291,7 +291,7 @@ export default function LoginPage() {
             setError('');
             setResendMsg('');
           }}
-          className="w-full mt-2 text-sm text-neutral-400 hover:text-indigo-300 transition"
+          className="w-full mt-2 text-sm text-neutral-500 hover:text-indigo-300 transition"
         >
           ← Back to login
         </button>
@@ -313,12 +313,12 @@ export default function LoginPage() {
             placeholder="123456"
             value={code}
             onChange={(e) => setCode(e.target.value)}
-            className="w-full bg-neutral-900/80 border border-white/15 rounded-xl px-4 py-3.5 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500 transition text-center tracking-[0.35em] text-lg font-semibold"
+            className="w-full bg-neutral-100/80 border border-black/15 rounded-xl px-4 py-3.5 text-black placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500 transition text-center tracking-[0.35em] text-lg font-semibold"
           />
           <button
             type="submit"
             disabled={loading}
-            className="w-full font-bold py-3.5 px-4 rounded-full transition disabled:opacity-50 bg-white text-black hover:bg-neutral-200"
+            className="w-full font-bold py-3.5 px-4 rounded-full transition disabled:opacity-50 bg-black text-white hover:bg-neutral-800"
           >
             {loading ? 'Verifying…' : 'Verify & log in'}
           </button>
@@ -334,7 +334,7 @@ export default function LoginPage() {
             setCode('');
             setError('');
           }}
-          className="w-full mt-4 text-sm text-neutral-400 hover:text-indigo-300 transition"
+          className="w-full mt-4 text-sm text-neutral-500 hover:text-indigo-300 transition"
         >
           ← Back to login
         </button>
@@ -346,13 +346,13 @@ export default function LoginPage() {
     <Shell title="Welcome back" subtitle="Sign in to manage tickets and events">
       {errorBox}
       {resendBox}
-      <div className="flex rounded-xl bg-neutral-900/80 p-1 mb-6 border border-neutral-700/80">
-        <span className="flex-1 text-center py-2.5 rounded-full text-sm font-bold shadow bg-white text-black hover:bg-neutral-200">
+      <div className="flex rounded-xl bg-neutral-100/80 p-1 mb-6 border border-black/15">
+        <span className="flex-1 text-center py-2.5 rounded-full text-sm font-bold shadow bg-black text-white hover:bg-neutral-800">
           Login
         </span>
         <Link
           href="/signup"
-          className="flex-1 text-center py-2.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-white transition"
+          className="flex-1 text-center py-2.5 rounded-lg text-sm font-semibold text-neutral-500 hover:text-black transition"
         >
           Sign up
         </Link>
@@ -375,7 +375,7 @@ export default function LoginPage() {
               placeholder="name@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-neutral-900/80 border border-white/15 rounded-xl pl-11 pr-4 py-3.5 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500 transition"
+              className="w-full bg-neutral-100/80 border border-black/15 rounded-xl pl-11 pr-4 py-3.5 text-black placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500 transition"
               autoComplete="username"
             />
           </div>
@@ -404,7 +404,7 @@ export default function LoginPage() {
               onChange={setPassword}
               required
               placeholder="Your password"
-              className="w-full bg-neutral-900/80 border border-white/15 rounded-xl pl-11 pr-12 py-3.5 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500 transition"
+              className="w-full bg-neutral-100/80 border border-black/15 rounded-xl pl-11 pr-12 py-3.5 text-black placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500 transition"
               autoComplete="current-password"
             />
           </div>
@@ -414,14 +414,14 @@ export default function LoginPage() {
             type="checkbox"
             checked={rememberMe}
             onChange={(e) => setRememberMe(e.target.checked)}
-            className="h-4 w-4 rounded border-neutral-600 bg-neutral-900 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-0 focus:ring-offset-neutral-950"
+            className="h-4 w-4 rounded border-black/20 bg-neutral-100 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-0 focus:ring-offset-neutral-950"
           />
-          <span className="text-sm text-neutral-300">Keep me signed in for 30 days</span>
+          <span className="text-sm text-neutral-700">Keep me signed in for 30 days</span>
         </label>
         <button
           type="submit"
           disabled={loading}
-          className="w-full font-bold py-3.5 px-4 rounded-full transition disabled:opacity-50 flex items-center justify-center gap-2 bg-white text-black hover:bg-neutral-200"
+          className="w-full font-bold py-3.5 px-4 rounded-full transition disabled:opacity-50 flex items-center justify-center gap-2 bg-black text-white hover:bg-neutral-800"
         >
           {loading ? 'Signing in…' : (
             <>
@@ -435,10 +435,10 @@ export default function LoginPage() {
       </form>
       <div className="relative my-6">
         <div className="absolute inset-0 flex items-center" aria-hidden>
-          <div className="w-full border-t border-white/15" />
+          <div className="w-full border-t border-black/15" />
         </div>
         <div className="relative flex justify-center text-xs">
-          <span className="bg-neutral-950 px-3 text-neutral-500 font-medium">or</span>
+          <span className="bg-white px-3 text-neutral-500 font-medium">or</span>
         </div>
       </div>
       <a
@@ -453,7 +453,7 @@ export default function LoginPage() {
         </svg>
         Continue with Google
       </a>
-      <div className="mt-6 pt-5 border-t border-white/10 text-center text-sm text-neutral-400">
+      <div className="mt-6 pt-5 border-t border-black/10 text-center text-sm text-neutral-500">
         Don&apos;t have an account?{' '}
         <Link href="/signup" className="text-indigo-400 hover:text-cyan-400 font-semibold transition">
           Sign up

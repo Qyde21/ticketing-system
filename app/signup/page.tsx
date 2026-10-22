@@ -54,26 +54,26 @@ function SignupForm() {
 
   if (submittedEmail) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-white text-black flex flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
           <Link href="/" className="flex items-center justify-center gap-2.5 mb-6">
             <img src="/logo-badge.png" alt="TicketHub" className="h-14 w-14" />
             <span className="font-serif text-2xl font-bold tracking-tight">
-              <span className="font-bold text-white">TicketHub</span>
+              <span className="font-bold text-black">TicketHub</span>
             </span>
           </Link>
-          <div className="bg-slate-900 py-8 px-6 shadow sm:rounded-lg border border-slate-800">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-900/50 border border-emerald-700 mb-4">
+          <div className="bg-neutral-100 py-8 px-6 shadow sm:rounded-lg border border-black/10">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 border border-emerald-200 mb-4">
               <span className="text-2xl">✉️</span>
             </div>
-            <h2 className="text-xl font-bold text-white mb-2">Check your email</h2>
-            <p className="text-sm text-slate-400">
-              We sent a confirmation link to <span className="text-white font-medium">{submittedEmail}</span>.
+            <h2 className="text-xl font-bold text-black mb-2">Check your email</h2>
+            <p className="text-sm text-neutral-500">
+              We sent a confirmation link to <span className="text-black font-medium">{submittedEmail}</span>.
               Click the link to activate your account and get started.
             </p>
-            <p className="text-xs text-slate-500 mt-4">
+            <p className="text-xs text-neutral-500 mt-4">
               Didn&apos;t get it? Check your spam folder, or{' '}
-              <Link href="/login" className="text-emerald-400 hover:text-emerald-300 font-medium">
+              <Link href="/login" className="text-emerald-600 hover:text-emerald-700 font-medium">
                 go to login
               </Link>{' '}
               to request a new link.
@@ -85,39 +85,39 @@ function SignupForm() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white text-black flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <Link href="/" className="flex items-center gap-2.5">
             <img src="/logo-badge.png" alt="TicketHub" className="h-14 w-14" />
             <span className="font-serif text-2xl font-bold tracking-tight">
-              <span className="font-bold text-white">TicketHub</span>
+              <span className="font-bold text-black">TicketHub</span>
             </span>
           </Link>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-black">
           Create your account
         </h2>
-        <p className="mt-2 text-center text-sm text-slate-400">
+        <p className="mt-2 text-center text-sm text-neutral-500">
           Already have an account?{' '}
-          <Link href="/login" className="font-medium text-emerald-400 hover:text-emerald-300">
+          <Link href="/login" className="font-medium text-emerald-600 hover:text-emerald-700">
             Sign in
           </Link>
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-slate-900 py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-slate-800">
+        <div className="bg-neutral-100 py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-black/10">
           
           {/* Role Toggle Selector */}
-          <div className="mb-6 flex rounded-lg bg-slate-800 p-1 border border-slate-700">
+          <div className="mb-6 flex rounded-lg bg-neutral-200 p-1 border border-black/15">
             <button
               type="button"
               onClick={() => setRole('attendee')}
               className={`flex-1 py-2 text-xs sm:text-sm font-semibold rounded-md transition ${
                 role === 'attendee'
                   ? 'bg-emerald-600 text-white shadow'
-                  : 'text-slate-400 hover:text-white'
+                  : 'text-neutral-500 hover:text-black'
               }`}
             >
               Attendee (Buy Tickets)
@@ -128,7 +128,7 @@ function SignupForm() {
               className={`flex-1 py-2 text-xs sm:text-sm font-semibold rounded-md transition ${
                 role === 'organizer'
                   ? 'bg-emerald-600 text-white shadow'
-                  : 'text-slate-400 hover:text-white'
+                  : 'text-neutral-500 hover:text-black'
               }`}
             >
               Organizer (Sell Tickets)
@@ -150,52 +150,52 @@ function SignupForm() {
                 Continue with Google
               </a>
               <div className="flex items-center gap-3 mb-5">
-                <div className="flex-1 h-px bg-neutral-900" />
+                <div className="flex-1 h-px bg-neutral-100" />
                 <span className="text-xs text-neutral-500 uppercase tracking-wider">or sign up with email</span>
-                <div className="flex-1 h-px bg-neutral-900" />
+                <div className="flex-1 h-px bg-neutral-100" />
               </div>
             </>
           )}
 
           {error && (
-            <div className="mb-4 bg-red-900/50 border border-red-500/50 text-red-200 px-4 py-3 rounded text-sm">
+            <div className="mb-4 bg-red-50 border border-red-500/50 text-red-800 px-4 py-3 rounded text-sm">
               {error}
             </div>
           )}
 
           <form className="space-y-5" onSubmit={handleSubmit}>
             <div>
-              <label className="block text-sm font-medium text-slate-300">Full Name</label>
+              <label className="block text-sm font-medium text-neutral-700">Full Name</label>
               <input
                 type="text"
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="mt-1 block w-full rounded-md bg-slate-950 border border-slate-800 px-3 py-2 text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-sm"
+                className="mt-1 block w-full rounded-md bg-white border border-black/10 px-3 py-2 text-black placeholder-neutral-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-sm"
                 placeholder="Jane Doe"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300">Email address</label>
+              <label className="block text-sm font-medium text-neutral-700">Email address</label>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full rounded-md bg-slate-950 border border-slate-800 px-3 py-2 text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-sm"
+                className="mt-1 block w-full rounded-md bg-white border border-black/10 px-3 py-2 text-black placeholder-neutral-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-sm"
                 placeholder="you@example.com"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300">Password</label>
+              <label className="block text-sm font-medium text-neutral-700">Password</label>
               <PasswordInput
                 value={password}
                 onChange={setPassword}
                 required
                 placeholder="••••••••"
-                className="mt-1 block w-full rounded-md bg-slate-950 border border-slate-800 px-3 py-2 text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-sm"
+                className="mt-1 block w-full rounded-md bg-white border border-black/10 px-3 py-2 text-black placeholder-neutral-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-sm"
                 autoComplete="new-password"
               />
             </div>
@@ -216,7 +216,7 @@ function SignupForm() {
 
 export default function SignupPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">Loading...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-white text-black flex items-center justify-center">Loading...</div>}>
       <SignupForm />
     </Suspense>
   );

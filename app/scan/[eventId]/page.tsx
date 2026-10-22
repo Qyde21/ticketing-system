@@ -19,7 +19,7 @@ export default async function ScanPage({ params }: { params: Promise<{ eventId: 
     FROM events WHERE id = ${eventId}
   `;
   if (!event) {
-    return <div className="max-w-md mx-auto py-12 px-4 text-white">Event not found.</div>;
+    return <div className="max-w-md mx-auto py-12 px-4 text-black">Event not found.</div>;
   }
 
   const isAdmin = session.role === 'admin';
@@ -36,9 +36,9 @@ export default async function ScanPage({ params }: { params: Promise<{ eventId: 
 
   if (!isAdmin && !isOrganizer && !isStaff) {
     return (
-      <div className="max-w-md mx-auto py-12 px-4 text-white">
+      <div className="max-w-md mx-auto py-12 px-4 text-black">
         <h1 className="text-xl font-extrabold mb-2">Not authorized</h1>
-        <p className="text-neutral-400 text-sm">
+        <p className="text-neutral-500 text-sm">
           You do not have permission to scan tickets for this event.
         </p>
         <Link href="/" className="inline-block mt-4 text-indigo-400 hover:underline text-sm">
@@ -55,12 +55,12 @@ export default async function ScanPage({ params }: { params: Promise<{ eventId: 
 
   if (eventEnded) {
     return (
-      <div className="max-w-md mx-auto py-12 px-4 text-white">
+      <div className="max-w-md mx-auto py-12 px-4 text-black">
         <h1 className="text-xl font-extrabold mb-1">Check-in closed</h1>
-        <p className="text-neutral-400 text-sm mb-4">
+        <p className="text-neutral-500 text-sm mb-4">
           {event.title}{event.venue_name ? ` · ${event.venue_name}` : ''}
         </p>
-        <div className="rounded-xl border border-white/15 bg-neutral-950 px-4 py-4 text-sm text-neutral-300">
+        <div className="rounded-xl border border-black/15 bg-white px-4 py-4 text-sm text-neutral-700">
           This event has ended. Ticket scanning is no longer available.
         </div>
         <Link
@@ -78,9 +78,9 @@ export default async function ScanPage({ params }: { params: Promise<{ eventId: 
     FROM tickets t JOIN ticket_types tt ON tt.id = t.ticket_type_id WHERE tt.event_id = ${eventId}
   `;
   return (
-    <div className="max-w-md mx-auto py-8 px-4 text-white">
+    <div className="max-w-md mx-auto py-8 px-4 text-black">
       <h1 className="text-xl font-extrabold mb-1">Check-in</h1>
-      <p className="text-neutral-400 text-sm mb-5">
+      <p className="text-neutral-500 text-sm mb-5">
         {event.title}{event.venue_name ? ` · ${event.venue_name}` : ''}
       </p>
       <Scanner

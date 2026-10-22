@@ -30,7 +30,7 @@ export default function InboxReply({ eventId, recipientId, senderName }: { event
     }
   }
 
-  if (success) return <p className="text-sm text-emerald-400">Reply sent to {senderName}!</p>;
+  if (success) return <p className="text-sm text-emerald-600">Reply sent to {senderName}!</p>;
 
   return (
     <div>
@@ -46,9 +46,9 @@ export default function InboxReply({ eventId, recipientId, senderName }: { event
             onChange={(e) => setBody(e.target.value)}
             placeholder={`Reply to ${senderName}...`}
             rows={3}
-            className="w-full bg-black border border-white/10 rounded-lg p-3 text-white text-sm resize-y focus:outline-none focus:border-indigo-500 placeholder:text-neutral-500"
+            className="w-full bg-neutral-50 border border-black/10 rounded-lg p-3 text-black text-sm resize-y focus:outline-none focus:border-indigo-500 placeholder:text-neutral-500"
           />
-          {error && <p className="text-red-400 text-sm mt-1">{error}</p>}
+          {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
           <div className="flex gap-2 mt-2">
             <button
               onClick={handleReply}
@@ -59,7 +59,7 @@ export default function InboxReply({ eventId, recipientId, senderName }: { event
             </button>
             <button
               onClick={() => setOpen(false)}
-              className="bg-neutral-900 hover:bg-neutral-800 text-neutral-300 px-4 py-2 rounded-lg text-sm transition"
+              className="bg-neutral-100 hover:bg-neutral-200 text-neutral-700 px-4 py-2 rounded-lg text-sm transition"
             >
               Cancel
             </button>

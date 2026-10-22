@@ -35,30 +35,30 @@ export default async function AdminOrganizerSupportPage({
   `;
 
   return (
-    <div className="max-w-3xl mx-auto py-10 px-4 text-white">
+    <div className="max-w-3xl mx-auto py-10 px-4 text-black">
       <Link href="/admin/organizers" className="text-sm text-indigo-400 hover:underline">&larr; Organizers</Link>
       <div className="mt-2 mb-1 inline-block text-[10px] font-bold uppercase tracking-wider bg-amber-500 text-black px-2 py-0.5 rounded">
         Support view · read-only
       </div>
       <h1 className="text-2xl font-extrabold">{org.business_name || org.full_name}</h1>
-      <p className="text-neutral-400 text-sm mb-6">
+      <p className="text-neutral-500 text-sm mb-6">
         {org.email} · {org.is_verified ? 'Verified' : 'Unverified'} · {org.status}
       </p>
-      <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-400 mb-3">Events</h2>
+      <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-500 mb-3">Events</h2>
       <ul className="space-y-3">
         {(events as any[]).map((e) => (
-          <li key={e.id} className="bg-neutral-950 border border-white/10 rounded-xl p-4">
+          <li key={e.id} className="bg-white border border-black/10 rounded-xl p-4">
             <p className="font-bold">{e.title}</p>
-            <p className="text-xs text-neutral-400">
+            <p className="text-xs text-neutral-500">
               {e.status} · {e.start_at ? new Date(e.start_at).toLocaleString() : '—'} · {e.paid_orders} paid · KES {Number(e.gross).toLocaleString()}
             </p>
             <div className="flex flex-wrap gap-2 mt-3 text-xs">
-              <Link className="px-2 py-1 rounded bg-neutral-900 border border-white/15" href={`/admin/events/${e.id}/orders`}>Orders</Link>
-              <Link className="px-2 py-1 rounded bg-neutral-900 border border-white/15" href={`/admin/events/${e.id}/analytics`}>Analytics</Link>
-              <Link className="px-2 py-1 rounded bg-neutral-900 border border-white/15" href={`/organizer/events/${e.id}/scan-overview`}>Scan</Link>
-              <Link className="px-2 py-1 rounded bg-neutral-900 border border-white/15" href={`/organizer/events/${e.id}/staff`}>Staff</Link>
-              <Link className="px-2 py-1 rounded bg-neutral-900 border border-white/15" href={`/organizer/events/${e.id}/shifts`}>Shifts</Link>
-              <Link className="px-2 py-1 rounded bg-neutral-900 border border-white/15" href={`/events/${e.slug || e.id}`}>Public</Link>
+              <Link className="px-2 py-1 rounded bg-neutral-100 border border-black/15" href={`/admin/events/${e.id}/orders`}>Orders</Link>
+              <Link className="px-2 py-1 rounded bg-neutral-100 border border-black/15" href={`/admin/events/${e.id}/analytics`}>Analytics</Link>
+              <Link className="px-2 py-1 rounded bg-neutral-100 border border-black/15" href={`/organizer/events/${e.id}/scan-overview`}>Scan</Link>
+              <Link className="px-2 py-1 rounded bg-neutral-100 border border-black/15" href={`/organizer/events/${e.id}/staff`}>Staff</Link>
+              <Link className="px-2 py-1 rounded bg-neutral-100 border border-black/15" href={`/organizer/events/${e.id}/shifts`}>Shifts</Link>
+              <Link className="px-2 py-1 rounded bg-neutral-100 border border-black/15" href={`/events/${e.slug || e.id}`}>Public</Link>
             </div>
           </li>
         ))}

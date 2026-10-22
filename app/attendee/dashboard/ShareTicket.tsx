@@ -48,8 +48,8 @@ export default function ShareTicket({ code, eventTitle }: { code: string; eventT
         onClick={handleCopy}
         className={`text-xs px-2 py-1 rounded border whitespace-nowrap transition ${
           copied
-            ? 'bg-emerald-950/60 border-emerald-800 text-emerald-400'
-            : 'bg-neutral-900 border-white/15 text-neutral-300 hover:bg-neutral-800'
+            ? 'bg-emerald-50 border-emerald-200 text-emerald-600'
+            : 'bg-neutral-100 border-black/15 text-neutral-700 hover:bg-neutral-200'
         }`}
       >
         {copied ? 'Copied!' : 'Copy link'}

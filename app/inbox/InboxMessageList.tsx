@@ -50,28 +50,28 @@ export default function InboxMessageList({ initialMessages }: { initialMessages:
 
   return (
     <div>
-      <p className="text-neutral-400 text-sm mt-1 mb-8">
+      <p className="text-neutral-500 text-sm mt-1 mb-8">
         {messages.length} message(s)
         {hasNew && (
-          <span className="ml-2 text-emerald-400 font-semibold">· New message received</span>
+          <span className="ml-2 text-emerald-600 font-semibold">· New message received</span>
         )}
       </p>
 
       {messages.length === 0 && (
-        <div className="bg-neutral-950 border border-white/10 rounded-2xl p-8 text-center text-neutral-400">
+        <div className="bg-white border border-black/10 rounded-2xl p-8 text-center text-neutral-500">
           No messages yet. Messages from event organizers will appear here.
         </div>
       )}
 
       <ul className="space-y-3">
         {messages.map((m) => (
-          <li key={m.id} className="bg-neutral-950 border border-white/10 rounded-xl p-5">
+          <li key={m.id} className="bg-white border border-black/10 rounded-xl p-5">
             <div className="flex justify-between items-center mb-1">
               <span className="text-sm font-bold text-indigo-400">{m.event_title}</span>
               <span className="text-xs text-neutral-500">{new Date(m.created_at).toLocaleString()}</span>
             </div>
-            <div className="text-sm text-neutral-400 mb-2">From: {m.sender_name}</div>
-            <p className="text-sm text-neutral-200 leading-relaxed mb-3">{m.body}</p>
+            <div className="text-sm text-neutral-500 mb-2">From: {m.sender_name}</div>
+            <p className="text-sm text-neutral-800 leading-relaxed mb-3">{m.body}</p>
             <InboxReply eventId={m.event_id} recipientId={m.sender_id} senderName={m.sender_name} />
           </li>
         ))}

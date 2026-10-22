@@ -16,10 +16,10 @@ export default async function EventStaffPage({ params }: { params: Promise<{ id:
     FROM events WHERE id = ${id}
   `;
   if (!event) {
-    return <div className="max-w-2xl mx-auto py-12 px-4 text-white">Event not found.</div>;
+    return <div className="max-w-2xl mx-auto py-12 px-4 text-black">Event not found.</div>;
   }
   if (event.organizer_id !== session.userId && session.role !== 'admin') {
-    return <div className="max-w-2xl mx-auto py-12 px-4 text-white">Not authorized for this event.</div>;
+    return <div className="max-w-2xl mx-auto py-12 px-4 text-black">Not authorized for this event.</div>;
   }
 
   const eventEnded =
@@ -30,13 +30,13 @@ export default async function EventStaffPage({ params }: { params: Promise<{ id:
   if (eventEnded) {
     const reason = event.status === 'cancelled' ? 'This event has been cancelled.' : 'This event has ended.';
     return (
-      <div className="max-w-2xl mx-auto py-10 px-4 text-white">
+      <div className="max-w-2xl mx-auto py-10 px-4 text-black">
         <Link href="/organizer/dashboard" className="text-sm text-indigo-400 hover:underline">
           &larr; Back to dashboard
         </Link>
         <h1 className="text-2xl font-extrabold mt-2 mb-1">Door staff</h1>
-        <p className="text-neutral-400 text-sm mb-4">{event.title}</p>
-        <div className="rounded-xl border border-white/15 bg-neutral-950 px-4 py-4 text-sm text-neutral-300">
+        <p className="text-neutral-500 text-sm mb-4">{event.title}</p>
+        <div className="rounded-xl border border-black/15 bg-white px-4 py-4 text-sm text-neutral-700">
           {reason} Door staff invites and scanning are closed.
         </div>
       </div>
@@ -52,12 +52,12 @@ export default async function EventStaffPage({ params }: { params: Promise<{ id:
   `;
 
   return (
-    <div className="max-w-2xl mx-auto py-10 px-4 text-white">
+    <div className="max-w-2xl mx-auto py-10 px-4 text-black">
       <Link href="/organizer/dashboard" className="text-sm text-indigo-400 hover:underline">
         &larr; Back to dashboard
       </Link>
       <h1 className="text-2xl font-extrabold mt-2 mb-1">Door staff</h1>
-      <p className="text-neutral-400 text-sm mb-6">{event.title}</p>
+      <p className="text-neutral-500 text-sm mb-6">{event.title}</p>
       <StaffManager eventId={event.id} initialStaff={staff as any} />
     </div>
   );
