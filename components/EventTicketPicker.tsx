@@ -101,9 +101,9 @@ export default function EventTicketPicker({
         const current = qty[t.id] || 0;
 
         return (
-          <div key={t.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-neutral-950 border border-white/10 p-5 rounded-[20px] transition hover:border-white/25">
+          <div key={t.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-neutral-50 border border-black/10 p-5 rounded-[20px] transition hover:border-black/30">
             <div>
-              <p className="text-lg font-bold text-white flex items-center gap-2 flex-wrap">
+              <p className="text-lg font-bold text-black flex items-center gap-2 flex-wrap">
                 {t.name}
                 {flashActive && (
                   <span className="animate-pulse text-[10px] uppercase tracking-wider font-extrabold bg-amber-500 text-black px-2 py-0.5 rounded-full">
@@ -111,11 +111,11 @@ export default function EventTicketPicker({
                   </span>
                 )}
               </p>
-              <p className="text-sm text-neutral-400">
+              <p className="text-sm text-neutral-500">
                 {flashActive ? (
                   <>
                     <span className="line-through text-neutral-500 mr-1.5">KES {regular.toLocaleString()}</span>
-                    <span className="text-amber-400 font-bold">KES {price.toLocaleString()}</span>{' '}
+                    <span className="text-amber-600 font-bold">KES {price.toLocaleString()}</span>{' '}
                     {t.flash_sale_ends_at && <FlashSaleCountdown endsAt={t.flash_sale_ends_at} />}
                   </>
                 ) : (
@@ -123,7 +123,7 @@ export default function EventTicketPicker({
                 )}
                 {soldOut && <span> · Sold out</span>}
                 {!soldOut && almostSoldOut && (
-                  <span className="text-amber-400 font-bold"> · Almost sold out!</span>
+                  <span className="text-amber-600 font-bold"> · Almost sold out!</span>
                 )}
               </p>
             </div>
@@ -135,15 +135,15 @@ export default function EventTicketPicker({
                 <button
                   type="button"
                   onClick={() => setTierQty(t.id, current - 1, maxQty)}
-                  className="w-10 h-10 rounded-full bg-transparent border border-white/25 text-white font-bold transition hover:bg-white hover:text-black disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-white"
+                  className="w-10 h-10 rounded-full bg-transparent border border-black/25 text-black font-bold transition hover:bg-black hover:text-white disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-black"
                 >
                   −
                 </button>
-                <span className="w-8 text-center font-bold text-white">{current}</span>
+                <span className="w-8 text-center font-bold text-black">{current}</span>
                 <button
                   type="button"
                   onClick={() => setTierQty(t.id, current + 1, maxQty)}
-                  className="w-10 h-10 rounded-full bg-transparent border border-white/25 text-white font-bold transition hover:bg-white hover:text-black disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-white"
+                  className="w-10 h-10 rounded-full bg-transparent border border-black/25 text-black font-bold transition hover:bg-black hover:text-white disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-black"
                   disabled={current >= maxQty}
                 >
                   +
@@ -155,18 +155,18 @@ export default function EventTicketPicker({
       })}
 
       {totalQty > 0 && (
-        <div className="sticky bottom-4 z-10 mt-4 rounded-[20px] border border-white/20 bg-black/90 backdrop-blur p-4 shadow-2xl">
+        <div className="sticky bottom-4 z-10 mt-4 rounded-[20px] border border-black/15 bg-white/95 backdrop-blur p-4 shadow-2xl">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <p className="text-sm text-neutral-300">
-                <span className="font-bold text-white">{totalQty}</span> ticket{totalQty === 1 ? '' : 's'} selected
+              <p className="text-sm text-neutral-600">
+                <span className="font-bold text-black">{totalQty}</span> ticket{totalQty === 1 ? '' : 's'} selected
               </p>
-              <p className="text-xl font-extrabold text-white">KES {totalKes.toLocaleString()}</p>
+              <p className="text-xl font-extrabold text-black">KES {totalKes.toLocaleString()}</p>
             </div>
             <button
               type="button"
               onClick={goCheckout}
-              className="px-8 py-3 bg-white hover:bg-neutral-200 text-black rounded-full font-bold text-sm transition active:scale-[0.98]"
+              className="px-8 py-3 bg-black hover:bg-neutral-800 text-white rounded-full font-bold text-sm transition active:scale-[0.98]"
             >
               Checkout →
             </button>

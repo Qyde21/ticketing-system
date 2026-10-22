@@ -119,7 +119,7 @@ export default async function OrganizerProfilePage({
       <h2 className="text-xl font-bold mb-4">Upcoming events</h2>
       {upcomingEvents.length > 0 ? (
         <div className="mb-12">
-          <EventList events={upcomingEvents} showFilters={false} />
+          <EventList events={upcomingEvents} showFilters={false} theme="dark" />
         </div>
       ) : (
         <p className="text-neutral-400 mb-12">No upcoming events right now.</p>
@@ -128,7 +128,7 @@ export default async function OrganizerProfilePage({
       {pastEvents.length > 0 && (
         <>
           <h2 className="text-xl font-bold mb-4">Past events</h2>
-          <EventList events={pastEvents} showFilters={false} />
+          <EventList events={pastEvents} showFilters={false} theme="dark" />
         </>
       )}
     </div>

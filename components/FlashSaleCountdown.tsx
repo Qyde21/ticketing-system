@@ -40,7 +40,7 @@ export default function FlashSaleCountdown({ endsAt }: { endsAt: string }) {
   if (ended) return null;
 
   return (
-    <span className="inline-flex items-center gap-1 text-amber-400 font-bold">
+    <span className="inline-flex items-center gap-1 text-amber-600 font-bold">
       &middot; Ends in {remaining}
     </span>
   );

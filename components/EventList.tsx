@@ -8,10 +8,12 @@ export default function EventList({
   events,
   showFilters = true,
   favoriteIds = [],
+  theme = 'light',
 }: {
   events: any[];
   showFilters?: boolean;
   favoriteIds?: string[];
+  theme?: 'light' | 'dark';
 }) {
   const favSet = useMemo(() => new Set(favoriteIds), [favoriteIds]);
   const [search, setSearch] = useState('');
@@ -53,11 +55,36 @@ export default function EventList({
     });
   }, [search, category, whenFilter, events]);
 
+  const L = theme === 'light';
+  const T = {
+    searchBox: L
+      ? 'border-black/10 bg-neutral-100 focus-within:border-black/40'
+      : 'border-white/10 bg-white/[0.06] focus-within:border-white/40',
+    searchInput: L ? 'text-black placeholder-neutral-500' : 'text-white placeholder-neutral-500',
+    clearBtn: L ? 'text-neutral-500 hover:text-black' : 'text-neutral-400 hover:text-white',
+    pillOn: L ? 'bg-black text-white' : 'bg-white text-black',
+    pillOff: L
+      ? 'border border-black/15 bg-transparent text-neutral-700 hover:border-black/50 hover:text-black'
+      : 'border border-white/15 bg-transparent text-neutral-300 hover:border-white/40 hover:text-white',
+    count: 'text-neutral-500',
+    emptyBox: L ? 'border-black/10 bg-neutral-100' : 'border-white/10 bg-neutral-950',
+    emptyTitle: L ? 'text-neutral-800' : 'text-neutral-200',
+    emptyBtn: L
+      ? 'border-black/30 text-black hover:bg-black hover:text-white'
+      : 'border-white/25 text-white hover:bg-white hover:text-black',
+    frame: L ? 'border-black/10 bg-neutral-200' : 'border-white/10 bg-neutral-900',
+    fallback: L
+      ? 'from-neutral-200 to-neutral-300 text-neutral-500'
+      : 'from-neutral-900 to-neutral-800 text-neutral-600',
+    title: L ? 'text-black' : 'text-white',
+    meta: L ? 'text-neutral-500' : 'text-neutral-400',
+    org: L ? 'text-neutral-500 hover:text-black' : 'text-neutral-500 hover:text-white',
+    price: L ? 'text-black' : 'text-white',
+  };
+
   const pill = (active: boolean) =>
     `whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition active:scale-[0.97] ${
-      active
-        ? 'bg-white text-black'
-        : 'border border-white/15 bg-transparent text-neutral-300 hover:border-white/40 hover:text-white'
+      active ? T.pillOn : T.pillOff
     }`;
 
   const fmtPrice = (v: unknown) => {
@@ -71,8 +98,8 @@ export default function EventList({
     <div>
       {showFilters && (
         <div className="mb-8">
-          <div className="mb-4 flex w-full items-center gap-3 rounded-full border border-white/10 bg-white/[0.06] px-5 py-3 transition focus-within:border-white/40">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="2" aria-hidden>
+          <div className={`mb-4 flex w-full items-center gap-3 rounded-full border px-5 py-3 transition ${T.searchBox}`}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#737373" strokeWidth="2" aria-hidden>
               <circle cx="11" cy="11" r="8" />
               <path d="m21 21-4.35-4.35" />
             </svg>
@@ -81,15 +108,11 @@ export default function EventList({
               placeholder="Search events, venues, organizers..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="flex-1 bg-transparent text-[15px] text-white placeholder-neutral-500 outline-none"
+              className={`flex-1 bg-transparent text-[15px] outline-none ${T.searchInput}`}
               aria-label="Search events"
             />
             {search && (
-              <button
-                type="button"
-                onClick={() => setSearch('')}
-                className="text-[13px] font-semibold text-neutral-400 hover:text-white"
-              >
+              <button type="button" onClick={() => setSearch('')} className={`text-[13px] font-semibold ${T.clearBtn}`}>
                 Clear
               </button>
             )}
@@ -117,7 +140,7 @@ export default function EventList({
             ))}
           </div>
 
-          <p className="mt-4 text-[13px] text-neutral-500">
+          <p className={`mt-4 text-[13px] ${T.count}`}>
             {filteredEvents.length} event{filteredEvents.length !== 1 ? 's' : ''}
             {search ? ` matching "${search}"` : ''}
             {category !== 'All' ? ` in ${category}` : ''}
@@ -126,8 +149,8 @@ export default function EventList({
       )}
 
       {filteredEvents.length === 0 ? (
-        <div className="rounded-2xl border border-white/10 bg-neutral-950 px-4 py-14 text-center">
-          <p className="m-0 font-semibold text-neutral-200">No events found</p>
+        <div className={`rounded-2xl border px-4 py-14 text-center ${T.emptyBox}`}>
+          <p className={`m-0 font-semibold ${T.emptyTitle}`}>No events found</p>
           <p className="m-0 mt-2 text-sm text-neutral-500">Try another search, category, or date filter.</p>
           {showFilters && (search || category !== 'All' || whenFilter !== 'all') && (
             <button
@@ -137,7 +160,7 @@ export default function EventList({
                 setCategory('All');
                 setWhenFilter('all');
               }}
-              className="mt-5 rounded-full border border-white/25 px-5 py-2 text-sm font-semibold text-white transition hover:bg-white hover:text-black"
+              className={`mt-5 rounded-full border px-5 py-2 text-sm font-semibold transition ${T.emptyBtn}`}
             >
               Clear filters
             </button>
@@ -176,7 +199,7 @@ export default function EventList({
 
             return (
               <article key={e.id} className={`group relative ${isPastEvent || isCancelled ? 'opacity-70' : ''}`}>
-                <div className="relative aspect-[4/5] overflow-hidden rounded-[20px] border border-white/10 bg-neutral-900">
+                <div className={`relative aspect-[4/5] overflow-hidden rounded-[20px] border ${T.frame}`}>
                   <Link href={href} aria-label={e.title} className="absolute inset-0 block">
                     {e.cover_image_url ? (
                       <img
@@ -186,11 +209,11 @@ export default function EventList({
                         className="event-card-img h-full w-full object-cover"
                       />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-neutral-900 to-neutral-800 p-4 text-center font-display text-2xl font-bold uppercase text-neutral-600">
+                      <div className={`flex h-full w-full items-center justify-center bg-gradient-to-br p-4 text-center font-display text-2xl font-bold uppercase ${T.fallback}`}>
                         {e.title}
                       </div>
                     )}
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/70 to-transparent" />
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
                   </Link>
 
                   <div className="pointer-events-none absolute left-3 top-3 flex flex-col items-start gap-1.5">
@@ -213,30 +236,30 @@ export default function EventList({
                   </div>
 
                   {e.category && (
-                    <span className="pointer-events-none absolute bottom-3 left-3 rounded-full border border-white/20 bg-black/50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur">
+                    <span className="pointer-events-none absolute bottom-3 left-3 rounded-full border border-white/25 bg-black/50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur">
                       {e.category}
                     </span>
                   )}
                 </div>
 
                 <div className="pt-3">
-                  <h3 className="line-clamp-2 text-[17px] font-bold leading-snug text-white">
+                  <h3 className={`line-clamp-2 text-[17px] font-bold leading-snug ${T.title}`}>
                     <Link href={href} className="hover:underline underline-offset-2">
                       {e.title}
                     </Link>
                   </h3>
-                  <p className="mt-1 text-sm text-neutral-400">{dateLabel}</p>
-                  <p className="truncate text-sm text-neutral-400">{e.venue_name || 'Venue TBD'}</p>
+                  <p className={`mt-1 text-sm ${T.meta}`}>{dateLabel}</p>
+                  <p className={`truncate text-sm ${T.meta}`}>{e.venue_name || 'Venue TBD'}</p>
                   {e.organizer_id && e.organizer_name && (
                     <Link
                       href={`/organizers/${e.organizer_id}`}
-                      className="mt-0.5 block truncate text-xs text-neutral-500 transition hover:text-white"
+                      className={`mt-0.5 block truncate text-xs transition ${T.org}`}
                     >
                       by {e.organizer_name}
                     </Link>
                   )}
                   {price && !isPastEvent && !isCancelled && (
-                    <p className="mt-2 text-sm font-semibold text-white">{price}</p>
+                    <p className={`mt-2 text-sm font-semibold ${T.price}`}>{price}</p>
                   )}
                 </div>
               </article>
