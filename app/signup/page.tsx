@@ -59,7 +59,7 @@ function SignupForm() {
           <Link href="/" className="flex items-center justify-center gap-2.5 mb-6">
             <img src="/logo-badge.png" alt="TicketHub" className="h-14 w-14" />
             <span className="font-serif text-2xl font-bold tracking-tight">
-              <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent font-bold">TicketHub</span>
+              <span className="font-bold text-white">TicketHub</span>
             </span>
           </Link>
           <div className="bg-slate-900 py-8 px-6 shadow sm:rounded-lg border border-slate-800">
@@ -91,7 +91,7 @@ function SignupForm() {
           <Link href="/" className="flex items-center gap-2.5">
             <img src="/logo-badge.png" alt="TicketHub" className="h-14 w-14" />
             <span className="font-serif text-2xl font-bold tracking-tight">
-              <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent font-bold">TicketHub</span>
+              <span className="font-bold text-white">TicketHub</span>
             </span>
           </Link>
         </div>
@@ -139,7 +139,7 @@ function SignupForm() {
             <>
               <a
                 href="/api/auth/google"
-                className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2.5 rounded-lg text-sm transition mb-5"
+                className="w-full flex items-center justify-center gap-3 bg-white hover:bg-neutral-100 text-neutral-800 font-semibold py-2.5 rounded-lg text-sm transition mb-5"
               >
                 <svg width="18" height="18" viewBox="0 0 48 48">
                   <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/>
@@ -150,9 +150,9 @@ function SignupForm() {
                 Continue with Google
               </a>
               <div className="flex items-center gap-3 mb-5">
-                <div className="flex-1 h-px bg-gray-800" />
-                <span className="text-xs text-gray-500 uppercase tracking-wider">or sign up with email</span>
-                <div className="flex-1 h-px bg-gray-800" />
+                <div className="flex-1 h-px bg-neutral-900" />
+                <span className="text-xs text-neutral-500 uppercase tracking-wider">or sign up with email</span>
+                <div className="flex-1 h-px bg-neutral-900" />
               </div>
             </>
           )}

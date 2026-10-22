@@ -1,4 +1,4 @@
-﻿import { sql } from '@/lib/db';
+import { sql } from '@/lib/db';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import JoinWaitlistButton from '@/components/JoinWaitlistButton';
@@ -27,7 +27,7 @@ export async function generateMetadata({
   const event = rows[0];
 
   if (!event) {
-    return { title: 'Event not found â€” TicketHub' };
+    return { title: 'Event not found — TicketHub' };
   }
 
   const dateStr = event.start_at
@@ -127,7 +127,7 @@ export default async function EventDetailPage({
 
   // A single "does this session's account have a paid ticket for this event"
   // check, reused for both the message-organizer gate (only while the event
-  // is still active) and the review gate (only once it's over) â€” avoids
+  // is still active) and the review gate (only once it's over) — avoids
   // running the same buyer_email lookup twice.
   const session = await getSession();
   let hasPaidTicket = false;
@@ -183,15 +183,22 @@ export default async function EventDetailPage({
   const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(eventUrl)}`;
 
   return (
-    <div className="max-w-4xl mx-auto py-12 px-4 text-white">
-      <div className="flex items-start justify-between gap-3 mb-2">
-        <h1 className="text-4xl font-extrabold">{event.title}</h1>
+    <div className="text-white">
+      {event.cover_image_url && (
+        <div className="relative w-full h-[300px] sm:h-[440px] overflow-hidden border-b border-white/10 bg-neutral-950">
+          <img src={event.cover_image_url} alt={event.title} className="absolute inset-0 h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+        </div>
+      )}
+      <div className="max-w-4xl mx-auto px-4 pb-16 pt-8">
+      <div className="flex items-start justify-between gap-3 mb-3">
+        <h1 className="font-display text-5xl sm:text-6xl font-extrabold uppercase leading-[0.95] tracking-tight">{event.title}</h1>
         <FavoriteButton eventId={event.id} initialFavorited={isFavorited} />
       </div>
       {organizerName && (
         <Link
           href={`/organizers/${event.organizer_id}`}
-          className="inline-flex items-center gap-1.5 text-gray-300 hover:text-cyan-400 text-sm mb-6"
+          className="inline-flex items-center gap-1.5 text-neutral-300 hover:text-cyan-400 text-sm mb-6"
           style={{ textDecoration: 'none' }}
         >
           by {organizerName}
@@ -205,7 +212,7 @@ export default async function EventDetailPage({
           )}
         </Link>
       )}
-      <p className="text-gray-300 text-lg mb-6 leading-relaxed">{event.description}</p>
+      <p className="text-neutral-300 text-lg mb-6 leading-relaxed">{event.description}</p>
 
       {!isCancelled && !isEnded && (
         <div className="flex gap-2 mb-8 flex-wrap">
@@ -213,8 +220,7 @@ export default async function EventDetailPage({
             href={whatsappShareUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-white text-xs font-semibold px-3 py-2 rounded-lg transition"
-            style={{ background: '#25D366' }}
+            className="inline-flex items-center gap-1.5 border border-white/15 hover:bg-white hover:text-black text-white text-xs font-semibold px-4 py-2 rounded-full transition"
           >
             Share on WhatsApp
           </a>
@@ -222,7 +228,7 @@ export default async function EventDetailPage({
             href={twitterShareUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 bg-gray-800 hover:bg-gray-700 text-white text-xs font-semibold px-3 py-2 rounded-lg transition"
+            className="inline-flex items-center gap-1.5 border border-white/15 hover:bg-white hover:text-black text-white text-xs font-semibold px-4 py-2 rounded-full transition"
           >
             Share on X
           </a>
@@ -230,8 +236,7 @@ export default async function EventDetailPage({
             href={facebookShareUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-white text-xs font-semibold px-3 py-2 rounded-lg transition"
-            style={{ background: '#1877F2' }}
+            className="inline-flex items-center gap-1.5 border border-white/15 hover:bg-white hover:text-black text-white text-xs font-semibold px-4 py-2 rounded-full transition"
           >
             Share on Facebook
           </a>
@@ -244,7 +249,7 @@ export default async function EventDetailPage({
         </div>
       )}
       {!isCancelled && isEnded && (
-        <div className="bg-gray-800/60 border border-gray-700 text-gray-300 font-semibold px-4 py-3 rounded-xl mb-6">
+        <div className="bg-neutral-900/60 border border-white/15 text-neutral-300 font-semibold px-4 py-3 rounded-xl mb-6">
           This event has already ended.
         </div>
       )}
@@ -260,13 +265,23 @@ export default async function EventDetailPage({
         </div>
       )}
 
-      <div className="bg-gray-900 border border-gray-800 p-6 rounded-2xl mb-8 space-y-3">
-        <p><strong className="text-gray-400">Date:</strong> {eventDate ? new Date(eventDate).toLocaleString() : 'TBA'}</p>
-        <p><strong className="text-gray-400">Location:</strong> {event.venue_name || event.location || 'Online / Venue TBA'}</p>
+      <div className="grid gap-5 sm:grid-cols-2 bg-neutral-950 border border-white/10 p-6 rounded-[20px] mb-8">
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-widest text-neutral-500 mb-1">Date &amp; time</p>
+          <p className="text-base font-semibold">
+            {eventDate
+              ? new Date(eventDate).toLocaleString('en-KE', { dateStyle: 'full', timeStyle: 'short', timeZone: 'Africa/Nairobi' })
+              : 'TBA'}
+          </p>
+        </div>
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-widest text-neutral-500 mb-1">Venue</p>
+          <p className="text-base font-semibold">{event.venue_name || event.location || 'Online / Venue TBA'}</p>
+        </div>
       </div>
 
       {event.venue_name && !isEnded && !isCancelled && (
-            <div className="mb-8 rounded-2xl overflow-hidden border border-gray-800">
+            <div className="mb-8 rounded-[20px] overflow-hidden border border-white/10">
               <iframe
                 title={`Map showing ${event.venue_name}`}
                 width="100%"
@@ -282,9 +297,9 @@ export default async function EventDetailPage({
             )}
 
       <div className="space-y-3">
-        <h2 className="text-xl font-bold text-white mb-2">Tickets</h2>
+        <h2 className="font-display text-3xl font-extrabold uppercase tracking-tight text-white mb-3">Tickets</h2>
         {salesClosed ? (
-          <p className="text-gray-400">
+          <p className="text-neutral-400">
             {isCancelled
               ? 'Ticket sales are closed because this event was cancelled.'
               : isEnded
@@ -294,7 +309,7 @@ export default async function EventDetailPage({
               : 'Ticket sales for this event are currently unavailable.'}
           </p>
         ) : ticketTypes.length === 0 ? (
-          <p className="text-gray-400">No tickets are available for this event yet.</p>
+          <p className="text-neutral-400">No tickets are available for this event yet.</p>
         ) : (
           <EventTicketPicker
             eventId={String(event.id)}
@@ -310,6 +325,7 @@ export default async function EventDetailPage({
           eventTitle={event.title}
         />
       )}
+      </div>
     </div>
   );
 }

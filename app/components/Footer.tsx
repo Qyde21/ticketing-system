@@ -3,26 +3,24 @@ import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer className="bg-slate-900 border-t border-slate-800 text-slate-300 py-12">
+    <footer className="bg-black border-t border-white/10 text-neutral-300 py-14 mt-8">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
           {/* Brand Info */}
           <div>
             <Link href="/" className="flex items-center gap-2 mb-3">
               <img src="/logo-badge.png" alt="TicketHub" className="h-10 w-10" />
-              <span className="font-serif text-xl font-bold tracking-tight">
-                <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent font-bold">TicketHub</span>
-              </span>
+              <span className="font-display text-2xl font-extrabold uppercase tracking-tight text-white">TicketHub</span>
             </Link>
-            <p className="text-sm text-slate-400 leading-relaxed">
+            <p className="text-sm text-neutral-400 leading-relaxed">
               Kenya's premier event ticketing platform. Buy and sell tickets for concerts, festivals, and live events.
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-white text-sm font-bold mb-4">Quick Links</h4>
-            <ul className="space-y-2 text-sm text-slate-400">
+            <h4 className="text-white text-xs font-bold uppercase tracking-widest mb-4">Quick Links</h4>
+            <ul className="space-y-2 text-sm text-neutral-400">
               <li><Link href="/" className="hover:text-white transition">Browse Events</Link></li>
               <li><Link href="/pricing" className="hover:text-white transition">Sell Tickets</Link></li>
               <li><Link href="/my-tickets" className="hover:text-white transition">My Tickets</Link></li><li><Link href="/login" className="hover:text-white transition">Log In</Link></li>
@@ -32,8 +30,8 @@ export default function Footer() {
 
           {/* Support */}
           <div>
-            <h4 className="text-white text-sm font-bold mb-4">Support</h4>
-            <ul className="space-y-2 text-sm text-slate-400">
+            <h4 className="text-white text-xs font-bold uppercase tracking-widest mb-4">Support</h4>
+            <ul className="space-y-2 text-sm text-neutral-400">
               <li><Link href="/contact" className="hover:text-white transition">Contact Us</Link></li>
               <li><a href="https://wa.me/254114525941" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">WhatsApp Support</a></li>
               <li><Link href="/faq" className="hover:text-white transition">FAQ</Link></li>
@@ -43,8 +41,8 @@ export default function Footer() {
 
           {/* Follow Us */}
           <div>
-            <h4 className="text-white text-sm font-bold mb-4">Follow Us</h4>
-            <div className="flex gap-4 text-sm text-slate-400">
+            <h4 className="text-white text-xs font-bold uppercase tracking-widest mb-4">Follow Us</h4>
+            <div className="flex gap-4 text-sm text-neutral-400">
               <a href="https://twitter.com/tickethubke" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Twitter/X</a>
               <a href="https://instagram.com/tickethubke" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Instagram</a>
               <a href="https://facebook.com/tickethubke" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Facebook</a>
@@ -53,7 +51,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-slate-800 pt-6 flex flex-col md:flex-row justify-between items-center text-xs text-slate-400 gap-4">
+        <div className="border-t border-white/10 pt-6 flex flex-col md:flex-row justify-between items-center text-xs text-neutral-400 gap-4">
           <p>&copy; {new Date().getFullYear()} TicketHub Kenya. All rights reserved.</p>
           <div className="flex gap-6">
             <Link href="/privacy" className="hover:text-white transition">Privacy Policy</Link>

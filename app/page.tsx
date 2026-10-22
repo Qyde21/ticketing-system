@@ -19,6 +19,7 @@ export default async function HomePage() {
       COALESCE(op.is_verified, false) AS organizer_verified,
       COALESCE(SUM(tt.quantity_total), 0) AS total_capacity,
       COALESCE(SUM(tt.quantity_sold), 0) AS total_sold,
+      MIN(tt.price_kes) AS min_price,
       BOOL_OR(
         tt.flash_sale_price_kes IS NOT NULL
         AND tt.flash_sale_starts_at IS NOT NULL
@@ -72,87 +73,79 @@ export default async function HomePage() {
   const featuredHasFlash = featuredEvent && hasFlashFlag(featuredEvent.has_active_flash);
   const flashSaleEvents = upcomingEvents.filter((e: any) => hasFlashFlag(e.has_active_flash));
 
+  const dateFmt = (v: string) =>
+    new Date(v).toLocaleDateString('en-GB', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      timeZone: 'Africa/Nairobi',
+    });
+  const priceLabel = (v: unknown) => {
+    if (v === null || v === undefined || v === '') return null;
+    const n = Number(v);
+    if (!Number.isFinite(n)) return null;
+    return n === 0 ? 'Free' : `From KES ${n.toLocaleString()}`;
+  };
+  const heroPrice = featuredEvent ? priceLabel(featuredEvent.min_price) : null;
+
   return (
-    <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh', color: '#fff', paddingBottom: '2rem' }}>
+    <div className="min-h-screen bg-black text-white pb-8">
       {featuredEvent && (
-        <div style={{ position: 'relative', width: '100%', height: 420, marginBottom: 24, borderBottom: '1px solid #1f1f1f' }}>
+        <section className="relative w-full h-[440px] sm:h-[540px] overflow-hidden border-b border-white/10 bg-neutral-950">
           {featuredEvent.cover_image_url && (
             <img
               src={featuredEvent.cover_image_url}
               alt={featuredEvent.title}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              className="absolute inset-0 w-full h-full object-cover opacity-75"
             />
           )}
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 0,
-              padding: '24px 32px',
-              background: 'linear-gradient(transparent, rgba(0,0,0,0.95))',
-              width: '100%',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 4 }}>
-              <h1
-                className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400"
-                style={{ margin: 0, fontSize: 32 }}
-              >
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0">
+            <div className="mx-auto w-full max-w-[1200px] px-4 sm:px-6 pb-8 sm:pb-12 fade-up">
+              <div className="flex items-center gap-2 flex-wrap mb-3">
+                {featuredEvent.category && (
+                  <span className="inline-block rounded-full border border-white/25 bg-white/10 backdrop-blur px-3 py-1 text-[11px] font-bold uppercase tracking-widest">
+                    {featuredEvent.category}
+                  </span>
+                )}
+                {featuredHasFlash && <FlashSaleBadge />}
+              </div>
+              <h1 className="font-display text-5xl sm:text-7xl font-extrabold uppercase leading-[0.92] tracking-tight max-w-3xl">
                 {featuredEvent.title}
               </h1>
-              {featuredHasFlash && <FlashSaleBadge />}
+              <p className="mt-3 text-base sm:text-lg text-neutral-300">
+                {dateFmt(featuredEvent.start_at)} · {featuredEvent.venue_name || 'Venue TBD'}
+              </p>
+              <div className="mt-5 flex items-center gap-4 flex-wrap">
+                <Link
+                  href={`/events/${featuredEvent.slug}`}
+                  className="inline-flex items-center rounded-full bg-white px-7 py-3 text-sm font-bold text-black transition hover:bg-neutral-200 active:scale-[0.98]"
+                >
+                  Get tickets
+                </Link>
+                {heroPrice && <span className="text-sm font-semibold text-neutral-200">{heroPrice}</span>}
+              </div>
             </div>
-            <p style={{ margin: '4px 0 12px 0', color: '#67e8f9', fontSize: 15, fontWeight: 600 }}>
-              {featuredEvent.venue_name || 'Venue TBD'}
-            </p>
-            <Link
-              href={`/events/${featuredEvent.slug}`}
-              className="text-indigo-400 hover:text-cyan-400 font-bold"
-              style={{ textDecoration: 'none', fontSize: 14 }}
-            >
-              View Event &rarr;
-            </Link>
           </div>
-        </div>
+        </section>
       )}
 
-      {/* Flash sales strip — under hero, above Tonight / filters */}
       {flashSaleEvents.length > 0 && (
-        <div style={{ maxWidth: 1000, margin: '0 auto 20px', padding: '0 1rem' }}>
-          <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              alignItems: 'center',
-              gap: 12,
-              padding: '14px 16px',
-              borderRadius: 12,
-              border: '1px solid rgba(245, 158, 11, 0.45)',
-              background: 'linear-gradient(90deg, rgba(245,158,11,0.14), rgba(15,23,42,0.95))',
-            }}
-          >
+        <div className="mx-auto w-full max-w-[1200px] px-4 sm:px-6 mt-6">
+          <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-amber-500/40 bg-amber-500/[0.07] px-4 py-3.5">
             <FlashSaleBadge />
-            <div style={{ flex: 1, minWidth: 200 }}>
-              <p style={{ margin: 0, fontWeight: 800, color: '#fbbf24', fontSize: 14 }}>
-                Flash sales on now
-              </p>
-              <p style={{ margin: '4px 0 0', color: '#d1d5db', fontSize: 13 }}>
+            <div className="flex-1 min-w-[200px]">
+              <p className="m-0 text-sm font-bold text-amber-300">Flash sales on now</p>
+              <p className="m-0 mt-1 text-[13px] text-neutral-300">
                 {flashSaleEvents.map((e: any) => e.title).join(' · ')}
               </p>
             </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            <div className="flex flex-wrap gap-2">
               {flashSaleEvents.slice(0, 3).map((e: any) => (
                 <Link
                   key={e.id}
                   href={`/events/${e.slug}`}
-                  style={{
-                    textDecoration: 'none',
-                    color: '#000',
-                    background: '#f59e0b',
-                    padding: '8px 12px',
-                    borderRadius: 999,
-                    fontSize: 13,
-                    fontWeight: 700,
-                  }}
+                  className="rounded-full bg-amber-500 px-3.5 py-2 text-[13px] font-bold text-black transition hover:bg-amber-400"
                 >
                   {(e.title.length > 28 ? e.title.slice(0, 28) + '…' : e.title) + ' →'}
                 </Link>
@@ -162,24 +155,23 @@ export default async function HomePage() {
         </div>
       )}
 
-      <div style={{ maxWidth: 1000, margin: '0 auto', padding: '0 1rem' }}>
-        <h2
-          className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400"
-          style={{ marginBottom: 20, fontSize: 22 }}
-        >
-          Events Coming Up
+      <div className="mx-auto w-full max-w-[1200px] px-4 sm:px-6 pt-10">
+        <h2 className="mb-6 font-display text-4xl sm:text-5xl font-extrabold uppercase tracking-tight">
+          Upcoming events
         </h2>
         {remainingUpcoming.length > 0 ? (
           <EventList events={remainingUpcoming} showFilters={true} favoriteIds={favoriteIds} />
         ) : upcomingEvents.length === 1 ? (
-          <p style={{ color: '#888', marginBottom: 32 }}>More events will appear here as they are published.</p>
+          <p className="mb-8 text-neutral-500">More events will appear here as they are published.</p>
         ) : (
-          <p style={{ color: '#888', marginBottom: 32 }}>No upcoming events right now.</p>
+          <p className="mb-8 text-neutral-500">No upcoming events right now.</p>
         )}
 
         {pastEvents.length > 0 && (
-          <div style={{ marginTop: 48 }}>
-            <h2 style={{ marginBottom: 16, color: '#666', fontSize: 20, fontWeight: 700 }}>Past Events</h2>
+          <div className="mt-16">
+            <h2 className="mb-6 font-display text-3xl font-extrabold uppercase tracking-tight text-neutral-500">
+              Past events
+            </h2>
             <EventList events={pastEvents} showFilters={false} favoriteIds={favoriteIds} />
           </div>
         )}

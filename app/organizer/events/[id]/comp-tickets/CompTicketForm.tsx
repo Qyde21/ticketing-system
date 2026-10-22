@@ -18,8 +18,8 @@ interface CompEntry {
 }
 
 const inputClass =
-  'w-full bg-gray-900 border border-gray-800 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500 placeholder:text-gray-500';
-const labelClass = 'block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2';
+  'w-full bg-neutral-950 border border-white/10 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500 placeholder:text-neutral-500';
+const labelClass = 'block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2';
 
 export default function CompTicketForm({
   eventId,
@@ -112,10 +112,10 @@ export default function CompTicketForm({
   return (
     <div className="max-w-xl mx-auto py-12 px-4 text-white space-y-6">
       <div>
-        <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">
+        <h1 className="text-3xl font-extrabold text-white">
           Complimentary Tickets
         </h1>
-        <p className="text-gray-400 text-sm mt-1">{eventTitle}</p>
+        <p className="text-neutral-400 text-sm mt-1">{eventTitle}</p>
         <a href={`/organizer/events/${eventId}/edit`} className="text-indigo-400 hover:text-cyan-400 text-sm">
           &larr; Back to event
         </a>
@@ -128,7 +128,7 @@ export default function CompTicketForm({
       )}
 
       {ticketTypes.length === 0 ? (
-        <p className="text-gray-400 text-sm">This event has no ticket types yet — add one from the event editor first.</p>
+        <p className="text-neutral-400 text-sm">This event has no ticket types yet — add one from the event editor first.</p>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
@@ -197,14 +197,14 @@ export default function CompTicketForm({
           <h2 className="text-lg font-bold text-white mb-3">Recently Issued</h2>
           <div className="space-y-2">
             {recentComps.map((c) => (
-              <div key={c.id} className="bg-gray-900 border border-gray-800 rounded-xl p-3 text-sm">
+              <div key={c.id} className="bg-neutral-950 border border-white/10 rounded-xl p-3 text-sm">
                 <div className="flex justify-between items-start gap-3">
                   <div className="min-w-0">
                     <p className="text-white font-semibold truncate">{c.name} · {c.quantity} ticket{c.quantity > 1 ? 's' : ''}</p>
-                    <p className="text-gray-500 text-xs truncate">{c.email}</p>
-                    {c.note && <p className="text-gray-400 text-xs mt-1">{c.note}</p>}
+                    <p className="text-neutral-500 text-xs truncate">{c.email}</p>
+                    {c.note && <p className="text-neutral-400 text-xs mt-1">{c.note}</p>}
                   </div>
-                  <span className="text-gray-500 text-xs flex-shrink-0">
+                  <span className="text-neutral-500 text-xs flex-shrink-0">
                     {new Date(c.createdAt).toLocaleDateString()}
                   </span>
                 </div>

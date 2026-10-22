@@ -77,7 +77,7 @@ export default async function CheckoutPage({ params }: { params: Promise<{ slug:
         </Link>
       </div>
 
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6">
+      <div className="bg-neutral-950 border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6">
         <div>
           <span className="text-xs uppercase tracking-wider font-bold text-indigo-400 bg-indigo-950/60 px-3 py-1 rounded-full border border-indigo-800/50">
             Checkout
@@ -85,8 +85,8 @@ export default async function CheckoutPage({ params }: { params: Promise<{ slug:
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white mt-3">{event.title}</h1>
         </div>
 
-        <div className="bg-gray-950 border border-gray-800 rounded-xl p-4 space-y-3">
-          <div className="flex justify-between items-center pb-3 border-b border-gray-800">
+        <div className="bg-black border border-white/10 rounded-xl p-4 space-y-3">
+          <div className="flex justify-between items-center pb-3 border-b border-white/10">
             <div>
               <h3 className="font-bold text-lg text-white">{ticketType.name} Ticket</h3>
               {remaining <= 0 ? (
@@ -94,7 +94,7 @@ export default async function CheckoutPage({ params }: { params: Promise<{ slug:
               ) : remaining <= 10 || (total > 0 && remaining / total <= 0.1) ? (
                 <p className="text-xs text-amber-400 font-semibold">Almost sold out</p>
               ) : (
-                <p className="text-xs text-gray-400">Tickets available</p>
+                <p className="text-xs text-neutral-400">Tickets available</p>
               )}
             </div>
             <span className="text-cyan-400 font-extrabold text-lg">
@@ -102,7 +102,7 @@ export default async function CheckoutPage({ params }: { params: Promise<{ slug:
             </span>
           </div>
 
-          <div className="text-xs text-gray-400 space-y-1">
+          <div className="text-xs text-neutral-400 space-y-1">
             <p><strong>Venue:</strong> {event.venue_name || 'TBD'}</p>
             <p><strong>Date:</strong> {event.start_at ? new Date(event.start_at).toLocaleString() : 'TBD'}</p>
           </div>

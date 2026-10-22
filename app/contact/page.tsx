@@ -33,19 +33,19 @@ export default function ContactPage() {
     }
   }
 
-  const inputClass = 'w-full bg-gray-950 border border-gray-800 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition';
-  const labelClass = 'block text-xs font-semibold text-gray-300 mb-1.5';
+  const inputClass = 'w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-indigo-500 transition';
+  const labelClass = 'block text-xs font-semibold text-neutral-300 mb-1.5';
 
   return (
     <div className="max-w-xl mx-auto px-6 py-16 text-white">
       <h1 className="text-3xl font-extrabold mb-2">Contact Us</h1>
-      <p className="text-gray-400 mb-8">We typically respond within 24 hours. You can also reach us instantly on WhatsApp.</p>
+      <p className="text-neutral-400 mb-8">We typically respond within 24 hours. You can also reach us instantly on WhatsApp.</p>
 
       <div className="flex gap-3 mb-8 flex-wrap">
         <a href="https://wa.me/254114525941" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white py-2.5 px-5 rounded-lg font-semibold text-sm" style={{ background: '#25D366' }}>
           WhatsApp Support
         </a>
-        <a href="mailto:tickethub199@gmail.com" className="inline-flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-white py-2.5 px-5 rounded-lg font-semibold text-sm transition">
+        <a href="mailto:tickethub199@gmail.com" className="inline-flex items-center gap-2 bg-neutral-900 hover:bg-neutral-800 text-white py-2.5 px-5 rounded-lg font-semibold text-sm transition">
           tickethub199@gmail.com
         </a>
       </div>
@@ -56,7 +56,7 @@ export default function ContactPage() {
           <p className="text-green-300 text-sm">Thank you for reaching out. We will get back to you within 24 hours.</p>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="bg-neutral-950 border border-white/10 rounded-2xl p-6 flex flex-col gap-4">
           <div>
             <label className={labelClass}>Full name</label>
             <input value={name} onChange={(e) => setName(e.target.value)} required placeholder="Your name" className={inputClass} />

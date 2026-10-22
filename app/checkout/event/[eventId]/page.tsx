@@ -44,7 +44,7 @@ export default async function EventCheckoutPage({
           ← Back to Event
         </Link>
         <h1 className="text-2xl font-extrabold mt-4 mb-2">No tickets selected</h1>
-        <p className="text-gray-400 text-sm">Go back to the event page and choose quantities for one or more tiers.</p>
+        <p className="text-neutral-400 text-sm">Go back to the event page and choose quantities for one or more tiers.</p>
       </main>
     );
   }
@@ -98,7 +98,7 @@ export default async function EventCheckoutPage({
           ← Back to Event
         </Link>
         <h1 className="text-2xl font-extrabold mt-4 mb-2">Tickets unavailable</h1>
-        <p className="text-gray-400 text-sm">Those tiers are sold out or invalid. Pick again on the event page.</p>
+        <p className="text-neutral-400 text-sm">Those tiers are sold out or invalid. Pick again on the event page.</p>
       </main>
     );
   }
@@ -109,7 +109,7 @@ export default async function EventCheckoutPage({
         ← Back to Event
       </Link>
       <h1 className="text-2xl font-extrabold mt-4 mb-1">Checkout</h1>
-      <p className="text-gray-400 text-sm mb-6">{event.title}</p>
+      <p className="text-neutral-400 text-sm mb-6">{event.title}</p>
       <MultiCheckoutForm event={{ id: event.id, title: event.title }} lines={lines} />
     </main>
   );

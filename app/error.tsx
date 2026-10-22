@@ -20,19 +20,19 @@ export default function ErrorPage({
         !
       </div>
       <h1 className="text-2xl font-bold mb-3">Something went wrong</h1>
-      <p className="text-gray-400 mb-8">
+      <p className="text-neutral-400 mb-8">
         An unexpected error occurred. You can try again, or head back to the homepage. If this keeps happening, please contact support.
       </p>
       <div className="flex flex-wrap items-center justify-center gap-3">
         <button
           onClick={() => reset()}
-          className="bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-bold py-3 px-6 rounded-lg transition shadow-lg"
+          className="font-bold py-3 px-6 rounded-full transition bg-white text-black hover:bg-neutral-200"
         >
           Try Again
         </button>
         <Link
           href="/"
-          className="bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition"
+          className="bg-neutral-900 hover:bg-neutral-800 border border-white/15 text-white font-semibold py-3 px-6 rounded-lg transition"
         >
           Back to Home
         </Link>

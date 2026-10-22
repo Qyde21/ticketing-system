@@ -154,11 +154,11 @@ export default function StaffManager({
   }
   return (
     <div className="space-y-6">
-      <form onSubmit={handleInvite} className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-3">
-        <h2 className="text-sm font-bold uppercase tracking-wider text-gray-400">
+      <form onSubmit={handleInvite} className="bg-neutral-950 border border-white/10 rounded-2xl p-5 space-y-3">
+        <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-400">
           Invite staff by email
         </h2>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-neutral-500">
           Paste one or many emails (comma, space, or new line). Each person must already have a
           TicketHub account. We email them the scanner link automatically.
         </p>
@@ -167,7 +167,7 @@ export default function StaffManager({
           onChange={(e) => setEmailsText(e.target.value)}
           placeholder={'staff1@example.com\nstaff2@example.com\nstaff3@example.com'}
           rows={4}
-          className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-white font-mono"
+          className="w-full bg-black border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white font-mono"
         />
         <button
           type="submit"
@@ -179,10 +179,10 @@ export default function StaffManager({
         {error && <p className="text-red-400 text-sm">{error}</p>}
         {message && <p className="text-emerald-400 text-sm">{message}</p>}
         {results && results.length > 0 && (
-          <ul className="text-xs space-y-1 mt-2 border-t border-gray-800 pt-3">
+          <ul className="text-xs space-y-1 mt-2 border-t border-white/10 pt-3">
             {results.map((r) => (
               <li key={r.email} className="flex flex-wrap gap-x-2">
-                <span className="text-gray-300 font-mono">{r.email}</span>
+                <span className="text-neutral-300 font-mono">{r.email}</span>
                 <span
                   className={
                     r.status === 'added'
@@ -204,21 +204,21 @@ export default function StaffManager({
         )}
       </form>
       <div>
-        <h2 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-3">
+        <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-400 mb-3">
           Current staff ({staff.length})
         </h2>
         {staff.length === 0 ? (
-          <p className="text-gray-500 text-sm">No staff yet.</p>
+          <p className="text-neutral-500 text-sm">No staff yet.</p>
         ) : (
           <ul className="space-y-2">
             {staff.map((s) => (
               <li
                 key={s.id}
-                className="flex items-center justify-between gap-3 bg-gray-900 border border-gray-800 rounded-xl px-4 py-3"
+                className="flex items-center justify-between gap-3 bg-neutral-950 border border-white/10 rounded-xl px-4 py-3"
               >
                 <div>
                   <p className="font-semibold text-white text-sm">{s.full_name}</p>
-                  <p className="text-xs text-gray-400">{s.email}</p>
+                  <p className="text-xs text-neutral-400">{s.email}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <button

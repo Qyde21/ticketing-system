@@ -35,8 +35,8 @@ export default async function EventStaffPage({ params }: { params: Promise<{ id:
           &larr; Back to dashboard
         </Link>
         <h1 className="text-2xl font-extrabold mt-2 mb-1">Door staff</h1>
-        <p className="text-gray-400 text-sm mb-4">{event.title}</p>
-        <div className="rounded-xl border border-gray-700 bg-gray-900 px-4 py-4 text-sm text-gray-300">
+        <p className="text-neutral-400 text-sm mb-4">{event.title}</p>
+        <div className="rounded-xl border border-white/15 bg-neutral-950 px-4 py-4 text-sm text-neutral-300">
           {reason} Door staff invites and scanning are closed.
         </div>
       </div>
@@ -57,7 +57,7 @@ export default async function EventStaffPage({ params }: { params: Promise<{ id:
         &larr; Back to dashboard
       </Link>
       <h1 className="text-2xl font-extrabold mt-2 mb-1">Door staff</h1>
-      <p className="text-gray-400 text-sm mb-6">{event.title}</p>
+      <p className="text-neutral-400 text-sm mb-6">{event.title}</p>
       <StaffManager eventId={event.id} initialStaff={staff as any} />
     </div>
   );

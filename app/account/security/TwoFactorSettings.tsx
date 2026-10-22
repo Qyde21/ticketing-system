@@ -88,16 +88,16 @@ export default function TwoFactorSettings({ initialEnabled }: { initialEnabled: 
     }
   }
 
-  const inputClass = 'w-full bg-gray-950 border border-gray-800 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition';
+  const inputClass = 'w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-indigo-500 transition';
 
   if (step === 'backup-codes') {
     return (
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+      <div className="bg-neutral-950 border border-white/10 rounded-2xl p-6">
         <h2 className="text-lg font-bold text-emerald-400 mb-2">2FA Enabled!</h2>
-        <p className="text-sm text-gray-300 mb-4">
+        <p className="text-sm text-neutral-300 mb-4">
           Save these backup codes somewhere safe. Each one can be used once to log in if you lose access to your authenticator app. They won&apos;t be shown again.
         </p>
-        <div className="bg-gray-950 border border-gray-800 rounded-xl p-4 grid grid-cols-2 gap-2 font-mono text-sm text-white mb-4">
+        <div className="bg-black border border-white/10 rounded-xl p-4 grid grid-cols-2 gap-2 font-mono text-sm text-white mb-4">
           {backupCodes.map((c) => (
             <div key={c}>{c}</div>
           ))}
@@ -114,16 +114,16 @@ export default function TwoFactorSettings({ initialEnabled }: { initialEnabled: 
 
   if (step === 'qr') {
     return (
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+      <div className="bg-neutral-950 border border-white/10 rounded-2xl p-6">
         <h2 className="text-lg font-bold text-white mb-3">Scan this QR code</h2>
-        <p className="text-sm text-gray-400 mb-4">
+        <p className="text-sm text-neutral-400 mb-4">
           Use Google Authenticator, Authy, or any TOTP app to scan this code, then enter the 6-digit code it generates.
         </p>
         <div className="bg-white p-4 rounded-xl inline-block mb-4">
           <QRCodeSVG value={otpauthUrl} size={180} />
         </div>
-        <p className="text-xs text-gray-500 mb-4">
-          Can&apos;t scan? Enter this code manually: <span className="font-mono text-gray-300">{secret}</span>
+        <p className="text-xs text-neutral-500 mb-4">
+          Can&apos;t scan? Enter this code manually: <span className="font-mono text-neutral-300">{secret}</span>
         </p>
         <form onSubmit={handleVerifySetup} className="flex flex-col gap-3">
           <input
@@ -147,7 +147,7 @@ export default function TwoFactorSettings({ initialEnabled }: { initialEnabled: 
             <button
               type="button"
               onClick={() => { setStep('idle'); setError(''); }}
-              className="bg-gray-800 hover:bg-gray-700 text-gray-300 px-5 py-2.5 rounded-lg text-sm transition"
+              className="bg-neutral-900 hover:bg-neutral-800 text-neutral-300 px-5 py-2.5 rounded-lg text-sm transition"
             >
               Cancel
             </button>
@@ -159,9 +159,9 @@ export default function TwoFactorSettings({ initialEnabled }: { initialEnabled: 
 
   if (step === 'disable') {
     return (
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+      <div className="bg-neutral-950 border border-white/10 rounded-2xl p-6">
         <h2 className="text-lg font-bold text-white mb-3">Disable Two-Factor Authentication</h2>
-        <p className="text-sm text-gray-400 mb-4">Enter your password to confirm.</p>
+        <p className="text-sm text-neutral-400 mb-4">Enter your password to confirm.</p>
         <form onSubmit={handleDisable} className="flex flex-col gap-3">
           <input
             type="password"
@@ -183,7 +183,7 @@ export default function TwoFactorSettings({ initialEnabled }: { initialEnabled: 
             <button
               type="button"
               onClick={() => { setStep('idle'); setError(''); setPassword(''); }}
-              className="bg-gray-800 hover:bg-gray-700 text-gray-300 px-5 py-2.5 rounded-lg text-sm transition"
+              className="bg-neutral-900 hover:bg-neutral-800 text-neutral-300 px-5 py-2.5 rounded-lg text-sm transition"
             >
               Cancel
             </button>
@@ -194,7 +194,7 @@ export default function TwoFactorSettings({ initialEnabled }: { initialEnabled: 
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+    <div className="bg-neutral-950 border border-white/10 rounded-2xl p-6">
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-lg font-bold text-white">Two-Factor Authentication</h2>
         <span
@@ -202,20 +202,20 @@ export default function TwoFactorSettings({ initialEnabled }: { initialEnabled: 
             'text-xs font-semibold px-2.5 py-1 rounded-full ' +
             (enabled
               ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/50'
-              : 'bg-gray-800 text-gray-400 border border-gray-700')
+              : 'bg-neutral-900 text-neutral-400 border border-white/15')
           }
         >
           {enabled ? 'Enabled' : 'Disabled'}
         </span>
       </div>
-      <p className="text-sm text-gray-400 mb-4">
+      <p className="text-sm text-neutral-400 mb-4">
         Add an extra layer of security to your account with an authenticator app.
       </p>
       {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
       {enabled ? (
         <button
           onClick={() => setStep('disable')}
-          className="bg-gray-800 hover:bg-gray-700 text-gray-300 px-5 py-2.5 rounded-lg font-semibold text-sm transition"
+          className="bg-neutral-900 hover:bg-neutral-800 text-neutral-300 px-5 py-2.5 rounded-lg font-semibold text-sm transition"
         >
           Disable 2FA
         </button>

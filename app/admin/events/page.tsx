@@ -50,12 +50,12 @@ export default async function AdminEventsPage({ searchParams }: { searchParams: 
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-8 text-white">
-      <div className="flex justify-between items-center mb-8 pb-4 border-b border-gray-800">
+      <div className="flex justify-between items-center mb-8 pb-4 border-b border-white/10">
         <div>
-          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">
+          <h1 className="text-3xl font-extrabold text-white">
             {organizerName ? `Events Hosted by ${organizerName}` : 'All System Events'}
           </h1>
-          <p className="text-gray-400 text-sm mt-1">
+          <p className="text-neutral-400 text-sm mt-1">
             {organizerId ? 'Showing filtered events for this specific organizer.' : 'Manage and review all platform events'}
           </p>
         </div>
@@ -63,19 +63,19 @@ export default async function AdminEventsPage({ searchParams }: { searchParams: 
           {organizerId && (
             <Link
               href="/admin/organizers"
-              className="bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold px-4 py-2 rounded-xl text-xs transition"
+              className="bg-neutral-900 hover:bg-neutral-800 text-neutral-300 font-semibold px-4 py-2 rounded-xl text-xs transition"
             >
               ← Back to Organizers
             </Link>
           )}
-          <div className="bg-gray-900 border border-gray-800 px-4 py-2 rounded-xl text-sm text-gray-300 shadow">
+          <div className="bg-neutral-950 border border-white/10 px-4 py-2 rounded-xl text-sm text-neutral-300 shadow">
             Total Events: <strong className="text-cyan-400">{events.length}</strong>
           </div>
         </div>
       </div>
 
       {events.length === 0 ? (
-        <div className="text-center py-16 bg-gray-900 border border-gray-800 rounded-2xl shadow-xl text-gray-400">
+        <div className="text-center py-16 bg-neutral-950 border border-white/10 rounded-2xl shadow-xl text-neutral-400">
           No events found for this organizer.
         </div>
       ) : (
@@ -91,17 +91,17 @@ export default async function AdminEventsPage({ searchParams }: { searchParams: 
                 ? 'Pending Review'
                 : (ev.status || 'draft');
             const badgeClass = isCompleted
-              ? 'bg-gray-800 text-gray-300 border border-gray-600'
+              ? 'bg-neutral-900 text-neutral-300 border border-neutral-600'
               : ev.status === 'published'
                 ? 'bg-green-950 text-green-400 border border-green-800'
                 : ev.status === 'pending_review'
                   ? 'bg-amber-950 text-amber-400 border border-amber-800'
                   : ev.status === 'cancelled'
                     ? 'bg-red-950 text-red-400 border border-red-800'
-                    : 'bg-gray-800 text-gray-400 border border-gray-700';
+                    : 'bg-neutral-900 text-neutral-400 border border-white/15';
 
             return (
-              <div key={ev.id} className="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-xl flex flex-col justify-between space-y-4">
+              <div key={ev.id} className="bg-neutral-950 border border-white/10 rounded-2xl p-5 shadow-xl flex flex-col justify-between space-y-4">
                 <div>
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="text-lg font-bold text-white line-clamp-1">{ev.title}</h3>
@@ -110,12 +110,12 @@ export default async function AdminEventsPage({ searchParams }: { searchParams: 
                     </span>
                   </div>
                   <p className="text-xs text-indigo-300 mb-2">Organizer: {ev.organizer_name || ev.organizer_email || 'Unknown'}</p>
-                  <p className="text-xs text-gray-400 line-clamp-2">{ev.description}</p>
+                  <p className="text-xs text-neutral-400 line-clamp-2">{ev.description}</p>
                 </div>
 
-                <div className="pt-3 border-t border-gray-800 space-y-3">
-                  <p className="text-xs text-gray-400">{ev.start_at ? new Date(ev.start_at).toLocaleDateString() : 'Date TBD'}</p>
-                  <div className="flex justify-between items-center text-xs text-gray-400">
+                <div className="pt-3 border-t border-white/10 space-y-3">
+                  <p className="text-xs text-neutral-400">{ev.start_at ? new Date(ev.start_at).toLocaleDateString() : 'Date TBD'}</p>
+                  <div className="flex justify-between items-center text-xs text-neutral-400">
                     <Link
                       href={`/organizer/events/${ev.id}/edit`}
                       className="text-indigo-300 hover:underline font-semibold"

@@ -112,7 +112,7 @@ export default async function OrganizerProfilePage({
         )}
       </div>
       {memberSince && (
-        <p className="text-gray-400 text-sm mb-10">Organizing events on TicketHub since {memberSince}</p>
+        <p className="text-neutral-400 text-sm mb-10">Organizing events on TicketHub since {memberSince}</p>
       )}
       {!memberSince && <div className="mb-10" />}
 
@@ -122,7 +122,7 @@ export default async function OrganizerProfilePage({
           <EventList events={upcomingEvents} showFilters={false} />
         </div>
       ) : (
-        <p className="text-gray-400 mb-12">No upcoming events right now.</p>
+        <p className="text-neutral-400 mb-12">No upcoming events right now.</p>
       )}
 
       {pastEvents.length > 0 && (

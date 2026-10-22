@@ -75,10 +75,10 @@ export default async function OrganizerDashboardPage() {
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-8 text-white">
-      <div className="flex justify-between items-center mb-8 pb-4 border-b border-gray-800">
+      <div className="flex justify-between items-center mb-8 pb-4 border-b border-white/10">
         <div>
-          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Events & Ticket Inventory Analytics</h1>
-          <p className="text-gray-400 text-sm mt-1">Real-time status breakdown and ticket sales overview</p>
+          <h1 className="text-3xl font-extrabold text-white">Events & Ticket Inventory Analytics</h1>
+          <p className="text-neutral-400 text-sm mt-1">Real-time status breakdown and ticket sales overview</p>
         </div>
         {isSuspended ? (
           <span
@@ -120,15 +120,15 @@ export default async function OrganizerDashboardPage() {
         <div className="mb-10">
           <h2 className="text-lg font-bold text-white mb-4">Overview — All Events</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div className="bg-gray-900 p-6 rounded-lg border border-gray-800 shadow-lg">
+            <div className="bg-neutral-950 p-6 rounded-lg border border-white/10 shadow-lg">
               <p className="text-indigo-300 font-medium text-sm">Total Revenue (all events)</p>
               <p className="text-2xl font-bold text-cyan-400 mt-2">KES {totalRevenueAllEvents.toLocaleString()}</p>
             </div>
-            <div className="bg-gray-900 p-6 rounded-lg border border-gray-800 shadow-lg">
+            <div className="bg-neutral-950 p-6 rounded-lg border border-white/10 shadow-lg">
               <p className="text-indigo-300 font-medium text-sm">Total Tickets Sold</p>
               <p className="text-2xl font-bold text-emerald-400 mt-2">{totalTicketsAllEvents.toLocaleString()}</p>
             </div>
-            <div className="bg-gray-900 p-6 rounded-lg border border-gray-800 shadow-lg">
+            <div className="bg-neutral-950 p-6 rounded-lg border border-white/10 shadow-lg">
               <p className="text-indigo-300 font-medium text-sm">Total Events</p>
               <p className="text-2xl font-bold text-amber-400 mt-2">{events.length}</p>
             </div>
@@ -137,21 +137,21 @@ export default async function OrganizerDashboardPage() {
           <SalesTrendChart orders={overviewOrders as any} />
 
           {topEvents.length > 0 && (
-            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+            <div className="bg-neutral-950 border border-white/10 rounded-2xl p-6">
               <h3 className="text-base font-bold text-indigo-300 mb-4">Top Performing Events</h3>
               <div className="space-y-2">
                 {topEvents.map((e: any, i: number) => (
                   <Link
                     key={e.id}
                     href={`/organizer/events/${e.id}/analytics`}
-                    className="flex items-center justify-between gap-3 bg-gray-950/60 hover:bg-gray-800/60 border border-gray-800 rounded-xl px-4 py-3 transition"
+                    className="flex items-center justify-between gap-3 bg-black/60 hover:bg-neutral-900/60 border border-white/10 rounded-xl px-4 py-3 transition"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <span className="text-gray-500 font-bold text-sm w-5 shrink-0">{i + 1}</span>
+                      <span className="text-neutral-500 font-bold text-sm w-5 shrink-0">{i + 1}</span>
                       <span className="text-white font-semibold text-sm truncate">{e.title}</span>
                     </div>
                     <div className="flex items-center gap-4 shrink-0 text-sm">
-                      <span className="text-gray-400">{Number(e.tickets_sold).toLocaleString()} sold</span>
+                      <span className="text-neutral-400">{Number(e.tickets_sold).toLocaleString()} sold</span>
                       <span className="text-emerald-400 font-bold">KES {Number(e.revenue).toLocaleString()}</span>
                     </div>
                   </Link>
@@ -163,7 +163,7 @@ export default async function OrganizerDashboardPage() {
       )}
 
       {events.length === 0 ? (
-        <div className="text-center py-16 bg-gray-900 border border-gray-800 rounded-2xl shadow-xl text-gray-400">
+        <div className="text-center py-16 bg-neutral-950 border border-white/10 rounded-2xl shadow-xl text-neutral-400">
           No events found.
         </div>
       ) : (
@@ -188,8 +188,8 @@ export default async function OrganizerDashboardPage() {
 
 
             return (
-              <div key={event.id} className="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl space-y-4">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-800 pb-4">
+              <div key={event.id} className="bg-neutral-950 border border-white/10 rounded-2xl p-6 shadow-xl space-y-4">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-white/10 pb-4">
                   <div>
                     <div className="flex items-center gap-3">
                       <h2 className="text-xl font-bold text-white">{event.title}</h2>
@@ -200,7 +200,7 @@ export default async function OrganizerDashboardPage() {
                         const isCompleted = event.status === 'completed' || eventEnded;
                         if (isCompleted) {
                           return (
-                            <span className="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider bg-gray-800 text-gray-300 border border-gray-600">
+                            <span className="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider bg-neutral-900 text-neutral-300 border border-neutral-600">
                               Completed
                             </span>
                           );
@@ -210,52 +210,52 @@ export default async function OrganizerDashboardPage() {
                             event.status === 'published' ? 'bg-green-950 text-green-400 border border-green-800'
                             : event.status === 'pending_review' ? 'bg-amber-950 text-amber-400 border border-amber-800'
                             : event.status === 'cancelled' ? 'bg-red-950 text-red-400 border border-red-800'
-                            : 'bg-gray-800 text-gray-400'
+                            : 'bg-neutral-900 text-neutral-400'
                           }`}>
                             {event.status === 'pending_review' ? 'Pending Review' : event.status}
                           </span>
                         );
                       })()}
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">Created: {new Date(event.created_at).toLocaleDateString()}</p>
+                    <p className="text-xs text-neutral-500 mt-1">Created: {new Date(event.created_at).toLocaleDateString()}</p>
                   </div>
 
                   <div className="flex items-center gap-6 text-right">
                     <div>
-                      <span className="text-xs text-gray-400 block">Revenue</span>
+                      <span className="text-xs text-neutral-400 block">Revenue</span>
                       <span className="text-lg font-extrabold text-cyan-400">KES {totalRevenue.toLocaleString()}</span>
                     </div>
                     <div>
-                      <span className="text-xs text-gray-400 block">Tickets Sold</span>
+                      <span className="text-xs text-neutral-400 block">Tickets Sold</span>
                       <span className="text-lg font-extrabold text-emerald-400">{totalTicketsSold} / {totalInventory || '∞'}</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-indigo-400 pt-1">
-                  <Link href={`/organizer/events/${event.id}/orders`} className="hover:underline text-cyan-300 bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Orders</Link>
-                  <Link href={`/organizer/events/${event.id}/analytics`} className="hover:underline text-cyan-300 bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Analytics</Link>
+                  <Link href={`/organizer/events/${event.id}/orders`} className="hover:underline text-cyan-300 bg-neutral-900/60 px-3 py-1.5 rounded-lg border border-white/15">Orders</Link>
+                  <Link href={`/organizer/events/${event.id}/analytics`} className="hover:underline text-cyan-300 bg-neutral-900/60 px-3 py-1.5 rounded-lg border border-white/15">Analytics</Link>
 {eventEnded ? (
-                    <span className="text-gray-600 bg-gray-900/60 px-3 py-1.5 rounded-lg border border-gray-800 cursor-not-allowed" title="Flash sales are disabled after the event has ended">Flash Sales</span>
+                    <span className="text-neutral-600 bg-neutral-950/60 px-3 py-1.5 rounded-lg border border-white/10 cursor-not-allowed" title="Flash sales are disabled after the event has ended">Flash Sales</span>
                   ) : (
-                    <Link href={`/organizer/events/${event.id}/flash-sales`} className="hover:underline text-amber-300 bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Flash Sales</Link>
+                    <Link href={`/organizer/events/${event.id}/flash-sales`} className="hover:underline text-amber-300 bg-neutral-900/60 px-3 py-1.5 rounded-lg border border-white/15">Flash Sales</Link>
                   )}
-                  <Link href={`/organizer/events/${event.id}/edit`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Manage Details</Link>
-                  <Link href={`/organizer/events/${event.id}/comp-tickets`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Comp Tickets</Link>
-                  <Link href={`/organizer/events/${event.id}/messages`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Messages</Link>
-                  <Link href={`/organizer/events/${event.id}/scan-overview`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Scan Overview</Link>
+                  <Link href={`/organizer/events/${event.id}/edit`} className="hover:underline bg-neutral-900/60 px-3 py-1.5 rounded-lg border border-white/15">Manage Details</Link>
+                  <Link href={`/organizer/events/${event.id}/comp-tickets`} className="hover:underline bg-neutral-900/60 px-3 py-1.5 rounded-lg border border-white/15">Comp Tickets</Link>
+                  <Link href={`/organizer/events/${event.id}/messages`} className="hover:underline bg-neutral-900/60 px-3 py-1.5 rounded-lg border border-white/15">Messages</Link>
+                  <Link href={`/organizer/events/${event.id}/scan-overview`} className="hover:underline bg-neutral-900/60 px-3 py-1.5 rounded-lg border border-white/15">Scan Overview</Link>
                   {eventEnded ? (
-                    <span className="text-gray-600 bg-gray-900/60 px-3 py-1.5 rounded-lg border border-gray-800 cursor-not-allowed" title="Shifts closed after event ended">Shifts</span>
+                    <span className="text-neutral-600 bg-neutral-950/60 px-3 py-1.5 rounded-lg border border-white/10 cursor-not-allowed" title="Shifts closed after event ended">Shifts</span>
                   ) : (
-                    <Link href={`/organizer/events/${event.id}/shifts`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Shifts</Link>
+                    <Link href={`/organizer/events/${event.id}/shifts`} className="hover:underline bg-neutral-900/60 px-3 py-1.5 rounded-lg border border-white/15">Shifts</Link>
                   )}
-                  <Link href={`/organizer/events/${event.id}/staff`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Door staff</Link>
+                  <Link href={`/organizer/events/${event.id}/staff`} className="hover:underline bg-neutral-900/60 px-3 py-1.5 rounded-lg border border-white/15">Door staff</Link>
                   {eventEnded ? (
-                    <span className="text-gray-600 bg-gray-900/60 px-3 py-1.5 rounded-lg border border-gray-800 cursor-not-allowed" title="Promo codes are disabled after the event has ended">Promo Codes</span>
+                    <span className="text-neutral-600 bg-neutral-950/60 px-3 py-1.5 rounded-lg border border-white/10 cursor-not-allowed" title="Promo codes are disabled after the event has ended">Promo Codes</span>
                   ) : (
-                    <Link href={`/organizer/events/${event.id}/promo-codes`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Promo Codes</Link>
+                    <Link href={`/organizer/events/${event.id}/promo-codes`} className="hover:underline bg-neutral-900/60 px-3 py-1.5 rounded-lg border border-white/15">Promo Codes</Link>
                   )}
-                  <Link href={`/organizer/events/new?duplicateFrom=${event.id}`} className="hover:underline bg-gray-800/60 px-3 py-1.5 rounded-lg border border-gray-700">Duplicate</Link>
+                  <Link href={`/organizer/events/new?duplicateFrom=${event.id}`} className="hover:underline bg-neutral-900/60 px-3 py-1.5 rounded-lg border border-white/15">Duplicate</Link>
                   {event.status === 'draft' && (
                     <PublishButton eventId={event.id} />
                   )}
@@ -278,12 +278,12 @@ export default async function OrganizerDashboardPage() {
                     const progress = Math.min(100, (sold / ticket.quantity_total) * 100);
 
                     return (
-                      <div key={ticket.id} className="bg-gray-950 border border-gray-800/80 rounded-xl p-4 space-y-2">
+                      <div key={ticket.id} className="bg-black border border-neutral-800/80 rounded-xl p-4 space-y-2">
                         <div className="flex justify-between items-start">
                           <h3 className="font-semibold text-white text-sm">{ticket.name}</h3>
                           <span className="text-indigo-300 font-bold text-sm">KES {Number(ticket.price_kes).toLocaleString()}</span>
                         </div>
-                        <div className="flex justify-between text-xs text-gray-400">
+                        <div className="flex justify-between text-xs text-neutral-400">
                           <span>Sold: <strong className="text-white">{sold}</strong></span>
                           <span>Remaining: <strong className={remaining <= 0 ? 'text-red-500 font-extrabold' : 'text-white'}>{remaining}</strong></span>
                           <span>Total: <strong className="text-white">{ticket.quantity_total}</strong></span>
@@ -293,7 +293,7 @@ export default async function OrganizerDashboardPage() {
                             Sold Out
                           </span>
                         )}
-                        <div className="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden">
+                        <div className="w-full bg-neutral-900 h-1.5 rounded-full overflow-hidden">
                           <div className="bg-cyan-500 h-full rounded-full transition-all" style={{ width: `${progress}%` }} />
                         </div>
                       </div>

@@ -39,16 +39,16 @@ export default async function AdminOrganizerEventsPage({ params }: { params: Pro
       </div>
 
       <h1 className="text-2xl font-extrabold mb-1">Events by {organizer.full_name}</h1>
-      <p className="text-gray-400 text-sm mb-6">{organizer.email}</p>
+      <p className="text-neutral-400 text-sm mb-6">{organizer.email}</p>
 
       {events.length === 0 ? (
-        <p className="text-gray-400">No events found for this organizer.</p>
+        <p className="text-neutral-400">No events found for this organizer.</p>
       ) : (
         <ul className="list-none p-0 m-0">
           {events.map((e: any) => (
             <li
               key={e.id}
-              className="flex gap-4 mb-4 items-center bg-gray-900 border border-gray-800 rounded-xl p-3"
+              className="flex gap-4 mb-4 items-center bg-neutral-950 border border-white/10 rounded-xl p-3"
             >
               {/* Thumbnail */}
               <div className="w-20 h-15 rounded-lg overflow-hidden flex-shrink-0 bg-indigo-600 flex items-center justify-center" style={{ width: 80, height: 60 }}>
@@ -62,7 +62,7 @@ export default async function AdminOrganizerEventsPage({ params }: { params: Pro
               {/* Event Info & Action Buttons */}
               <div className="flex-1">
                 <strong className="text-white">{e.title}</strong>
-                <div className="text-xs text-gray-400 mt-0.5">
+                <div className="text-xs text-neutral-400 mt-0.5">
                   {e.status} &middot; {new Date(e.start_at).toLocaleDateString()}
                 </div>
 

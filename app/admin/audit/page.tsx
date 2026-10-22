@@ -27,18 +27,18 @@ export default async function AdminAuditPage() {
     <div className="max-w-4xl mx-auto py-10 px-4 text-white">
       <Link href="/admin/dashboard" className="text-sm text-indigo-400 hover:underline">&larr; Admin</Link>
       <h1 className="text-2xl font-extrabold mt-2 mb-2">Audit log</h1>
-      <p className="text-gray-400 text-sm mb-6">Recent admin actions (approvals, refunds, payouts).</p>
+      <p className="text-neutral-400 text-sm mb-6">Recent admin actions (approvals, refunds, payouts).</p>
       {rows.length === 0 ? (
-        <p className="text-gray-500 text-sm">No audit entries yet. Run migration 010 on Neon.</p>
+        <p className="text-neutral-500 text-sm">No audit entries yet. Run migration 010 on Neon.</p>
       ) : (
         <ul className="space-y-2">
           {rows.map((r) => (
-            <li key={r.id} className="bg-gray-900 border border-gray-800 rounded-lg px-3 py-2 text-sm">
+            <li key={r.id} className="bg-neutral-950 border border-white/10 rounded-lg px-3 py-2 text-sm">
               <div className="flex flex-wrap justify-between gap-2">
                 <span className="font-semibold text-amber-300">{r.action}</span>
-                <span className="text-gray-500 text-xs">{new Date(r.created_at).toLocaleString()}</span>
+                <span className="text-neutral-500 text-xs">{new Date(r.created_at).toLocaleString()}</span>
               </div>
-              <p className="text-gray-400 text-xs mt-1">
+              <p className="text-neutral-400 text-xs mt-1">
                 {r.full_name || r.email || 'system'}
                 {r.entity_type ? ` · ${r.entity_type}` : ''}
                 {r.entity_id ? ` · ${r.entity_id}` : ''}

@@ -31,9 +31,9 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
   if (!isOwner && !isAdmin) {
     return (
       <div className="max-w-lg mx-auto py-12 px-4 text-white">
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center">
+        <div className="bg-neutral-950 border border-white/10 rounded-2xl p-8 text-center">
           <p className="text-lg font-bold text-white mb-1">Access Denied</p>
-          <p className="text-sm text-gray-400">You don&apos;t have permission to edit this event.</p>
+          <p className="text-sm text-neutral-400">You don&apos;t have permission to edit this event.</p>
         </div>
       </div>
     );

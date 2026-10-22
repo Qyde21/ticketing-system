@@ -43,18 +43,18 @@ export default async function OrganizerMessagesPage({ params }: { params: Promis
     <div className="max-w-2xl mx-auto py-12 px-4 text-white">
       <Link href="/organizer/dashboard" className="text-sm text-indigo-400 hover:text-cyan-400">Back to dashboard</Link>
       <h1 className="text-3xl font-extrabold mt-2 mb-1">Messages — {event.title}</h1>
-      <p className="text-gray-400 text-sm mb-8">{buyers.length} ticket buyer(s)</p>
+      <p className="text-neutral-400 text-sm mb-8">{buyers.length} ticket buyer(s)</p>
 
       <MessageComposer eventId={event.id} buyers={buyers as any} />
 
       <h2 className="text-xl font-bold text-white mt-10 mb-4">Message History</h2>
-      {messages.length === 0 && <p className="text-gray-400">No messages yet.</p>}
+      {messages.length === 0 && <p className="text-neutral-400">No messages yet.</p>}
       <ul className="space-y-3">
         {messages.map((m: any) => (
-          <li key={m.id} className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+          <li key={m.id} className="bg-neutral-950 border border-white/10 rounded-xl p-4">
             <div className="flex justify-between items-center mb-1.5">
               <span className="text-sm font-bold text-white">{m.sender_name}</span>
-              <span className="text-xs text-gray-500">{new Date(m.created_at).toLocaleString()}</span>
+              <span className="text-xs text-neutral-500">{new Date(m.created_at).toLocaleString()}</span>
             </div>
             {m.is_broadcast && (
               <span className="text-xs bg-indigo-950 text-indigo-300 border border-indigo-800 px-2 py-0.5 rounded-full font-semibold mb-1.5 inline-block">
@@ -62,11 +62,11 @@ export default async function OrganizerMessagesPage({ params }: { params: Promis
               </span>
             )}
             {!m.is_broadcast && m.recipient_name && (
-              <span className="text-xs bg-gray-800 text-gray-300 px-2 py-0.5 rounded-full mb-1.5 inline-block">
+              <span className="text-xs bg-neutral-900 text-neutral-300 px-2 py-0.5 rounded-full mb-1.5 inline-block">
                 To: {m.recipient_name}
               </span>
             )}
-            <p className="text-sm text-gray-300 leading-relaxed mt-1.5">{m.body}</p>
+            <p className="text-sm text-neutral-300 leading-relaxed mt-1.5">{m.body}</p>
           </li>
         ))}
       </ul>

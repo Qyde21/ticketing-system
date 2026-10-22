@@ -104,14 +104,14 @@ export default function FlashSaleManager({ ticketTypes }: { ticketTypes: TicketT
 
   return (
     <div className="space-y-4">
-      {tiers.length === 0 && <p className="text-gray-400">No ticket tiers found for this event.</p>}
+      {tiers.length === 0 && <p className="text-neutral-400">No ticket tiers found for this event.</p>}
 
       {tiers.map((t) => {
         const active = isFlashActive(t);
         const hasFlashConfigured = !!t.flash_sale_price_kes;
 
         return (
-          <div key={t.id} className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+          <div key={t.id} className="bg-neutral-950 border border-white/10 rounded-xl p-5">
             <div className="flex items-center justify-between flex-wrap gap-3">
               <div>
                 <p className="font-bold text-white flex items-center gap-2">
@@ -122,7 +122,7 @@ export default function FlashSaleManager({ ticketTypes }: { ticketTypes: TicketT
                     </span>
                   )}
                 </p>
-                <p className="text-xs text-gray-400 mt-1">Regular price: KES {Number(t.price_kes).toLocaleString()}</p>
+                <p className="text-xs text-neutral-400 mt-1">Regular price: KES {Number(t.price_kes).toLocaleString()}</p>
                 {hasFlashConfigured && (
                   <p className="text-xs text-amber-400 font-semibold mt-1">
                     Flash price: KES {Number(t.flash_sale_price_kes).toLocaleString()}
@@ -146,7 +146,7 @@ export default function FlashSaleManager({ ticketTypes }: { ticketTypes: TicketT
                 )}
                 <button
                   onClick={() => (editingId === t.id ? cancelEdit() : startEdit(t))}
-                  className="text-xs bg-gray-800 hover:bg-gray-700 text-indigo-300 border border-gray-700 px-3 py-2 rounded-lg font-semibold transition"
+                  className="text-xs bg-neutral-900 hover:bg-neutral-800 text-indigo-300 border border-white/15 px-3 py-2 rounded-lg font-semibold transition"
                 >
                   {editingId === t.id ? 'Close' : hasFlashConfigured ? 'Edit Flash Sale' : 'Start Flash Sale'}
                 </button>
@@ -154,47 +154,47 @@ export default function FlashSaleManager({ ticketTypes }: { ticketTypes: TicketT
             </div>
 
             {editingId === t.id && (
-              <div className="mt-4 pt-4 border-t border-gray-800 space-y-3">
+              <div className="mt-4 pt-4 border-t border-white/10 space-y-3">
                 {error && <p className="text-red-400 text-sm">{error}</p>}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
-                    <label className="text-xs text-gray-400 block mb-1">Flash Price (KES)</label>
+                    <label className="text-xs text-neutral-400 block mb-1">Flash Price (KES)</label>
                     <input
                       type="number"
                       min="0"
                       value={form.price}
                       onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))}
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white"
+                      className="w-full bg-neutral-900 border border-white/15 rounded-lg px-3 py-2 text-sm text-white"
                       placeholder={`< ${t.price_kes}`}
                     />
                   </div>
                   <div>
-                    <label className="text-xs text-gray-400 block mb-1">Starts</label>
+                    <label className="text-xs text-neutral-400 block mb-1">Starts</label>
                     <input
                       type="datetime-local"
                       value={form.startsAt}
                       onChange={(e) => setForm((f) => ({ ...f, startsAt: e.target.value }))}
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white"
+                      className="w-full bg-neutral-900 border border-white/15 rounded-lg px-3 py-2 text-sm text-white"
                     />
                   </div>
                   <div>
-                    <label className="text-xs text-gray-400 block mb-1">Ends</label>
+                    <label className="text-xs text-neutral-400 block mb-1">Ends</label>
                     <input
                       type="datetime-local"
                       value={form.endsAt}
                       onChange={(e) => setForm((f) => ({ ...f, endsAt: e.target.value }))}
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white"
+                      className="w-full bg-neutral-900 border border-white/15 rounded-lg px-3 py-2 text-sm text-white"
                     />
                   </div>
                 </div>
                 <div className="max-w-xs">
-                  <label className="text-xs text-gray-400 block mb-1">Quantity Cap (optional)</label>
+                  <label className="text-xs text-neutral-400 block mb-1">Quantity Cap (optional)</label>
                   <input
                     type="number"
                     min="1"
                     value={form.cap}
                     onChange={(e) => setForm((f) => ({ ...f, cap: e.target.value }))}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white"
+                    className="w-full bg-neutral-900 border border-white/15 rounded-lg px-3 py-2 text-sm text-white"
                     placeholder="e.g. 20 — leave blank for no cap"
                   />
                 </div>

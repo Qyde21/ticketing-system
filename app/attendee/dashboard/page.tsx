@@ -86,7 +86,7 @@ export default async function AttendeeDashboard() {
         <h1 className="text-3xl font-extrabold">My Tickets</h1>
         <Link
           href="/inbox"
-          className="flex items-center gap-2 bg-gray-900 hover:bg-gray-800 border border-gray-800 rounded-lg px-4 py-2 text-sm font-semibold text-white transition shrink-0"
+          className="flex items-center gap-2 bg-neutral-950 hover:bg-neutral-900 border border-white/10 rounded-lg px-4 py-2 text-sm font-semibold text-white transition shrink-0"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -99,7 +99,7 @@ export default async function AttendeeDashboard() {
           )}
         </Link>
       </div>
-      <p className="text-gray-400 text-sm mb-6">{orders.length} paid order(s)</p>
+      <p className="text-neutral-400 text-sm mb-6">{orders.length} paid order(s)</p>
 
       <div className="mb-8">
         <LoyaltyPanel
@@ -110,7 +110,7 @@ export default async function AttendeeDashboard() {
 
       {staffEvents.length > 0 && (
         <div className="mb-8">
-          <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Door Staff Access</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Door Staff Access</p>
           <ul className="space-y-2">
             {staffEvents.map((e: any) => {
               const ended =
@@ -119,17 +119,17 @@ export default async function AttendeeDashboard() {
               return (
                 <li
                   key={e.id}
-                  className="flex items-center justify-between gap-3 bg-gray-900 border border-gray-800 rounded-xl px-4 py-3"
+                  className="flex items-center justify-between gap-3 bg-neutral-950 border border-white/10 rounded-xl px-4 py-3"
                 >
                   <div>
                     <p className="font-semibold text-white text-sm">{e.title}</p>
-                    <p className="text-gray-500 text-xs">
+                    <p className="text-neutral-500 text-xs">
                       {e.venue_name}
                       {e.start_at && ` Â· ${new Date(e.start_at).toLocaleDateString('en-KE', { dateStyle: 'medium' })}`}
                     </p>
                   </div>
                   {ended ? (
-                    <span className="text-xs text-gray-500 whitespace-nowrap">Check-in closed</span>
+                    <span className="text-xs text-neutral-500 whitespace-nowrap">Check-in closed</span>
                   ) : (
                     <Link
                       href={`/scan/${e.id}`}
@@ -146,7 +146,7 @@ export default async function AttendeeDashboard() {
       )}
 
       {orders.length === 0 && (
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center text-gray-400">
+        <div className="bg-neutral-950 border border-white/10 rounded-2xl p-8 text-center text-neutral-400">
           No tickets yet. <Link href="/" className="text-indigo-400 hover:text-cyan-400">Browse events</Link>
         </div>
       )}
@@ -155,30 +155,30 @@ export default async function AttendeeDashboard() {
         {orders.map((o: any) => {
           const eventEnded = (o.end_at || o.start_at) ? new Date(o.end_at || o.start_at) < new Date() : false;
           return (
-            <li key={o.id} className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+            <li key={o.id} className="bg-neutral-950 border border-white/10 rounded-2xl overflow-hidden">
               {o.cover_image_url && (
                 <img src={o.cover_image_url} alt={o.title} className="w-full h-40 object-cover" />
               )}
               <div className="p-5">
                 <h2 className="text-lg font-bold text-white mb-1">{o.title}</h2>
-                <p className="text-gray-400 text-sm mb-1">{o.venue_name}</p>
+                <p className="text-neutral-400 text-sm mb-1">{o.venue_name}</p>
                 <p className="text-indigo-400 font-semibold text-sm mb-4">
                   {new Date(o.start_at).toLocaleString('en-KE', { dateStyle: 'full', timeStyle: 'short' })}
                 </p>
 
                 <div className="mb-3">
-                  <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">
+                  <p className="text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">
                     Your tickets ({o.tickets.length}):
                   </p>
                   {o.tickets.length === 0 ? (
-                    <p className="text-gray-500 text-sm bg-gray-950 border border-gray-800 rounded-lg px-3 py-2">
+                    <p className="text-neutral-500 text-sm bg-black border border-white/10 rounded-lg px-3 py-2">
                       All tickets from this order have been shared or transferred.
                     </p>
                   ) : (
                   <div className="flex flex-col gap-2">
                     {o.tickets.map((t: any, index: number) => (
-                      <div key={t.code} className="flex flex-wrap items-center gap-2 bg-gray-950 border border-gray-800 rounded-lg px-3 py-2">
-                        <span className="text-xs text-gray-500 min-w-[20px]">#{index + 1}</span>
+                      <div key={t.code} className="flex flex-wrap items-center gap-2 bg-black border border-white/10 rounded-lg px-3 py-2">
+                        <span className="text-xs text-neutral-500 min-w-[20px]">#{index + 1}</span>
                         <Link href={'/tickets/' + t.code} className="text-indigo-400 hover:text-cyan-400 font-semibold text-sm flex-1">
                           View Ticket
                         </Link>
@@ -189,10 +189,10 @@ export default async function AttendeeDashboard() {
                           <TransferTicketButton code={t.code} />
                         )}
                         {t.status === 'used' && (
-                          <span className="text-xs text-gray-500 whitespace-nowrap">Checked in</span>
+                          <span className="text-xs text-neutral-500 whitespace-nowrap">Checked in</span>
                         )}
                         {t.status === 'valid' && eventEnded && (
-                          <span className="text-xs text-gray-500 whitespace-nowrap">Expired</span>
+                          <span className="text-xs text-neutral-500 whitespace-nowrap">Expired</span>
                         )}
                       </div>
                     ))}
@@ -205,10 +205,10 @@ export default async function AttendeeDashboard() {
                     View on Google Maps
                   </a>
                 ) : (
-                  <p className="text-sm text-gray-500">{o.venue_name}</p>
+                  <p className="text-sm text-neutral-500">{o.venue_name}</p>
                 )}
 
-                <div className="mt-3 pt-3 border-t border-gray-800 flex justify-between text-sm text-gray-400">
+                <div className="mt-3 pt-3 border-t border-white/10 flex justify-between text-sm text-neutral-400">
                   <span>KES {Number(o.total_amount_kes).toLocaleString()} &middot; {o.quantity} ticket(s)</span>
                   <span>{new Date(o.created_at).toLocaleDateString()}</span>
                 </div>

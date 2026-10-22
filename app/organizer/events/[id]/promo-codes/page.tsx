@@ -26,7 +26,7 @@ export default async function PromoCodesPage({ params }: { params: Promise<{ id:
       <div className="max-w-2xl mx-auto py-12 px-4 text-white">
         <Link href="/organizer/dashboard" className="text-sm text-indigo-400 hover:underline">&larr; Back to dashboard</Link>
         <h1 className="text-2xl font-extrabold mt-4 mb-2">Promo Codes</h1>
-        <p className="text-gray-400">This event has ended. Promo codes can no longer be created or edited.</p>
+        <p className="text-neutral-400">This event has ended. Promo codes can no longer be created or edited.</p>
       </div>
     );
   }
@@ -44,7 +44,7 @@ export default async function PromoCodesPage({ params }: { params: Promise<{ id:
         &larr; Back to dashboard
       </Link>
       <h1 className="text-2xl font-extrabold mt-2 mb-1">Promo Codes</h1>
-      <p className="text-gray-400 text-sm mb-6">{event.title}</p>
+      <p className="text-neutral-400 text-sm mb-6">{event.title}</p>
 
       <PromoCodeManager eventId={event.id} initialCodes={codes as any} />
     </div>

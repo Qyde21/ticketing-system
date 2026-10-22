@@ -2,7 +2,7 @@ export default function PrivacyPage() {
   return (
     <div className="max-w-2xl mx-auto px-6 py-16 text-white">
       <h1 className="text-3xl font-extrabold mb-2">Privacy Policy</h1>
-      <p className="text-gray-400 text-sm mb-8">Last updated: July 2026</p>
+      <p className="text-neutral-400 text-sm mb-8">Last updated: July 2026</p>
 
       {[
         {
@@ -36,7 +36,7 @@ export default function PrivacyPage() {
       ].map((section) => (
         <section key={section.title} className="mb-7">
           <h2 className="text-lg font-bold text-white mb-2">{section.title}</h2>
-          <p className="text-gray-300" style={{ lineHeight: 1.8 }}>{section.body}</p>
+          <p className="text-neutral-300" style={{ lineHeight: 1.8 }}>{section.body}</p>
         </section>
       ))}
     </div>

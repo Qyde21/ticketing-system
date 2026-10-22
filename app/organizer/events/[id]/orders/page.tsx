@@ -25,9 +25,9 @@ export default async function EventOrdersPage({ params }: { params: Promise<{ id
     return (
       <main className="max-w-6xl mx-auto px-4 py-8 text-white">
         <h1 className="text-2xl font-bold text-red-400 mb-2">Event Not Found</h1>
-        <p className="text-gray-400">
+        <p className="text-neutral-400">
           Could not find an event matching:{' '}
-          <code className="bg-gray-800 px-2 py-1 rounded text-cyan-300">{decodedId}</code>
+          <code className="bg-neutral-900 px-2 py-1 rounded text-cyan-300">{decodedId}</code>
         </p>
         <div className="mt-6">
           <Link href="/organizer/dashboard" className="text-indigo-400 hover:underline">
@@ -62,12 +62,12 @@ export default async function EventOrdersPage({ params }: { params: Promise<{ id
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-8 text-white">
-      <div className="flex justify-between items-center mb-8 pb-4 border-b border-gray-800">
+      <div className="flex justify-between items-center mb-8 pb-4 border-b border-white/10">
         <div>
-          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">
+          <h1 className="text-3xl font-extrabold text-white">
             Orders for {event.title}
           </h1>
-          <p className="text-gray-400 text-sm mt-1">
+          <p className="text-neutral-400 text-sm mt-1">
             Review ticket purchases, customer details, and process refunds
             {eventEnded && (
               <span className="text-amber-400"> · Event ended — refunds closed</span>
@@ -77,7 +77,7 @@ export default async function EventOrdersPage({ params }: { params: Promise<{ id
         <div className="flex items-center gap-4 shrink-0">
           <a
             href={`/api/events/${event.id}/orders/export`}
-            className="inline-flex items-center gap-1.5 bg-gray-800 hover:bg-gray-700 text-white text-xs font-semibold px-3 py-2 rounded-lg border border-gray-700 transition"
+            className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-semibold px-3 py-2 rounded-lg border border-white/15 transition"
           >
             Export CSV
           </a>
@@ -88,7 +88,7 @@ export default async function EventOrdersPage({ params }: { params: Promise<{ id
       </div>
 
       {orders.length === 0 ? (
-        <div className="text-center py-16 bg-gray-900 border border-gray-800 rounded-2xl shadow-xl text-gray-400">
+        <div className="text-center py-16 bg-neutral-950 border border-white/10 rounded-2xl shadow-xl text-neutral-400">
           No orders found for this event yet.
         </div>
       ) : (
@@ -101,7 +101,7 @@ export default async function EventOrdersPage({ params }: { params: Promise<{ id
               return (
                 <div
                   key={order.id}
-                  className="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-lg flex flex-col md:flex-row gap-6 items-start md:items-center justify-between transition hover:border-gray-700"
+                  className="bg-neutral-950 border border-white/10 rounded-xl p-6 shadow-lg flex flex-col md:flex-row gap-6 items-start md:items-center justify-between transition hover:border-white/15"
                 >
                   <div>
                     <div className="flex items-center gap-3 flex-wrap">
@@ -114,14 +114,14 @@ export default async function EventOrdersPage({ params }: { params: Promise<{ id
                           (isPaid
                             ? 'bg-green-950 text-green-400 border border-green-800'
                             : order.payment_status === 'refunded'
-                              ? 'bg-gray-800 text-gray-400 border border-gray-700'
+                              ? 'bg-neutral-900 text-neutral-400 border border-white/15'
                               : 'bg-amber-950 text-amber-400 border border-amber-800')
                         }
                       >
                         {order.payment_status || 'pending'}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-neutral-400 mt-1">
                       Email:{' '}
                       <span className="text-indigo-300 font-semibold">{order.buyer_email}</span> | Ticket:{' '}
                       <span className="text-cyan-300 font-semibold">
@@ -129,14 +129,14 @@ export default async function EventOrdersPage({ params }: { params: Promise<{ id
                       </span>{' '}
                       (Qty: {order.quantity})
                     </p>
-                    <p className="text-xs text-gray-500 mt-0.5">
+                    <p className="text-xs text-neutral-500 mt-0.5">
                       Ordered on: {new Date(order.created_at).toLocaleString()}
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end pt-4 md:pt-0 border-t md:border-t-0 border-gray-800">
+                  <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end pt-4 md:pt-0 border-t md:border-t-0 border-white/10">
                     <div className="text-right">
-                      <span className="text-xs text-gray-400 block">Total Amount</span>
+                      <span className="text-xs text-neutral-400 block">Total Amount</span>
                       <span className="text-lg font-bold text-indigo-300">
                         KES {Number(order.total_amount_kes).toLocaleString()}
                       </span>
@@ -149,7 +149,7 @@ export default async function EventOrdersPage({ params }: { params: Promise<{ id
 
                     {showRefund && <RefundButton orderId={order.id} />}
                     {isPaid && eventEnded && (
-                      <span className="text-xs text-gray-500 whitespace-nowrap">Refund closed</span>
+                      <span className="text-xs text-neutral-500 whitespace-nowrap">Refund closed</span>
                     )}
                   </div>
                 </div>

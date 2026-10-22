@@ -56,11 +56,11 @@ export default async function PayoutsPage() {
           { label: 'Refunded', value: totalRefunded, color: 'text-red-400' },
           { label: 'Net earnings', value: totalNet, color: 'text-emerald-400' },
         ].map((s) => (
-          <div key={s.label} className="flex-1 min-w-[120px] bg-gray-900 border border-gray-800 rounded-xl px-4 py-3">
+          <div key={s.label} className="flex-1 min-w-[120px] bg-neutral-950 border border-white/10 rounded-xl px-4 py-3">
             <div className={`text-xl font-bold ${s.color}`}>
               KES {s.value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
             </div>
-            <div className="text-xs text-gray-400 mt-0.5">{s.label}</div>
+            <div className="text-xs text-neutral-400 mt-0.5">{s.label}</div>
           </div>
         ))}
       </div>
@@ -76,10 +76,10 @@ export default async function PayoutsPage() {
           else if (!ended) disabledReason = 'Available after event ends';
           else if (c.net < 50) disabledReason = 'Below minimum';
           return (
-            <li key={e.id as string} className="flex justify-between gap-3 items-center bg-gray-900 border border-gray-800 rounded-xl px-4 py-3">
+            <li key={e.id as string} className="flex justify-between gap-3 items-center bg-neutral-950 border border-white/10 rounded-xl px-4 py-3">
               <div>
                 <div className="font-semibold text-sm">{e.title as string}</div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-neutral-500">
                   {new Date(String(e.start_at)).toLocaleDateString()} · {e.status as string} · {Number(e.paid_orders)} paid
                   {existing && <span className="ml-2 text-indigo-300">· payout {existing.status as string}</span>}
                 </div>
@@ -89,7 +89,7 @@ export default async function PayoutsPage() {
                   <div className="font-bold text-emerald-400 text-sm">
                     KES {c.net.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                   </div>
-                  <div className="text-[10px] text-gray-500">
+                  <div className="text-[10px] text-neutral-500">
                     fee {c.fee.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                   </div>
                 </div>
@@ -99,7 +99,7 @@ export default async function PayoutsPage() {
           );
         })}
       </ul>
-      <p className="text-xs text-gray-500 mt-6">
+      <p className="text-xs text-neutral-500 mt-6">
         Net = (paid − refunded) − 4% platform fee. Automatic payouts run ~48 hours after the event ends if your account is saved.
       </p>
     </div>

@@ -47,7 +47,7 @@ export default function EventApprovalActions({ eventId }: { eventId: string }) {
           value={reason}
           onChange={(e) => setReason(e.target.value)}
           placeholder="Reason for rejection (optional)"
-          className="bg-gray-950 border border-gray-800 rounded-lg px-3 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
+          className="bg-black border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-indigo-500"
         />
         {error && <p className="text-red-400 text-xs">{error}</p>}
         <div className="flex gap-2">
@@ -60,7 +60,7 @@ export default function EventApprovalActions({ eventId }: { eventId: string }) {
           </button>
           <button
             onClick={() => { setShowReject(false); setError(''); }}
-            className="bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs px-3 py-1.5 rounded-lg transition"
+            className="bg-neutral-900 hover:bg-neutral-800 text-neutral-300 text-xs px-3 py-1.5 rounded-lg transition"
           >
             Cancel
           </button>
@@ -82,7 +82,7 @@ export default function EventApprovalActions({ eventId }: { eventId: string }) {
         </button>
         <button
           onClick={() => setShowReject(true)}
-          className="bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs px-3 py-1.5 rounded-lg transition"
+          className="bg-neutral-900 hover:bg-neutral-800 text-neutral-300 text-xs px-3 py-1.5 rounded-lg transition"
         >
           Reject
         </button>

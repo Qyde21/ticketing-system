@@ -19,7 +19,7 @@ export default async function MyTicketsViewPage({
     return (
       <main className="max-w-md mx-auto py-16 px-4 text-white text-center">
         <h1 className="text-xl font-bold text-red-400 mb-2">Link expired or invalid</h1>
-        <p className="text-gray-400 text-sm mb-6">
+        <p className="text-neutral-400 text-sm mb-6">
           Magic links work for one hour. Request a new one with the same email.
         </p>
         <Link
@@ -79,22 +79,22 @@ export default async function MyTicketsViewPage({
   return (
     <main className="max-w-2xl mx-auto py-10 px-4 text-white">
       <h1 className="text-2xl font-extrabold mb-1">Your tickets</h1>
-      <p className="text-gray-400 text-sm mb-6">
+      <p className="text-neutral-400 text-sm mb-6">
         Showing paid orders for <span className="text-indigo-300">{email}</span>
       </p>
 
       {orders.length === 0 ? (
-        <p className="text-gray-500">No paid tickets found for this email.</p>
+        <p className="text-neutral-500">No paid tickets found for this email.</p>
       ) : (
         <ul className="space-y-4">
           {orders.map((o) => {
             const list = ticketsByOrder.get(o.id as string) || [];
             return (
-              <li key={o.id as string} className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+              <li key={o.id as string} className="bg-neutral-950 border border-white/10 rounded-2xl p-5">
                 <div className="flex justify-between gap-3 flex-wrap mb-3">
                   <div>
                     <h2 className="font-bold text-lg">{o.event_title as string}</h2>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-neutral-500">
                       {o.venue_name ? `${o.venue_name} · ` : ''}
                       {o.start_at ? new Date(o.start_at as string).toLocaleString('en-KE') : ''}
                     </p>
@@ -103,13 +103,13 @@ export default async function MyTicketsViewPage({
                     <div className="text-emerald-400 font-semibold">
                       KES {Number(o.total_amount_kes).toLocaleString()}
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-neutral-500">
                       {Number(o.quantity)} ticket{Number(o.quantity) === 1 ? '' : 's'}
                     </div>
                   </div>
                 </div>
                 {list.length === 0 ? (
-                  <p className="text-gray-500 text-sm">
+                  <p className="text-neutral-500 text-sm">
                     No tickets to show here - they may still be issuing, or have already been shared or transferred.
                   </p>
                 ) : (
@@ -123,13 +123,13 @@ export default async function MyTicketsViewPage({
                       return (
                       <li
                         key={t.ticket_code as string}
-                        className="flex justify-between items-center bg-gray-950/80 border border-gray-800 rounded-xl px-3 py-2.5"
+                        className="flex justify-between items-center bg-black/80 border border-white/10 rounded-xl px-3 py-2.5"
                       >
                         <div>
                           <span className="font-mono text-sm text-indigo-300">
                             {t.ticket_code as string}
                           </span>
-                          <span className="text-xs text-gray-500 ml-2">
+                          <span className="text-xs text-neutral-500 ml-2">
                             {(t.ticket_type as string) || 'Ticket'}
                             {t.holder_name ? ` · ${t.holder_name}` : ''}
                           </span>
@@ -137,7 +137,7 @@ export default async function MyTicketsViewPage({
                             <span className="ml-2 text-xs text-red-400">Used</span>
                           )}
                           {displayStatus === 'expired' && (
-                            <span className="ml-2 text-xs text-gray-500">Expired</span>
+                            <span className="ml-2 text-xs text-neutral-500">Expired</span>
                           )}
                         </div>
                         <Link
@@ -157,7 +157,7 @@ export default async function MyTicketsViewPage({
         </ul>
       )}
 
-      <p className="text-xs text-gray-600 mt-8 text-center">
+      <p className="text-xs text-neutral-600 mt-8 text-center">
         This page was opened with a private link. Do not share it. Request a new link anytime at{' '}
         <Link href="/my-tickets" className="text-indigo-400">
           /my-tickets

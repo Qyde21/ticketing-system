@@ -376,9 +376,9 @@ export default function Scanner({
           {online ? '● Online' : '● Offline mode'}
         </span>
         {packReady ? (
-          <span className="text-gray-400">Pack: {packInfo}</span>
+          <span className="text-neutral-400">Pack: {packInfo}</span>
         ) : (
-          <span className="text-gray-500">No offline pack yet</span>
+          <span className="text-neutral-500">No offline pack yet</span>
         )}
         {pendingSync > 0 && (
           <span className="text-amber-300 font-semibold">{pendingSync} waiting to sync</span>
@@ -403,21 +403,21 @@ export default function Scanner({
       </div>
 
       <div className="flex gap-3 mb-4">
-        <div className="flex-1 bg-gray-900 border border-gray-800 rounded-xl px-3 py-3 text-center">
+        <div className="flex-1 bg-neutral-950 border border-white/10 rounded-xl px-3 py-3 text-center">
           <div className="text-2xl font-bold text-emerald-400">{stats.checkedIn}</div>
-          <div className="text-xs text-gray-400 mt-0.5">Checked in</div>
+          <div className="text-xs text-neutral-400 mt-0.5">Checked in</div>
         </div>
-        <div className="flex-1 bg-gray-900 border border-gray-800 rounded-xl px-3 py-3 text-center">
+        <div className="flex-1 bg-neutral-950 border border-white/10 rounded-xl px-3 py-3 text-center">
           <div className="text-2xl font-bold text-amber-400">{stats.remaining}</div>
-          <div className="text-xs text-gray-400 mt-0.5">Not yet in</div>
+          <div className="text-xs text-neutral-400 mt-0.5">Not yet in</div>
         </div>
-        <div className="flex-1 bg-gray-900 border border-gray-800 rounded-xl px-3 py-3 text-center">
+        <div className="flex-1 bg-neutral-950 border border-white/10 rounded-xl px-3 py-3 text-center">
           <div className="text-2xl font-bold text-white">{stats.total}</div>
-          <div className="text-xs text-gray-400 mt-0.5">Total · {percent}%</div>
+          <div className="text-xs text-neutral-400 mt-0.5">Total · {percent}%</div>
         </div>
       </div>
 
-      <p className="text-xs text-gray-500 mb-2 flex justify-between">
+      <p className="text-xs text-neutral-500 mb-2 flex justify-between">
         <span>Point camera at QR code</span>
         <button
           type="button"
@@ -449,7 +449,7 @@ export default function Scanner({
           onChange={(e) => setManualCode(e.target.value.toUpperCase())}
           placeholder="Or type ticket code"
           autoComplete="off"
-          className="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2.5 text-white text-sm font-mono tracking-wider focus:outline-none focus:border-indigo-500"
+          className="flex-1 bg-neutral-950 border border-white/15 rounded-lg px-3 py-2.5 text-white text-sm font-mono tracking-wider focus:outline-none focus:border-indigo-500"
         />
         <button
           type="submit"
@@ -476,20 +476,20 @@ export default function Scanner({
       )}
       {stats.recent && stats.recent.length > 0 && (
         <div className="mt-2">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-500 mb-2">
             Recent check-ins
           </h3>
           <ul className="space-y-1.5 max-h-48 overflow-y-auto">
             {stats.recent.map((r) => (
               <li
                 key={r.ticketCode + (r.checkedInAt || '')}
-                className="flex justify-between items-center bg-gray-900/80 border border-gray-800 rounded-lg px-3 py-2 text-sm"
+                className="flex justify-between items-center bg-neutral-950/80 border border-white/10 rounded-lg px-3 py-2 text-sm"
               >
                 <div>
                   <span className="font-mono text-emerald-300 text-xs">{r.ticketCode}</span>
-                  {r.holderName && <span className="text-gray-300 ml-2">{r.holderName}</span>}
+                  {r.holderName && <span className="text-neutral-300 ml-2">{r.holderName}</span>}
                 </div>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-neutral-500">
                   {r.checkedInAt ? new Date(r.checkedInAt).toLocaleTimeString() : ''}
                 </span>
               </li>

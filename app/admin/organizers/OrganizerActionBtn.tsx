@@ -65,13 +65,13 @@ export default function OrganizerActionBtn({
       <div className="relative">
         <button
           onClick={() => setOpen(!open)}
-          className="bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 font-semibold px-3 py-2 rounded-xl text-xs transition"
+          className="bg-neutral-900 hover:bg-neutral-800 text-neutral-300 border border-white/15 font-semibold px-3 py-2 rounded-xl text-xs transition"
         >
           Manage ?
         </button>
 
         {open && (
-          <div className="absolute right-0 mt-2 w-40 bg-gray-950 border border-gray-800 rounded-xl shadow-2xl py-1 z-20">
+          <div className="absolute right-0 mt-2 w-40 bg-black border border-white/10 rounded-xl shadow-2xl py-1 z-20">
             <button
               onClick={handleToggleStatus}
               disabled={loading}
