@@ -7,6 +7,7 @@ import { finalizePaidOrder } from '@/lib/tickets';
 import { validatePromoCode } from '@/lib/promoCodes';
 import { checkRateLimit, recordAttempt, getClientIp } from '@/lib/rateLimit';
 import { Reservation, reserveTier, releaseReservation } from '@/lib/reservations';
+import { expireStalePendingOrders } from '@/lib/expiry';
 
 type CartItem = { ticketTypeId: string; quantity: number };
 
@@ -64,6 +65,15 @@ export async function POST(req: NextRequest) {
     items = Array.from(merged.entries()).map(([ticketTypeId, quantity]) => ({ ticketTypeId, quantity }));
     if (items.length === 0) {
       return NextResponse.json({ error: 'No valid ticket quantities' }, { status: 400 });
+    }
+
+    // Free seats held by abandoned carts BEFORE trying to reserve, so a ticket
+    // type isn't shown "sold out" because of unpaid orders older than the
+    // 30-minute hold. Best effort - never blocks the purchase.
+    try {
+      await expireStalePendingOrders({ ticketTypeIds: items.map((it) => it.ticketTypeId), limit: 25 });
+    } catch (expireErr) {
+      console.error('Stale-hold release at checkout failed (non-fatal):', expireErr);
     }
 
     for (const it of items) {

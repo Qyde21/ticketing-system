@@ -137,3 +137,41 @@ export async function fetchTransfer(transferCodeOrReference: string) {
     reason?: string;
   };
 }
+
+export type VerifyResult =
+  | { kind: 'success'; amountKes: number; currency: string }
+  | { kind: 'not_success'; status: string } // abandoned, failed, never initialised (404) ...
+  | { kind: 'error'; message: string }; // could not get a trustworthy answer - do NOT treat as unpaid
+
+/**
+ * Asks Paystack whether a transaction was paid. The three outcomes are kept
+ * apart on purpose: "Paystack says it wasn't paid" and "I couldn't reach
+ * Paystack" must never be confused, or an outage would look like abandoned
+ * carts.
+ */
+export async function verifyTransaction(reference: string): Promise<VerifyResult> {
+  const secret = process.env.PAYSTACK_SECRET_KEY;
+  if (!secret) return { kind: 'error', message: 'PAYSTACK_SECRET_KEY is not configured' };
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 10_000);
+  try {
+    const res = await fetch(`${PAYSTACK_BASE_URL}/transaction/verify/${encodeURIComponent(reference)}`, {
+      headers: { Authorization: `Bearer ${secret}` },
+      signal: controller.signal,
+    });
+    if (res.status === 404) return { kind: 'not_success', status: 'not_found' };
+    if (!res.ok) return { kind: 'error', message: `Paystack answered HTTP ${res.status}` };
+
+    const json = await res.json();
+    const status = json?.data?.status;
+    if (json?.status === true && status === 'success') {
+      return { kind: 'success', amountKes: Number(json.data.amount) / 100, currency: String(json.data.currency || '') };
+    }
+    return { kind: 'not_success', status: String(status || 'unknown') };
+  } catch (err: any) {
+    return { kind: 'error', message: err?.name === 'AbortError' ? 'Paystack timed out' : String(err?.message || err) };
+  } finally {
+    clearTimeout(timer);
+  }
+}
