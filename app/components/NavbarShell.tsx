@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import NavSearchBar from './NavSearchBar';
 
 interface NavbarShellProps {
   userEmail?: string;
@@ -13,6 +14,7 @@ interface NavbarShellProps {
 
 export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }: NavbarShellProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const pathname = usePathname();
 
   const handleLogout = async () => {
@@ -53,6 +55,16 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
         </Link>
 
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+          <button
+            onClick={() => { setSearchOpen((v) => !v); setMobileMenuOpen(false); }}
+            className="text-neutral-500 hover:text-black transition cursor-pointer"
+            aria-label="Search events"
+            aria-expanded={searchOpen}
+          >
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z" />
+            </svg>
+          </button>
           {isLoggedIn ? (
             <>
               <Link href="/" className={getLinkClass('/')}>Events</Link>
@@ -105,10 +117,20 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
           )}
         </nav>
 
-        <div className="flex md:hidden items-center">
+        <div className="flex md:hidden items-center gap-1">
+          <button
+            onClick={() => { setSearchOpen((v) => !v); setMobileMenuOpen(false); }}
+            className="text-black hover:text-neutral-600 focus:outline-none p-2 rounded-lg hover:bg-black/5"
+            aria-label="Search events"
+            aria-expanded={searchOpen}
+          >
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z" />
+            </svg>
+          </button>
 
           <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            onClick={() => { setMobileMenuOpen(!mobileMenuOpen); setSearchOpen(false); }}
             className="text-black hover:text-neutral-600 focus:outline-none p-2 rounded-lg hover:bg-black/5"
             aria-label="Toggle navigation menu"
             aria-expanded={mobileMenuOpen}
@@ -125,6 +147,8 @@ export default function NavbarShell({ userEmail, userRole, isVerifiedOrganizer }
           </button>
         </div>
       </div>
+
+      {searchOpen && <NavSearchBar onClose={() => setSearchOpen(false)} />}
 
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-black/10 bg-white">
